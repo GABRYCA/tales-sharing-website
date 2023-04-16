@@ -36,3 +36,99 @@ This is meant for storage size concerns (I got only 50GB available on my server,
 - MAYBE but quite unlikely, an automatic AI filter to detect NSFW content, and hide it from the public.
 - Should avoid the usage of cookies (2023 is coming, we don't need cookies anymore).
 - Should have an option for each user to easily show or hide AI generated content, not everyone likes that.
+
+# Planning:
+### Problem: Me and my friends need a website where we can store and see each other stories and arts.
+#### Future Vision: Availability to the public.
+
+### Database (Requires revision):
+- A table to store users, with username, male-female-unspecified, email, password (encrypted), URL to profile picture, URL to cover picture, description, motto.
+- A Friend table, with each user id, and the id of the other user.
+- A Follower table, with the id of the user, and the id of the follower.
+- A Gallery group table, with the id of the owner, the id to an image table or text table, and an option to hide the gallery.
+- A Content table, with the id of the owner, type (image or text), URL to image (Optional if text), text (Optional if image), title, description, upload date, private or public.
+- A Liked or Favourite table, with the id of the user, and the id of the image or text.
+- A Repost table, with the id of the user, and the id of the image or text.
+- A Comment table, with the id of the user, the id of the image or text, the comment, the date.
+- A Notification table, with the id of the user, the id of the image or text, the type of notification, the date, viewed or not.
+- A Stats for Content table, with the id of the Content, and the id of the user who has seen it, if not available (not registered), store an optional IP.
+
+### Possible preliminary commands to create the database (Requires revision):
+
+```MariaDB
+CREATE TABLE User (
+    username varchar(255) PRIMARY KEY,
+    gender varchar(10) CHECK (gender IN ('male', 'female', 'unspecified')),
+    email varchar(255) UNIQUE NOT NULL,
+    password varchar(255) NOT NULL,
+    urlProfilePicture varchar(255),
+    urlCoverPicture varchar(255),
+    description varchar(255),
+    motto varchar(255)
+);
+
+CREATE TABLE Friend (
+  userId1 varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+  userId2 varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+  PRIMARY KEY (userId1, userId2)
+);
+
+CREATE TABLE Follower (
+  userId varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+  followerId varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+  PRIMARY KEY (userId, followerId)
+);
+
+CREATE TABLE GalleryGroup (
+  ownerId varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+  contentId int REFERENCES Content(contentId) ON DELETE CASCADE ON UPDATE CASCADE,
+  hideGallery bit NOT NULL,
+  PRIMARY KEY (ownerId, contentId)
+);
+
+CREATE TABLE Content (
+  contentId int IDENTITY PRIMARY KEY,
+  ownerId varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+  type varchar(10) CHECK (type IN ('image', 'text')),
+  urlImage varchar(255),
+  textContent varchar(255),
+  title varchar(255),
+  description varchar(255),
+  uploadDate date NOT NULL,
+  privateOrPublic bit NOT NULL
+);
+
+CREATE TABLE Liked (
+  userId varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+  contentId int REFERENCES Content(contentId) ON DELETE CASCADE ON UPDATE CASCADE,
+  PRIMARY KEY (userId, contentId)
+);
+
+CREATE TABLE Repost (
+  userId varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+  contentId int REFERENCES Content(contentId) ON DELETE CASCADE ON UPDATE CASCADE,
+  PRIMARY KEY (userId, contentId)
+);
+
+CREATE TABLE Comment (
+  userId varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+  contentId int REFERENCES Content(contentId) ON DELETE CASCADE ON UPDATE CASCADE,
+  commentText varchar(255) NOT NULL,
+  commentDate date NOT NULL
+);
+
+CREATE TABLE Notification (
+  userId varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+  contentId int REFERENCES Content(contentId),
+  notificationType varchar(20),
+  notificationDate date NOT NULL,
+  viewedOrNot bit NOT NULL
+);
+
+CREATE TABLE StatsForContent (
+  contentId int REFERENCES Content(contentId) ON DELETE CASCADE ON UPDATE CASCADE,
+  viewerId varchar(255),
+  viewerIP varchar(15),
+);
+```
+
