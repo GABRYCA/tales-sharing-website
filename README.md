@@ -79,23 +79,25 @@ CREATE TABLE Follower (
   PRIMARY KEY (userId, followerId)
 );
 
-CREATE TABLE GalleryGroup (
-  ownerId varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
-  contentId int REFERENCES Content(contentId) ON DELETE CASCADE ON UPDATE CASCADE,
-  hideGallery bit NOT NULL,
-  PRIMARY KEY (ownerId, contentId)
-);
-
 CREATE TABLE Content (
-  contentId int IDENTITY PRIMARY KEY,
-  ownerId varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
-  type varchar(10) CHECK (type IN ('image', 'text')),
+  contentId int AUTO_INCREMENT PRIMARY KEY,
+  ownerId varchar(255),
+  type varchar(10),
   urlImage varchar(255),
   textContent varchar(255),
   title varchar(255),
   description varchar(255),
   uploadDate date NOT NULL,
-  privateOrPublic bit NOT NULL
+  privateOrPublic TINYINT(1) NOT NULL,
+  FOREIGN KEY (ownerId) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT type_check CHECK (type IN ('image', 'text'))
+);
+
+CREATE TABLE GalleryGroup (
+  ownerId varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+  contentId int REFERENCES Content(contentId) ON DELETE CASCADE ON UPDATE CASCADE,
+  hideGallery bit NOT NULL,
+  PRIMARY KEY (ownerId, contentId)
 );
 
 CREATE TABLE Liked (
@@ -128,7 +130,10 @@ CREATE TABLE Notification (
 CREATE TABLE StatsForContent (
   contentId int REFERENCES Content(contentId) ON DELETE CASCADE ON UPDATE CASCADE,
   viewerId varchar(255),
-  viewerIP varchar(15),
+  viewerIP varchar(15)
 );
 ```
 
+### Diagram (Requires revision):
+
+![Diagram.png](img%2FDiagram.png)
