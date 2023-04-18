@@ -95,6 +95,7 @@ CREATE TABLE Content (
   description varchar(255),
   uploadDate date NOT NULL,
   privateOrPublic TINYINT(1) NOT NULL,
+  isAI TINYINT(1) NOT NULL DEFAULT 0,
   FOREIGN KEY (ownerId) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT type_check CHECK (type IN ('image', 'text'))
 );
@@ -148,6 +149,6 @@ CREATE TABLE Premium (
 );
 ```
 
-### Diagram (Requires revision):
+### Diagram (Requires revision and may not be updated):
 
 ![Diagram.png](assets%2Fimg%2FDiagram.webp)

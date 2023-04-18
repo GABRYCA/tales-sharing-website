@@ -35,20 +35,23 @@ class User
         
         if ($data = $conn->execute_query($sql, [$this->username])){
             if ($data->num_rows > 0) {
-                $row = $data->fetch_row();
-                $this->setUsername($row[0]);
-                $this->setGender($row[1]);
-                $this->setEmail($row[2]);
-                $this->setPassword($row[3]);
-                $this->setUrlProfilePicture($row[4]);
-                $this->setUrlCoverPicture($row[5]);
-                $this->setDescription($row[6]);
-                $this->setMotto($row[7]);
-                $this->setShowNSFW($row[8]);
-                $this->setOfAge($row[9]);
+                $row = $data->fetch_assoc();
+                $this->setUsername($row["username"]);
+                $this->setGender($row["gender"]);
+                $this->setEmail($row["email"]);
+                $this->setPassword($row["password"]);
+                $this->setUrlProfilePicture($row["urlProfilePicture"]);
+                $this->setUrlCoverPicture($row["urlCoverPicture"]);
+                $this->setDescription($row["description"]);
+                $this->setMotto($row["motto"]);
+                $this->setShowNSFW($row["showNSFW"]);
+                $this->setOfAge($row["ofAge"]);
+                $this->setIsActivated($row["isActivated"]);
+                $this->setIsMuted($row["isMuted"]);
+                $this->setActivationCode($row["activationCode"]);
             } else {
-                echo "0 results";
-                $this->setErrorStatus("0 results");
+                echo "User not found";
+                $this->setErrorStatus("User not found");
                 return false;
             }
         } else {
@@ -92,11 +95,11 @@ class User
 
         if ($data = $conn->execute_query($sql, [$this->username])){
             if ($data->num_rows > 0) {
-                $row = $data->fetch_row();
-                $this->setIsPremium($row[0]);
-                $this->setSubscriptionType($row[1]);
-                $this->setSubscriptionDate($row[2]);
-                $this->setExpiryDate($row[3]);
+                $row = $data->fetch_assoc();
+                $this->setIsPremium($row["isPremium"]);
+                $this->setSubscriptionType("subscriptionType");
+                $this->setSubscriptionDate("subscriptionDate");
+                $this->setExpiryDate("expiryDate");
                 
                 // Check if expiration date is expired.
                 if ($this->getExpiryDate() < date("Y-m-d")) {
@@ -104,7 +107,7 @@ class User
                     $this->setSubscriptionType(0);
                     $this->setSubscriptionDate(null);
                     $this->setExpiryDate(null);
-                    $this->updatePremiumData();
+                    $this->updatePasswordToDatabase();
                 }
                 
             } else {
@@ -232,7 +235,6 @@ class User
         
         if ($data = $conn->execute_query($sql, [$this->username, $activationCode])) {
             if ($data->num_rows > 0) {
-                $row = $data->fetch_row();
                 $this->setIsActivated(1);
                 $this->setActivationCode("");
                 if ($this->updateUserToDatabase()) {

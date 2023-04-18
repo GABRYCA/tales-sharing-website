@@ -111,6 +111,33 @@ class Likes
     }
 
     /**
+     * Function to get the Users that liked a content.
+     * @param $contentId
+     * @return array
+     */
+    public function getLikedUsers($contentId) : array {
+        $conn = connection();
+
+        $sql = "SELECT userId FROM Liked WHERE contentId = ?";
+
+        if ($data = $conn->execute_query($sql, [$contentId])) {
+            $users = array();
+            while ($row = $data->fetch_assoc()) {
+                // Load user from database and add it to array
+                $user = new User();
+                $user->setUsername($row['userId']);
+                if ($user->loadUser()){
+                    $users[] = $user;
+                }
+            }
+            return $users;
+        } else {
+            $this->setErrorStatus("Error while getting liked users");
+            return array();
+        }
+    }
+
+    /**
      * @return mixed
      */
     public function getErrorStatus()
