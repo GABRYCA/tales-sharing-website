@@ -32,16 +32,15 @@ class Friends
             $this->friends = array();
             $this->pendingOutFriends = array();
             foreach ($data as $row) {
-                if ($row["accepted"] == 1) {
-                    $user = new User();
-                    $user->setUsername($row["receiverId"]);
+                $user = new User();
+                if ($row[2] == 1) {
+                    $user->setUsername($row[1]);
                     // Load user from database
                     if ($user->loadUser()) {
                         $this->friends[] = $user;
                     }
                 } else {
-                    $user = new User();
-                    $user->setUsername($row["receiverId"]);
+                    $user->setUsername($row[1]);
                     // Load user from database
                     if ($user->loadUser()) {
                         $this->pendingOutFriends[] = $user;
@@ -71,7 +70,7 @@ class Friends
             $this->pendingInFriends = array();
             foreach ($data as $row) {
                 $user = new User();
-                $user->setUsername($row["senderId"]);
+                $user->setUsername($row[0]);
                 // Load user from database
                 if ($user->loadUser()) {
                     $this->pendingInFriends[] = $user;
@@ -119,5 +118,37 @@ class Friends
     public function setUsername(string $username) : void
     {
         $this->username = $username;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPendingInFriends()
+    {
+        return $this->pendingInFriends;
+    }
+
+    /**
+     * @param mixed $pendingInFriends
+     */
+    public function setPendingInFriends($pendingInFriends): void
+    {
+        $this->pendingInFriends = $pendingInFriends;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPendingOutFriends()
+    {
+        return $this->pendingOutFriends;
+    }
+
+    /**
+     * @param mixed $pendingOutFriends
+     */
+    public function setPendingOutFriends($pendingOutFriends): void
+    {
+        $this->pendingOutFriends = $pendingOutFriends;
     }
 }
