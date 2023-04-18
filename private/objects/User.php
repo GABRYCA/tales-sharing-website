@@ -27,7 +27,7 @@ class User
      * Load user by username from database.
      * @return bool
      */
-    public function loadUserFromDatabase() : bool
+    public function loadUser() : bool
     {
         $conn = connection();
 
@@ -126,7 +126,7 @@ class User
      */
     public function registerUser(): bool
     {
-        if ($this->loadUserFromDatabase()) {
+        if ($this->loadUser()) {
             $this->setErrorStatus("Username already taken!");
             return false;
         }
@@ -217,7 +217,7 @@ class User
      * @return bool
      */
     public function reloadData(): bool {
-        return $this->loadUserFromDatabase();
+        return $this->loadUser();
     }
 
     /**
