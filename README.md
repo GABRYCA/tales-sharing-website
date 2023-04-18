@@ -73,9 +73,10 @@ CREATE TABLE User (
 );
 
 CREATE TABLE Friend (
-  userId1 varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
-  friendId varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
-  PRIMARY KEY (userId1, friendId)
+  senderId varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+  receiverId varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+  accepted boolean NOT NULL DEFAULT 0,
+  PRIMARY KEY (senderId, receiverId)
 );
 
 CREATE TABLE Follower (

@@ -5,6 +5,8 @@ class Friends
 {
     private $username;
     private $friends;
+    private $pendingInFriends;
+    private $pendingOutFriends;
     private $errorStatus;
 
     // Constructor with username
@@ -23,28 +25,64 @@ class Friends
     {
         $conn = connection();
 
-        $sql = "SELECT friendId FROM Friend WHERE userId1 = ?";
+        $sql = "SELECT * FROM Friend WHERE senderId = ?";
 
-        if ($data = $conn->execute_query($sql, [$this->username])) {
-            // Array of User using followerId
+        if ($data = $conn->execute_query($sql, [$this->username])){
+            // If accepted is true, then the friend is accepted and add it to friends array, if not, add it to pendingOutFriends array.
             $this->friends = array();
+            $this->pendingOutFriends = array();
             foreach ($data as $row) {
-                // Check if userId2 is a friend of $username
-                $sql = "SELECT userId1 FROM Friend WHERE userId1 = ? AND friendId = ?";
-                if ($conn->execute_query($sql, [$row[1], $this->username])) {
+                if ($row["accepted"] == 1) {
                     $user = new User();
-                    $user->setUsername($row[1]);
+                    $user->setUsername($row["receiverId"]);
                     // Load user from database
                     if ($user->loadUser()) {
                         $this->friends[] = $user;
                     }
+                } else {
+                    $user = new User();
+                    $user->setUsername($row["receiverId"]);
+                    // Load user from database
+                    if ($user->loadUser()) {
+                        $this->pendingOutFriends[] = $user;
+                    }
                 }
             }
-            return true;
         } else {
             $this->setErrorStatus("Error while loading friends");
             return false;
         }
+
+        return true;
+    }
+
+    /**
+     * Function to get incoming friends requests.
+     * @return bool
+     */
+    public function loadPendingInFriends() : bool
+    {
+        $conn = connection();
+
+        $sql = "SELECT * FROM Friend WHERE receiverId = ? AND accepted = 0";
+
+        if ($data = $conn->execute_query($sql, [$this->username])){
+            // If accepted is true, then the friend is accepted and add it to friends array, if not, add it to pendingOutFriends array.
+            $this->pendingInFriends = array();
+            foreach ($data as $row) {
+                $user = new User();
+                $user->setUsername($row["senderId"]);
+                // Load user from database
+                if ($user->loadUser()) {
+                    $this->pendingInFriends[] = $user;
+                }
+            }
+        } else {
+            $this->setErrorStatus("Error while loading pending in friends");
+            return false;
+        }
+
+        return true;
     }
 
     /**
