@@ -15,6 +15,10 @@ class Content
     private $isAI;
     private $errorStatus;
 
+    /**
+     * Function to load a content from the database by ID (please use setContentId() before).
+     * @return bool
+     */
     public function loadContent(): bool {
         $conn = connection();
 
@@ -39,14 +43,20 @@ class Content
     }
 
     /**
-     * Function to add a content to the database.
+     * Function to add a content to the database (using parameters set into object).
      * @return bool
      */
     public function addContent(): bool
     {
         $conn = connection();
 
-        $sql = "INSERT INTO Content (ownerId, type, urlImage, textContent, title, description, uploadDate, privateOrPublic, isAI) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO Content (ownerId, type, urlImage, textContent, title, description, uploadDate, isPrivate, isAI) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        // Check if type is image or text, if not stop and send error.
+        if ($this->type != "image" && $this->type != "text") {
+            $this->setErrorStatus("Error while adding content, type is not image or text");
+            return false;
+        }
 
         if ($conn->execute_query($sql, [$this->ownerId, $this->type, $this->urlImage, $this->textContent, $this->title, $this->description, $this->uploadDate, $this->privateOrPublic, $this->isAI])) {
             return true;
@@ -82,7 +92,7 @@ class Content
     {
         $conn = connection();
 
-        $sql = "UPDATE Content SET ownerId = ?, type = ?, urlImage = ?, textContent = ?, title = ?, description = ?, uploadDate = ?, privateOrPublic = ?, isAI = ? WHERE contentId = ?";
+        $sql = "UPDATE Content SET ownerId = ?, type = ?, urlImage = ?, textContent = ?, title = ?, description = ?, uploadDate = ?, isPrivate = ?, isAI = ? WHERE contentId = ?";
 
         if ($conn->execute_query($sql, [$this->ownerId, $this->type, $this->urlImage, $this->textContent, $this->title, $this->description, $this->uploadDate, $this->privateOrPublic, $this->isAI, $this->contentId])) {
             return true;
@@ -111,7 +121,7 @@ class Content
     }
 
     /**
-     * Function to get all the content latest X amount of content from the database ordered by upload date (for example, get the latest 20 contents).
+     * Function to get all the latest X amount of content from the database ordered by upload date (for example, get the latest 20 contents).
      * @param int $amount
      * @return array
      */
@@ -137,7 +147,7 @@ class Content
     {
         $conn = connection();
 
-        $sql = "SELECT * FROM Content WHERE privateOrPublic = 0";
+        $sql = "SELECT * FROM Content WHERE isPrivate = 0";
 
         if ($data = $conn->execute_query($sql)) {
             return $this->contentDataArray($data);
@@ -155,7 +165,7 @@ class Content
     {
         $conn = connection();
 
-        $sql = "SELECT * FROM Content WHERE privateOrPublic = 1";
+        $sql = "SELECT * FROM Content WHERE isPrivate = 1";
 
         if ($data = $conn->execute_query($sql)) {
             return $this->contentDataArray($data);
@@ -197,6 +207,43 @@ class Content
             return $this->contentDataArray($data);
         } else {
             $this->setErrorStatus("Error while getting all not AI generated content");
+            return array();
+        }
+    }
+
+    /**
+     * Function to get all the content from the database that is public and not AI generated.
+     * @return array
+     */
+    public function getAllPublicNotAIGeneratedContent(): array
+    {
+        $conn = connection();
+
+        $sql = "SELECT * FROM Content WHERE isPrivate = 0 AND isAI = 0";
+
+        if ($data = $conn->execute_query($sql)) {
+            return $this->contentDataArray($data);
+        } else {
+            $this->setErrorStatus("Error while getting all public not AI generated content");
+            return array();
+        }
+    }
+
+    /**
+     * Function to get all the content of a specific user from the database.
+     * @param int $userId
+     * @return array
+     */
+    public function getAllContentOfUser(int $userId): array
+    {
+        $conn = connection();
+
+        $sql = "SELECT * FROM Content WHERE ownerId = ?";
+
+        if ($data = $conn->execute_query($sql, [$userId])) {
+            return $this->contentDataArray($data);
+        } else {
+            $this->setErrorStatus("Error while getting all content of user");
             return array();
         }
     }

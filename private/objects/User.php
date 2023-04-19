@@ -17,6 +17,7 @@ class User
     private $isActivated;
     private $isMuted;
     private $activationCode;
+    private $joinDate;
     private $errorStatus;
     private $isPremium;
     private $subscriptionType;
@@ -49,6 +50,7 @@ class User
                 $this->setIsActivated($row["isActivated"]);
                 $this->setIsMuted($row["isMuted"]);
                 $this->setActivationCode($row["activationCode"]);
+                $this->setJoinDate($row["joinDate"]);
             } else {
                 echo "User not found";
                 $this->setErrorStatus("User not found");
@@ -134,10 +136,10 @@ class User
             return false;
         }
 
-        $this->setPassword(password_hash($this->password, PASSWORD_DEFAULT));
-
         $this->setUrlProfilePicture("assets/img/profile.png");
         $this->setUrlCoverPicture("assets/img/cover.jpg");
+        $this->setDescription("I'm a new user!");
+        $this->setMotto("I'm a new user!");
         $this->setShowNSFW(0);
         $this->setOfAge(0);
         $this->setIsActivated(0);
@@ -159,8 +161,21 @@ class User
             return false;
         }
 
+        // Check if email is valid.
+        if (!filter_var($this->getEmail(), FILTER_VALIDATE_EMAIL)) {
+            $this->setErrorStatus("Invalid email!");
+            return false;
+        }
+
         // Encrypt password.
+        $debugPassword = $this->getPassword();
         $this->setPassword(password_hash($this->getPassword(), PASSWORD_DEFAULT));
+
+        // Check using password.
+        if (!password_verify($debugPassword, $this->getPassword())) {
+            $this->setErrorStatus("Password encryption failed!");
+            return false;
+        }
 
         // Generate random activation code.
         try {
@@ -175,8 +190,8 @@ class User
             $subject = "Account Activation";
             $message = "Hi " . $this->getUsername() . ",
             Thank you for registering! Please Click on the link below to activate your account.
-            https://anonymousgca.eu/tales-website/activation.php?code=" . $this->getActivationCode();
-            $headers = "From: noreply@anonymousgca.eu";
+            https://tales.anonymousgca.eu/activation.php?code=" . $this->getActivationCode();
+            $headers = "From: noreply@tales.anonymousgca.eu";
 
             if (@mail($to, $subject, $message, $headers)) {
                 $this->setErrorStatus("Email sent successfully!");
@@ -683,5 +698,21 @@ class User
     public function setExpiryDate($expiryDate): void
     {
         $this->expiryDate = $expiryDate;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getJoinDate()
+    {
+        return $this->joinDate;
+    }
+
+    /**
+     * @param mixed $joinDate
+     */
+    public function setJoinDate($joinDate): void
+    {
+        $this->joinDate = $joinDate;
     }
 }

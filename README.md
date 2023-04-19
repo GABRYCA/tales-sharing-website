@@ -69,7 +69,8 @@ CREATE TABLE User (
     ofAge TINYINT(1) NOT NULL DEFAULT 1,
     isActivated TINYINT(1) NOT NULL DEFAULT 0,
     isMuted TINYINT(1) NOT NULL DEFAULT 0,
-    activationCode varchar(50)
+    activationCode varchar(50),
+    joinDate date DEFAULT CURRENT_DATE
 );
 
 CREATE TABLE Friend (
@@ -94,7 +95,7 @@ CREATE TABLE Content (
   title varchar(255),
   description varchar(255),
   uploadDate date NOT NULL,
-  privateOrPublic TINYINT(1) NOT NULL,
+  isPrivate TINYINT(1) NOT NULL DEFAULT 0,
   isAI TINYINT(1) NOT NULL DEFAULT 0,
   FOREIGN KEY (ownerId) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT type_check CHECK (type IN ('image', 'text'))
