@@ -168,6 +168,12 @@ class User
             return false;
         }
 
+        // Check if email is already used.
+        if ($this->emailExists()) {
+            $this->setErrorStatus("Email already used!");
+            return false;
+        }
+
         // Encrypt password.
         $debugPassword = $this->getPassword();
         $this->setPassword(password_hash($this->getPassword(), PASSWORD_DEFAULT));
@@ -207,6 +213,32 @@ class User
         }
 
         return true;
+    }
+
+    /**
+     * Function to check if email is already used.
+     * @return bool
+     */
+    public function emailExists(): bool
+    {
+        $conn = connection();
+
+        $sql = "SELECT * FROM User WHERE email = ?";
+
+        if ($data = $conn->execute_query($sql, [$this->email])){
+            if ($data->num_rows > 0) {
+                $this->setErrorStatus("Email already taken!");
+                return true;
+            } else {
+                echo "0 results";
+                $this->setErrorStatus("0 results");
+                return false;
+            }
+        } else {
+            echo "Error: " . $conn->error;
+            $this->setErrorStatus("Error: " . $conn->error);
+            return false;
+        }
     }
 
     /**
