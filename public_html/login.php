@@ -50,16 +50,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // If password is correct, start a new session.
             session_start();
 
-            // Store data in session variables.
-            $_SESSION["loggedin"] = true;
-            $_SESSION["username"] = $username;
-
             // Create User object and save it in session.
             $user = new User();
             $user->setUsername($username);
             if (!$user->loadUser()){ // Load from DB the User with updated data.
                 exit("Error: could not load user (" . $user->getErrorStatus() . ")");
             }
+
+            // Check if user is activated.
+            if (!$user->getIsActivated()){
+                exit("Error: account not activated, please check your email or contact anonymousgca@tales.anonymousgca.eu");
+            }
+
+            // Store data in session variables.
+            $_SESSION["loggedin"] = true;
+            $_SESSION["username"] = $username;
             $_SESSION["user"] = $user;
 
             // Redirect user to home.php
