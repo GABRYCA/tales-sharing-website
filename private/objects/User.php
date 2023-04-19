@@ -4,25 +4,25 @@ include "../dbconnection.php";
 // This class, using dbconnection.php, is used to load or create a user like a JavaBean.
 class User
 {
-    private $username;
-    private $gender;
-    private $email;
-    private $password;
-    private $urlProfilePicture;
-    private $urlCoverPicture;
-    private $description;
-    private $motto;
-    private $showNSFW;
-    private $ofAge;
-    private $isActivated;
-    private $isMuted;
-    private $activationCode;
-    private $joinDate;
-    private $errorStatus;
-    private $isPremium;
-    private $subscriptionType;
-    private $subscriptionDate;
-    private $expiryDate;
+    private string $username;
+    private string $gender;
+    private string $email;
+    private string $password;
+    private string $urlProfilePicture;
+    private string $urlCoverPicture;
+    private string $description;
+    private string $motto;
+    private bool $showNSFW;
+    private bool $ofAge;
+    private bool $isActivated;
+    private bool $isMuted;
+    private string $activationCode;
+    private mixed $joinDate;
+    private string $errorStatus;
+    private bool $isPremium;
+    private string $subscriptionType;
+    private mixed $subscriptionDate;
+    private mixed $expiryDate;
 
     /**
      * Load user by username from database.
@@ -90,7 +90,8 @@ class User
      * Function to get object data about Premium of the user.
      * @return bool
      */
-    public function getPremiumData(): bool {
+    public function getPremiumData(): bool
+    {
         $conn = connection();
 
         $sql = "SELECT * FROM Premium WHERE userid = ?";
@@ -234,7 +235,8 @@ class User
      * Function to reload object retrieving data from database.
      * @return bool
      */
-    public function reloadData(): bool {
+    public function reloadData(): bool
+    {
         return $this->loadUser();
     }
 
@@ -243,7 +245,8 @@ class User
      * @param $activationCode
      * @return bool
      */
-    public function activateAccount($activationCode): bool {
+    public function activateAccount($activationCode): bool
+    {
         $conn = connection();
         
         $sql = "SELECT * FROM User WHERE username = ? AND activationCode = ?";
@@ -295,7 +298,8 @@ class User
      * @param $duration
      * @return bool
      */
-    public function activatePremium($subscriptionType, $duration): bool {
+    public function activatePremium($subscriptionType, $duration): bool
+    {
         $conn = connection();
 
         $sql = "INSERT INTO Premium (userid, subscriptionType, expiryDate) VALUES (?, ?, ?)";
@@ -354,13 +358,18 @@ class User
      */
     public function changePassword($oldPassword, $newPassword) : bool
     {
-        $conn = connection();
+        if ($oldPassword == $newPassword) {
+            $this->setErrorStatus("New password must be different from old password!");
+            return false;
+        }
 
-        // Convert oldPassword into an encrypted password to compare with $this->password.
-        $oldPassword = password_hash($oldPassword, PASSWORD_DEFAULT);
+        if ($this->getPassword() == null) {
+            $this->setErrorStatus("Password not set!");
+            return false;
+        }
 
         // Check if oldPassword is correct.
-        if ($oldPassword != $this->password) {
+        if (!password_verify($oldPassword, $this->getPassword())) {
             $this->setErrorStatus("Old password is incorrect!");
             return false;
         }
@@ -382,15 +391,14 @@ class User
         }
 
         // Convert newPassword into an encrypted password.
-        $newPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-        $this->setPassword($newPassword);
+        $this->setPassword(password_hash($newPassword, PASSWORD_DEFAULT));
 
         // Update password in database.
         return $this->updatePasswordToDatabase();
     }
 
     /**
-     * Function to update user password.
+     * Function to update user password, must update $this->setPassword() with a new password already hashed.
      * @return bool
      */
     public function updatePasswordToDatabase() : bool
@@ -410,76 +418,125 @@ class User
         return true;
     }
 
+    /**
+     * Function to start a password reset.
+     * @param $email
+     * @return bool
+     * @throws Exception
+     */
+    public function startPasswordReset($email) : bool
+    {
+        $conn = connection();
 
+        $sql = "SELECT * FROM User WHERE email = ?";
+        $result = $conn->execute_query($sql, [$email]);
+        if ($result->num_rows == 0) {
+            $this->setErrorStatus("Email not found!");
+            return false;
+        }
+
+        // Load user data.
+        $this->setUsername($result->fetch_assoc()["username"]);
+        $this->loadUser();
+
+        // Generate temporary password.
+        $tempPassword = bin2hex(random_bytes(8));
+        $this->setPassword(password_hash($tempPassword, PASSWORD_DEFAULT));
+        $this->updatePasswordToDatabase();
+
+        // Send email.
+        $to = $email;
+        $subject = "Password reset";
+        $message = "Hi " . $this->getUsername() . "!";
+        $message .= "<br>Your temporary password is: " . $tempPassword;
+        $message .= "<br>Please change your password as soon as possible.";
+        $message .= "<br>If you did not request a password reset, someone may have requested it for you and you should now use this one until you change it again.";
+        $message .= "<br>Sometimes, we may reset your password for security reasons.";
+        $message .= "<br>If you have any questions, please contact us at anonymousgca@tales.anonymousgca.eu";
+        $message .= "<br>We care about your security!";
+        $headers = "MIME-Version: 1.0\r\n";
+        $headers .= "Content-type:text/html;charset=UTF-8\r\n";
+        $headers .= "From: noreply@tales.anonymousgca.eu\r\n";
+        if (@mail($to, $subject, $message, $headers)){
+            echo "Email sent successfully";
+            $this->setErrorStatus("Email sent successfully");
+        } else {
+            echo "Email sending failed";
+            $this->setErrorStatus("Email sending failed");
+            return false;
+        }
+
+        return true;
+    }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->username;
     }
 
     /**
-     * @param mixed $username
+     * @param string $username
      */
-    public function setUsername($username): void
+    public function setUsername(string $username): void
     {
         $this->username = $username;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getGender()
+    public function getGender(): string
     {
         return $this->gender;
     }
 
     /**
-     * @param mixed $gender
+     * @param string $gender
      */
-    public function setGender($gender): void
+    public function setGender(string $gender): void
     {
         $this->gender = $gender;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
     }
 
     /**
-     * @param mixed $email
+     * @param string $email
      */
-    public function setEmail($email): void
+    public function setEmail(string $email): void
     {
         $this->email = $email;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getPassword()
+    public function getPassword(): string
     {
         return $this->password;
     }
 
     /**
-     * @param mixed $password
+     * @param string $password
      */
-    public function setPassword($password): void
+    public function setPassword(string $password): void
     {
         $this->password = $password;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getUrlProfilePicture()
+    public function getUrlProfilePicture(): string
     {
         return $this->urlProfilePicture;
     }
@@ -487,15 +544,15 @@ class User
     /**
      * @param mixed $urlProfilePicture
      */
-    public function setUrlProfilePicture($urlProfilePicture): void
+    public function setUrlProfilePicture(mixed $urlProfilePicture): void
     {
         $this->urlProfilePicture = $urlProfilePicture;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getUrlCoverPicture()
+    public function getUrlCoverPicture(): string
     {
         return $this->urlCoverPicture;
     }
@@ -503,167 +560,167 @@ class User
     /**
      * @param mixed $urlCoverPicture
      */
-    public function setUrlCoverPicture($urlCoverPicture): void
+    public function setUrlCoverPicture(mixed $urlCoverPicture): void
     {
         $this->urlCoverPicture = $urlCoverPicture;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
 
     /**
-     * @param mixed $description
+     * @param string $description
      */
-    public function setDescription($description): void
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getMotto()
+    public function getMotto(): string
     {
         return $this->motto;
     }
 
     /**
-     * @param mixed $motto
+     * @param string $motto
      */
-    public function setMotto($motto): void
+    public function setMotto(string $motto): void
     {
         $this->motto = $motto;
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
-    public function getShowNSFW()
+    public function getShowNSFW(): bool
     {
         return $this->showNSFW;
     }
 
     /**
-     * @param mixed $showNSFW
+     * @param bool $showNSFW
      */
-    public function setShowNSFW($showNSFW): void
+    public function setShowNSFW(bool $showNSFW): void
     {
         $this->showNSFW = $showNSFW;
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
-    public function getOfAge()
+    public function getOfAge(): bool
     {
         return $this->ofAge;
     }
 
     /**
-     * @param mixed $ofAge
+     * @param bool $ofAge
      */
-    public function setOfAge($ofAge): void
+    public function setOfAge(bool $ofAge): void
     {
         $this->ofAge = $ofAge;
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
-    public function getIsActivated()
+    public function getIsActivated(): bool
     {
         return $this->isActivated;
     }
 
     /**
-     * @param mixed $isActivated
+     * @param bool $isActivated
      */
-    public function setIsActivated($isActivated): void
+    public function setIsActivated(bool $isActivated): void
     {
         $this->isActivated = $isActivated;
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
-    public function getIsMuted()
+    public function getIsMuted(): bool
     {
         return $this->isMuted;
     }
 
     /**
-     * @param mixed $isMuted
+     * @param bool $isMuted
      */
-    public function setIsMuted($isMuted): void
+    public function setIsMuted(bool $isMuted): void
     {
         $this->isMuted = $isMuted;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getActivationCode()
+    public function getActivationCode(): string
     {
         return $this->activationCode;
     }
 
     /**
-     * @param mixed $activationCode
+     * @param string $activationCode
      */
-    public function setActivationCode($activationCode): void
+    public function setActivationCode(string $activationCode): void
     {
         $this->activationCode = $activationCode;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getErrorStatus()
+    public function getErrorStatus(): string
     {
         return $this->errorStatus;
     }
 
     /**
-     * @param mixed $errorStatus
+     * @param string $errorStatus
      */
-    public function setErrorStatus($errorStatus): void
+    public function setErrorStatus(string $errorStatus): void
     {
         $this->errorStatus = $errorStatus;
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
-    public function getIsPremium()
+    public function getIsPremium(): bool
     {
         return $this->isPremium;
     }
 
     /**
-     * @param mixed $isPremium
+     * @param bool $isPremium
      */
-    public function setIsPremium($isPremium): void
+    public function setIsPremium(bool $isPremium): void
     {
         $this->isPremium = $isPremium;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getSubscriptionType()
+    public function getSubscriptionType(): string
     {
         return $this->subscriptionType;
     }
 
     /**
-     * @param mixed $subscriptionType
+     * @param string $subscriptionType
      */
-    public function setSubscriptionType($subscriptionType): void
+    public function setSubscriptionType(string $subscriptionType): void
     {
         $this->subscriptionType = $subscriptionType;
     }
@@ -671,7 +728,7 @@ class User
     /**
      * @return mixed
      */
-    public function getSubscriptionDate()
+    public function getSubscriptionDate(): mixed
     {
         return $this->subscriptionDate;
     }
@@ -679,7 +736,7 @@ class User
     /**
      * @param mixed $subscriptionDate
      */
-    public function setSubscriptionDate($subscriptionDate): void
+    public function setSubscriptionDate(mixed $subscriptionDate): void
     {
         $this->subscriptionDate = $subscriptionDate;
     }
@@ -687,7 +744,7 @@ class User
     /**
      * @return mixed
      */
-    public function getExpiryDate()
+    public function getExpiryDate(): mixed
     {
         return $this->expiryDate;
     }
@@ -695,7 +752,7 @@ class User
     /**
      * @param mixed $expiryDate
      */
-    public function setExpiryDate($expiryDate): void
+    public function setExpiryDate(mixed $expiryDate): void
     {
         $this->expiryDate = $expiryDate;
     }
@@ -703,7 +760,7 @@ class User
     /**
      * @return mixed
      */
-    public function getJoinDate()
+    public function getJoinDate(): mixed
     {
         return $this->joinDate;
     }
@@ -711,7 +768,7 @@ class User
     /**
      * @param mixed $joinDate
      */
-    public function setJoinDate($joinDate): void
+    public function setJoinDate(mixed $joinDate): void
     {
         $this->joinDate = $joinDate;
     }

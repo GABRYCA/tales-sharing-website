@@ -13,7 +13,7 @@ session_start();
 include "../private/dbconnection.php";
 include "../private/objects/User.php";
 
-// If session is active, send user to home.php
+// If there's already an active session, send user to home.php.
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
     header("Location: ../home.php");
     exit();
@@ -21,42 +21,56 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
 
 // If there's POST data, then check if the user exists and if the password is correct.
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    // Check if all data in post is set.
+    if (!isset($_POST["username"]) || !isset($_POST["password"])) {
+        exit("Error: missing data");
+    }
+
+    // DBConnection.
     $conn = connection();
 
+    // Get username from POST and save it temporarily.
     $username = $_POST["username"];
 
+    // Prepare a select statement
     $sql = "SELECT password FROM User WHERE username = ?";
 
+    // Run query
     if ($data = $conn->execute_query($sql, [$username])) {
 
+        // Check if username exists in DB.
         if ($data->num_rows == 0) {
             exit("No account found with that username.");
         }
 
+        // Get from DB the hashed password
         $result = $data->fetch_assoc();
         if (password_verify($_POST['password'], $result['password'])) {
             // If password is correct, start a new session.
             session_start();
 
-            // Store data in session variables
+            // Store data in session variables.
             $_SESSION["loggedin"] = true;
             $_SESSION["username"] = $username;
 
-            // Create User object
+            // Create User object and save it in session.
             $user = new User();
             $user->setUsername($username);
-            $user->loadUser();
+            if (!$user->loadUser()){ // Load from DB the User with updated data.
+                exit("Error: could not load user (" . $user->getErrorStatus() . ")");
+            }
             $_SESSION["user"] = $user;
 
             // Redirect user to home.php
             header("Location: ../home.php");
         } else {
-            // Display an error message if password is not valid
+            // Display an error message if password is not valid.
              echo "Wrong password, please try again.";
         }
     } else {
-        // Display an error message if username doesn't exist
-        echo "No account found with that username.";
+        // Display an error message if username not found.
+        echo "Account not found, wrong username or password.";
     }
 } else {
 ?>
