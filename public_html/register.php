@@ -79,9 +79,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Tell account created with success, please verify email
         echo "Account created with success, please activate it using the activation link sent to your email";
 
-        exit();
         // If user is created, send to login page after 2 seconds
         header("Refresh: 2; url=login.php");
+        exit();
     } else {
         exit("Error: user could not be created (" . $user->getErrorStatus() . ")");
     }
