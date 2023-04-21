@@ -158,12 +158,12 @@
     <div class="row p-3 gap-0 justify-content-evenly gy-3">
         <div class="col-12 col-lg-4 col-xxl-3">
             <div class="img-wrapper position-relative">
-                <img src="data/profile/anonymousgca/gallery/images/Blaze.webp" alt="image" class="img-fluid rounded-4 img-thumbnail bg-placeholder img-home" loading="lazy" onclick="window.location.href = '/share.php?id=1'" onload="hideSpinner(this)" style="opacity: 0;" data-aos="fade-up">
+                <img src="data/profile/anonymousgca/gallery/images/Dragon%20-%20Fire%20-%20Dark.webp" alt="image" class="img-fluid rounded-4 img-thumbnail bg-placeholder img-home" loading="lazy" onclick="window.location.href = '/share.php?id=1'" onload="hideSpinner(this)" style="opacity: 0;" data-aos="fade-up">
             </div>
         </div>
         <div class="col-12 col-lg-4 col-xxl-3">
             <div class="img-wrapper position-relative">
-                <img src="data/profile/anonymousgca/gallery/images/Dylan.webp" alt="image" class="img-fluid rounded-4 img-thumbnail bg-placeholder img-home" loading="lazy" onclick="window.location.href = '/share.php?id=1'" onload="hideSpinner(this)" style="opacity: 0;" data-aos="fade-up">
+                <img src="data/profile/anonymousgca/gallery/images/Dragon%20-%20Electric%20-%20Dark.webp" alt="image" class="img-fluid rounded-4 img-thumbnail bg-placeholder img-home" loading="lazy" onclick="window.location.href = '/share.php?id=1'" onload="hideSpinner(this)" style="opacity: 0;" data-aos="fade-up">
             </div>
         </div>
     </div>

@@ -4,10 +4,13 @@
     <?php
     include 'common/common-head.php';
     ?>
-    <title>Login</title>
+    <title>Activation</title>
 </head>
-<body class="font-monospace text-light bg-dark">
+<body class="font-monospace text-light text-center pt-5 bg-dark">
 <?php
+include "../private/dbconnection.php";
+include "../private/objects/User.php";
+
 // Check if get method and code is set.
 if (isset($_GET["code"])){
     // Get code from get method.
@@ -21,7 +24,7 @@ if (isset($_GET["code"])){
 
         // Check if code exists in DB.
         if ($data->num_rows == 0) {
-            exit("No account found with that activation code.");
+            exit("No account found with that activation code (the activation code may be invalid or you're already activated).");
         }
 
         // Get from DB the username
@@ -36,7 +39,9 @@ if (isset($_GET["code"])){
         }
 
         // Activate user.
-        $user->activateAccount($code);
+        if (!$user->activateAccount($code)){
+            exit("Error: could not activate user (" . $user->getErrorStatus() . ")");
+        }
 
         // Update user in DB.
         if (!$user->updateUserToDatabase()){
@@ -46,8 +51,8 @@ if (isset($_GET["code"])){
         // Communicate to user that the account is activated.
         echo "Account activated with success!";
 
-        // Redirect user to login.php
-        header("Location: ../login.php");
+        // Redirect user to login.php after 2 seconds
+        header("refresh:2;url=login.php");
     } else {
         // Display an error message if username not found.
         echo "Account not found, maybe the user got deleted or the code is invalid.";
