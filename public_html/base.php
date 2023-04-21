@@ -171,6 +171,7 @@
 </div>
 
 <?php
+include 'common/common-footer.php';
 include 'common/common-body.php';
 ?>
 </body>

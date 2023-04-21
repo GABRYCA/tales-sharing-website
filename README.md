@@ -58,7 +58,7 @@ This is meant for storage size concerns (I got only 50GB available on my server,
 ```MariaDB
 CREATE TABLE User (
     username varchar(255) PRIMARY KEY,
-    gender varchar(10) CHECK (gender IN ('male', 'female', 'unspecified')),
+    gender varchar(11) CHECK (gender IN ('male', 'female', 'unspecified')) default 'unspecified',
     email varchar(255) UNIQUE NOT NULL,
     password varchar(255) NOT NULL,
     urlProfilePicture varchar(255),

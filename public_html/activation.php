@@ -17,14 +17,14 @@ if (isset($_GET["code"])){
     $code = $_GET["code"];
     // DBConnection.
     $conn = connection();
-    // Prepare a select statement
+    // Prepare a select statement.
     $sql = "SELECT username FROM User WHERE activationCode = ?";
     // Run query
     if ($data = $conn->execute_query($sql, [$code])) {
 
         // Check if code exists in DB.
         if ($data->num_rows == 0) {
-            exit("No account found with that activation code (the activation code may be invalid or you're already activated).");
+            exit("<p class='text-center'>No account found with that activation code (the activation code may be invalid or you're already activated).</p>");
         }
 
         // Get from DB the username
@@ -35,30 +35,30 @@ if (isset($_GET["code"])){
         $user = new User();
         $user->setUsername($username);
         if (!$user->loadUser()){ // Load from DB the User with updated data.
-            exit("Error: could not load user (" . $user->getErrorStatus() . ")");
+            exit("<p class='text-center'>Error: could not load user (" . $user->getErrorStatus() . ")</p>");
         }
 
         // Activate user.
         if (!$user->activateAccount($code)){
-            exit("Error: could not activate user (" . $user->getErrorStatus() . ")");
+            exit("<p class='text-center'>Error: could not activate user (" . $user->getErrorStatus() . ")</p>");
         }
 
         // Update user in DB.
         if (!$user->updateUserToDatabase()){
-            exit("Error: could not update user (" . $user->getErrorStatus() . ")");
+            exit("<p class='text-center'>Error: could not update user (" . $user->getErrorStatus() . ")</p>");
         }
 
         // Communicate to user that the account is activated.
-        echo "Account activated with success!";
+        echo "<p class='text-center'>Account activated with success!</p>";
 
-        // Redirect user to login.php after 2 seconds
+        // Redirect user to login.php after 2 seconds.
         header("refresh:2;url=login.php");
     } else {
         // Display an error message if username not found.
-        echo "Account not found, maybe the user got deleted or the code is invalid.";
+        echo "<p class='text-center'>Account not found, maybe the user got deleted or the code is invalid.</p>";
     }
 } else {
-    exit("Error: missing data");
+    exit("<p class='text-center'>Error: missing data</p>");
 }
 ?>
 

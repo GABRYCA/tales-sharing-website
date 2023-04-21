@@ -4,7 +4,7 @@
     <?php
     include 'common/common-head.php';
     ?>
-    <title>Register</title>
+    <title>Registration</title>
 </head>
 <body class="font-monospace text-light bg-dark">
 
@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Check if all data in post is set
     if (!isset($_POST["username"]) || !isset($_POST["password"]) || !isset($_POST["confirm_password"]) || !isset($_POST["email"]) || !isset($_POST["ofAge"])) {
-        echo "Error: missing data";
+        echo "<p class='text-center'>Error: missing data</p>";
         exit();
     }
 
@@ -42,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = $data->fetch_assoc();
         if ($result["username"] == $username) {
             // If username is taken, display error message
-            exit("Username is already taken");
+            exit("<p class='text-center'>Username is already taken</p>");
         }
     }
 
@@ -52,18 +52,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = $data->fetch_assoc();
         if ($result["email"] == $email) {
             // If email is taken, display error message
-            exit("There is already an account with this email");
+            exit("<p class='text-center'>There is already an account with this email</p>");
         }
     }
 
     // Check if password and confirm password match
     if ($password != $confirm_password) {
-        exit("Passwords do not match");
+        exit("<p class='text-center'>Passwords do not match</p>");
     }
 
     // Check if user is of age
     if ($ofAge != "on") {
-        exit("You must be of age to register");
+        exit("<p class='text-center'>You must be of age to register</p>");
     }
 
     // Create user object.
@@ -77,13 +77,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($user->registerUser()){
 
         // Tell account created with success, please verify email
-        echo "Account created with success, please activate it using the activation link sent to your email";
+        echo "<p class='text-center'>Account created with success, please activate it using the activation link sent to your email</p>";
 
         // If user is created, send to login page after 2 seconds
         header("Refresh: 2; url=login.php");
         exit();
     } else {
-        exit("Error: user could not be created (" . $user->getErrorStatus() . ")");
+        exit("<p class='text-center'>Error: user could not be created (" . $user->getErrorStatus() . ")</p>");
     }
 } else {
     ?>

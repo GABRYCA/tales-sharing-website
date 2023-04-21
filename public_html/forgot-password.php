@@ -4,9 +4,9 @@
     <?php
     include 'common/common-head.php';
     ?>
-    <title>Register</title>
+    <title>Forgot Password</title>
 </head>
-<body class="font-monospace text-light bg-dark">
+<body class="font-monospace text-light text-center pt-5 bg-dark">
 
 <?php
 session_start();
@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Check if all data in post is set
     if (!isset($_POST["email"])) {
-        echo "Error: missing data";
+        echo "<p class='text-center'>Error: missing data</p>";
         exit();
     }
 
@@ -46,12 +46,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     try {
         if ($user->startPasswordReset($email)) {
-            exit("Success: password reset with success, please check your email for instructions and close this page.");
+            exit("<br>Success: password reset with success, please check your email for instructions and close this page.</p>");
         } else {
-            exit("Error: could not start password reset (error: " . $user->getErrorStatus() . ")");
+            exit("<p class='text-center'>Error: could not start password reset (error: " . $user->getErrorStatus() . ")</p>");
         }
     } catch (Exception $e) {
-        exit("Error: could not start password reset (error: " . $e->getMessage() . ")");
+        exit("<p class='text-center'>Error: could not start password reset (error: " . $e->getMessage() . ")</p>");
     }
 
 } else {

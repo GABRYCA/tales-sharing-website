@@ -24,7 +24,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Check if all data in post is set.
     if (!isset($_POST["username"]) || !isset($_POST["password"])) {
-        exit("Error: missing data");
+        echo "<p class='text-center'>Error: missing data</p>";
+        header("refresh:2;url=../login.php");
+        exit();
     }
 
     // DBConnection.
@@ -41,7 +43,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Check if username exists in DB.
         if ($data->num_rows == 0) {
-            exit("No account found with that username.");
+            echo "<p class='text-center'>User not found, please check your username and try again.</p>";
+            header("refresh:2;url=../login.php");
+            exit();
         }
 
         // Get from DB the hashed password
@@ -54,12 +58,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $user = new User();
             $user->setUsername($username);
             if (!$user->loadUser()){ // Load from DB the User with updated data.
-                exit("Error: could not load user (" . $user->getErrorStatus() . ")");
+                echo "<p class='text-center'>Error: could not load user (" . $user->getErrorStatus() . ")</p>";
+                header("refresh:2;url=../login.php");
+                exit();
             }
 
             // Check if user is activated.
             if (!$user->getIsActivated()){
-                exit("Error: account not activated, please check your email or contact anonymousgca@tales.anonymousgca.eu");
+                echo "<p class='text-center'>Error: account not activated, please check your email or contact anonymousgca@tales.anonymousgca.eu</p>";
+
+                // Redirect user to login.php after 2 seconds.
+                header("refresh:2;url=../login.php");
+                exit();
             }
 
             // Store data in session variables.
@@ -67,15 +77,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION["username"] = $username;
             $_SESSION["user"] = $user;
 
-            // Redirect user to home.php
-            header("Location: ../home.php");
+            // Tell the user that the login was successful.
+            echo "<p class='text-center'>Login successful, redirecting...</p>";
+
+            // Redirect user to home.php after 2 seconds.
+            header("refresh:2;url=../home.php");
         } else {
             // Display an error message if password is not valid.
-             echo "Wrong password, please try again.";
+             echo "<p class='text-center'>Wrong password, please try again.</p>";
+             header("refresh:2;url=../login.php");
         }
     } else {
         // Display an error message if username not found.
-        echo "Account not found, wrong username or password.";
+        echo "<p class='text-center'>Account not found, wrong username or password.</p>";
+        header("refresh:2;url=../login.php");
     }
 } else {
 ?>

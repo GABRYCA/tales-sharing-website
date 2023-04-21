@@ -452,11 +452,11 @@ class User
 
     /**
      * Function to start a password reset.
-     * @param $email
+     * @param string $email
      * @return bool
      * @throws Exception
      */
-    public function startPasswordReset($email) : bool
+    public function startPasswordReset(string $email) : bool
     {
         $conn = connection();
 
@@ -490,8 +490,8 @@ class User
         $headers .= "Content-type:text/html;charset=UTF-8\r\n";
         $headers .= "From: noreply@tales.anonymousgca.eu\r\n";
         if (@mail($to, $subject, $message, $headers)){
-            echo "Email sent successfully";
-            $this->setErrorStatus("Email sent successfully");
+            echo "<br>Email sent successfully";
+            $this->setErrorStatus("<br>Email sent successfully");
         } else {
             echo "Email sending failed";
             $this->setErrorStatus("Email sending failed");
