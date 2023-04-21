@@ -75,16 +75,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Use function to create user in database
     if ($user->registerUser()){
-        // If user is created, send to login page
 
-        // For Debug reasons, output all post DATA and user object
-        echo "POST DATA: <br>";
-        var_dump($_POST);
-        echo "<br><br>USER OBJECT: <br>";
-        var_dump($user);
-        echo "<br><br>";
+        // Tell account created with success, please verify email
+        echo "Account created with success, please activate it using the activation link sent to your email";
 
-        //header("Location: login.php");
+        exit();
+        // If user is created, send to login page after 2 seconds
+        header("Refresh: 2; url=login.php");
     } else {
         exit("Error: user could not be created (" . $user->getErrorStatus() . ")");
     }
