@@ -2,8 +2,8 @@
 Just an idea, maybe I'll get to work on it this summer, just to share stuff with some friends.
 
 # Good points
-Name: TalesAndArts
-Domain: talesandarts.anonymousgca.eu OR anonymousgca.eu/talesandarts
+Name: TalesAndArts - Short -> Tales
+Domain: tales.anonymousgca.eu
 Description: A website to share your stories, drawings, etc. with your friends.
 Features:
 - Share your stories, drawings, etc. with your friends.
