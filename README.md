@@ -3,7 +3,7 @@ Just an idea, maybe I'll get to work on it this summer, just to share stuff with
 
 # Good points
 Name: TalesAndArts - Short -> Tales
-Domain: tales.anonymousgca.eu
+Domain: <a href="https://tales.anonymousgca.eu">tales.anonymousgca.eu</a>
 Description: A website to share your stories, drawings, etc. with your friends.
 Features:
 - Share your stories, drawings, etc. with your friends.
