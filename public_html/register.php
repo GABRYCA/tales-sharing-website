@@ -2,7 +2,7 @@
 <html lang="en" data-bs-theme="dark">
 <head>
     <?php
-    include 'common/common-head.php';
+    include_once (dirname(__FILE__) . '/common/common-head.php');
     ?>
     <title>Registration</title>
 </head>
@@ -10,8 +10,8 @@
 
 <?php
 session_start();
-include "../private/dbconnection.php";
-include "../private/objects/User.php";
+include_once (dirname(__FILE__) . "/../private/connection.php");
+include_once (dirname(__FILE__) . "/../private/objects/User.php");
 
 // If session is active, send user to home.php
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
@@ -36,26 +36,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST["email"];
     $ofAge = $_POST["ofAge"];
 
-    // Check if username is already taken
-    $sql = "SELECT username FROM User WHERE username = ?";
-    if ($data = $conn->execute_query($sql, [$username])) {
-        $result = $data->fetch_assoc();
-        if ($result["username"] == $username) {
-            // If username is taken, display error message
-            exit("<p class='text-center'>Username is already taken</p>");
-        }
-    }
-
-    // Check if email is already taken
-    $sql = "SELECT email FROM User WHERE email = ?";
-    if ($data = $conn->execute_query($sql, [$email])) {
-        $result = $data->fetch_assoc();
-        if ($result["email"] == $email) {
-            // If email is taken, display error message
-            exit("<p class='text-center'>There is already an account with this email</p>");
-        }
-    }
-
     // Check if password and confirm password match
     if ($password != $confirm_password) {
         exit("<p class='text-center'>Passwords do not match</p>");
@@ -66,6 +46,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit("<p class='text-center'>You must be of age to register</p>");
     }
 
+    $ofAge = true;
+
     // Create user object.
     $user = new User();
     $user->setUsername($username);
@@ -73,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user->setEmail($email);
     $user->setOfAge($ofAge);
 
-    // Use function to create user in database
+    // Use function to create user in database (Automatically checks email and username if they're already used).
     if ($user->registerUser()){
 
         // Tell account created with success, please verify email
@@ -167,12 +149,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <?php
-    include "common/common-footer.php";
+    include_once (dirname(__FILE__) . "/common/common-footer.php");
     ?>
 
     <?php
 }
-include "common/common-body.php";
+include_once (dirname(__FILE__) . "/common/common-body.php");
 ?>
 </body>
 </html>

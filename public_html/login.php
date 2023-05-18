@@ -2,7 +2,7 @@
 <html lang="en" data-bs-theme="dark">
 <head>
     <?php
-    include 'common/common-head.php';
+    include_once (dirname(__FILE__) . '/common/common-head.php');
     ?>
     <title>Login</title>
 </head>
@@ -10,8 +10,8 @@
 
 <?php
 session_start();
-include "../private/dbconnection.php";
-include "../private/objects/User.php";
+include (dirname(__FILE__) . "/../private/connection.php");
+include (dirname(__FILE__) . "/../private/objects/User.php");
 
 // If there's already an active session, send user to home.php.
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
@@ -146,12 +146,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <?php
-    include "common/common-footer.php";
+    include_once (dirname(__FILE__) . "/common/common-footer.php");
     ?>
 
 <?php
 }
-include "common/common-body.php";
+include_once (dirname(__FILE__) . "/common/common-body.php");
 ?>
 </body>
 </html>

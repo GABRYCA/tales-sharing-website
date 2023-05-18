@@ -2,14 +2,14 @@
 <html lang="en" data-bs-theme="dark">
 <head>
     <?php
-    include 'common/common-head.php';
+    include_once (dirname(__FILE__) . '/common/common-head.php');
     ?>
     <title>Activation</title>
 </head>
 <body class="font-monospace text-light text-center pt-5 bg-dark">
 <?php
-include "../private/dbconnection.php";
-include "../private/objects/User.php";
+include (dirname(__FILE__) . "/../private/connection.php");
+include (dirname(__FILE__) . "/../private/objects/User.php");
 
 // Check if get method and code is set.
 if (isset($_GET["code"])){
@@ -63,8 +63,8 @@ if (isset($_GET["code"])){
 ?>
 
 <?php
-include "common/common-footer.php";
-include "common/common-body.php";
+include_once (dirname(__FILE__) . "/common/common-footer.php");
+include_once (dirname(__FILE__) . "/common/common-body.php");
 ?>
 </body>
 </html>

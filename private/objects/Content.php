@@ -1,5 +1,5 @@
 <?php
-include "../dbconnection.php";
+include_once (dirname(__FILE__) . "/../connection.php");
 
 class Content
 {
@@ -387,7 +387,7 @@ class Content
     /**
      * @param mixed $privateOrPublic
      */
-    public function setPrivateOrPublic($privateOrPublic): void
+    public function setPrivate($privateOrPublic): void
     {
         $this->privateOrPublic = $privateOrPublic;
     }
@@ -441,7 +441,7 @@ class Content
             $content->setTitle($row["title"]);
             $content->setDescription($row["description"]);
             $content->setUploadDate($row["uploadDate"]);
-            $content->setPrivateOrPublic($row["privateOrPublic"]);
+            $content->setPrivate($row["privateOrPublic"]);
             $content->setIsAI($row["isAI"]);
             $contentArray[] = $content;
         }

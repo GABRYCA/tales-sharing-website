@@ -1,28 +1,28 @@
 <?php
-include "../dbconnection.php";
+include_once (dirname(__FILE__) . "/../connection.php");
 
-// This class, using dbconnection.php, is used to load or create a user like a JavaBean.
+// This class, using connection.php, is used to load or create a user like a JavaBean.
 class User
 {
-    private string $username;
-    private string $gender;
-    private string $email;
-    private string $password;
-    private string $urlProfilePicture;
-    private string $urlCoverPicture;
-    private string $description;
-    private string $motto;
-    private bool $showNSFW;
-    private bool $ofAge;
-    private bool $isActivated;
-    private bool $isMuted;
-    private string $activationCode;
-    private mixed $joinDate;
-    private string $errorStatus;
-    private bool $isPremium;
-    private string $subscriptionType;
-    private mixed $subscriptionDate;
-    private mixed $expiryDate;
+    private $username = null;
+    private $gender = null;
+    private $email = null;
+    private $password = null;
+    private $urlProfilePicture = null;
+    private $urlCoverPicture = null;
+    private $description = null;
+    private $motto = null;
+    private $showNSFW = false;
+    private $ofAge = false;
+    private $isActivated = false;
+    private $isMuted = false;
+    private $activationCode = null;
+    private $joinDate = null;
+    private $errorStatus = "No error";
+    private $isPremium = false;
+    private $subscriptionType = null;
+    private $subscriptionDate = null;
+    private $expiryDate = null;
 
     /**
      * Load user by username from database.
@@ -52,12 +52,10 @@ class User
                 $this->setActivationCode($row["activationCode"]);
                 $this->setJoinDate($row["joinDate"]);
             } else {
-                echo "User not found";
                 $this->setErrorStatus("User not found");
                 return false;
             }
         } else {
-            echo "Error: " . $conn->error;
             $this->setErrorStatus("Error: " . $conn->error);
             return false;
         }
@@ -66,6 +64,8 @@ class User
 
     /**
      * Function to add a user to the database.
+     * It uses default values for some fields.
+     * Only sets username, email, password and some other data.
      * @return bool
      */
     public function addUserToDatabase(): bool
@@ -74,11 +74,9 @@ class User
 
         $sql = "INSERT INTO User (username, gender, email, password, urlProfilePicture, urlCoverPicture, description, motto, showNSFW, ofAge, isActivated, isMuted, activationCode) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        if ($conn->execute_query($sql, [$this->username, $this->gender, $this->email, $this->password, $this->urlProfilePicture, $this->urlCoverPicture, $this->description, $this->motto, $this->showNSFW, $this->ofAge, $this->isActivated, $this->isMuted, $this->activationCode])){
-            echo "New User created successfully";
+        if ($conn->execute_query($sql, [$this->username, $this->gender, $this->email, $this->password, $this->urlProfilePicture, $this->urlCoverPicture, $this->description, $this->motto, $this->showNSFW, $this->ofAge, $this->isActivated, $this->isMuted, $this->activationCode])) {
             $this->setErrorStatus("New User created successfully");
         } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
             $this->setErrorStatus("Error: " . $sql . "<br>" . $conn->error);
             return false;
         }
@@ -114,12 +112,10 @@ class User
                 }
                 
             } else {
-                echo "0 results";
                 $this->setErrorStatus("0 results");
                 return false;
             }
         } else {
-            echo "Error: " . $conn->error;
             $this->setErrorStatus("Error: " . $conn->error);
             return false;
         }
@@ -132,19 +128,19 @@ class User
      */
     public function registerUser(): bool
     {
-        if ($this->loadUser()) {
+        if ($this->checkIfUserExists()) {
             $this->setErrorStatus("Username already taken!");
             return false;
         }
 
-        $this->setUrlProfilePicture("assets/img/profile.png");
-        $this->setUrlCoverPicture("assets/img/cover.jpg");
-        $this->setDescription("I'm a new user!");
-        $this->setMotto("I'm a new user!");
-        $this->setShowNSFW(0);
-        $this->setOfAge(0);
-        $this->setIsActivated(0);
-        $this->setIsMuted(0);
+        $this->gender = "unspecified";
+        $this->urlProfilePicture = "assets/img/profile.png";
+        $this->urlCoverPicture = "assets/img/cover.jpg";
+        $this->description = "I'm a new user!";
+        $this->motto = "I'm a new user!";
+        $this->showNSFW = 0;
+        $this->isActivated = 0;
+        $this->isMuted = 0;
 
         // Check if password is strong enough.
         if (strlen($this->getPassword()) < 8) {
@@ -193,6 +189,7 @@ class User
         }
 
         if ($this->addUserToDatabase()) {
+
             $to = $this->getEmail();
             $subject = "Account Activation";
             $message = "Hi " . $this->getUsername() . ",
@@ -230,12 +227,10 @@ class User
                 $this->setErrorStatus("Email already taken!");
                 return true;
             } else {
-                echo "0 results";
                 $this->setErrorStatus("0 results");
                 return false;
             }
         } else {
-            echo "Error: " . $conn->error;
             $this->setErrorStatus("Error: " . $conn->error);
             return false;
         }
@@ -252,10 +247,8 @@ class User
         $sql = "DELETE FROM User WHERE username = ?";
 
         if ($conn->execute_query($sql, [$this->username])){
-            echo "User deleted successfully";
             $this->setErrorStatus("User deleted successfully");
         } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
             $this->setErrorStatus("Error: " . $sql . "<br>" . $conn->error);
             return false;
         }
@@ -313,11 +306,9 @@ class User
         // Query with the update of all the user data (except password and username).
         $sql = "UPDATE User SET gender = ?, email = ?, urlProfilePicture = ?, urlCoverPicture = ?, showNSFW = ?, ofAge = ?, isActivated = ?, isMuted = ?, activationCode = ? WHERE username = ?";
 
-        if ($conn->execute_query($sql, [$this->getGender(), $this->getEmail(), $this->getUrlProfilePicture(), $this->getUrlCoverPicture(), $this->getShowNSFW(), $this->getOfAge(), $this->getIsActivated(), $this->getIsMuted(), $this->getActivationCode(), $this->getUsername()])) {
-            echo "User updated successfully";
+        if ($conn->execute_query($sql, [$this->getGender(), $this->getEmail(), $this->getUrlProfilePicture(), $this->getUrlCoverPicture(), $this->showNSFW, $this->ofAge, $this->isActivated, $this->isMuted, $this->getActivationCode(), $this->getUsername()])) {
             $this->setErrorStatus("User updated successfully");
         } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
             $this->setErrorStatus("Error: " . $sql . "<br>" . $conn->error);
             return false;
         }
@@ -351,10 +342,8 @@ class User
         // Get current MariaDB date and add duration to it.
         $expiryDate = $conn->execute_query("SELECT DATE_ADD(CURRENT_DATE(), INTERVAL ? MONTH)", [$duration])->fetch_row()[0];
         if ($conn->execute_query($sql, [$this->username, $subscriptionType, $expiryDate])) {
-            echo "Premium activated successfully";
             $this->setErrorStatus("Premium activated successfully");
         } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
             $this->setErrorStatus("Error: " . $sql . "<br>" . $conn->error);
             return false;
         }
@@ -372,10 +361,8 @@ class User
 
         $sql = "UPDATE Premium SET subscriptionType = ?, subscriptionDate = ?, expiryDate = ? WHERE userid = ?";
         if ($conn->execute_query($sql, [$this->getSubscriptionType(), $this->getSubscriptionDate(), $this->getExpiryDate(), $this->getUsername()])) {
-            echo "Premium updated successfully";
             $this->setErrorStatus("Premium updated successfully");
         } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
             $this->setErrorStatus("Error: " . $sql . "<br>" . $conn->error);
             return false;
         }
@@ -439,10 +426,8 @@ class User
 
         $sql = "UPDATE User SET password = ? WHERE username = ?";
         if ($conn->execute_query($sql, [$this->getPassword(), $this->getUsername()])) {
-            echo "Password updated successfully";
             $this->setErrorStatus("Password updated successfully");
         } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
             $this->setErrorStatus("Error: " . $sql . "<br>" . $conn->error);
             return false;
         }
@@ -490,11 +475,28 @@ class User
         $headers .= "Content-type:text/html;charset=UTF-8\r\n";
         $headers .= "From: noreply@tales.anonymousgca.eu\r\n";
         if (@mail($to, $subject, $message, $headers)){
-            echo "<br>Email sent successfully";
             $this->setErrorStatus("<br>Email sent successfully");
         } else {
-            echo "Email sending failed";
             $this->setErrorStatus("Email sending failed");
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if user exists (Note that you should set the username first)
+     * Return true if user exists, false if not.
+     * @return bool
+     */
+    public function checkIfUserExists() : bool
+    {
+        $conn = connection();
+
+        $sql = "SELECT * FROM User WHERE username = ?";
+        $result = $conn->execute_query($sql, [$this->username]);
+        if ($result->num_rows == 0) {
+            $this->setErrorStatus("User not found!");
             return false;
         }
 
@@ -638,9 +640,9 @@ class User
     }
 
     /**
-     * @param bool $showNSFW
+     * @param $showNSFW
      */
-    public function setShowNSFW(bool $showNSFW): void
+    public function setShowNSFW($showNSFW): void
     {
         $this->showNSFW = $showNSFW;
     }
@@ -654,9 +656,9 @@ class User
     }
 
     /**
-     * @param bool $ofAge
+     * @param $ofAge
      */
-    public function setOfAge(bool $ofAge): void
+    public function setOfAge($ofAge): void
     {
         $this->ofAge = $ofAge;
     }
@@ -670,9 +672,9 @@ class User
     }
 
     /**
-     * @param bool $isActivated
+     * @param $isActivated
      */
-    public function setIsActivated(bool $isActivated): void
+    public function setIsActivated($isActivated): void
     {
         $this->isActivated = $isActivated;
     }
@@ -686,9 +688,9 @@ class User
     }
 
     /**
-     * @param bool $isMuted
+     * @param $isMuted
      */
-    public function setIsMuted(bool $isMuted): void
+    public function setIsMuted($isMuted): void
     {
         $this->isMuted = $isMuted;
     }
@@ -728,15 +730,15 @@ class User
     /**
      * @return bool
      */
-    public function getIsPremium(): bool
+    public function getIsPremium()
     {
         return $this->isPremium;
     }
 
     /**
-     * @param bool $isPremium
+     * @param $isPremium
      */
-    public function setIsPremium(bool $isPremium): void
+    public function setIsPremium($isPremium): void
     {
         $this->isPremium = $isPremium;
     }
