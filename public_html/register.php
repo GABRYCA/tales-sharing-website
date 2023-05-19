@@ -12,6 +12,7 @@
 session_start();
 include_once (dirname(__FILE__) . "/../private/connection.php");
 include_once (dirname(__FILE__) . "/../private/objects/User.php");
+include_once (dirname(__FILE__) . "/common/utility.php");
 
 // If session is active, send user to home.php
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
@@ -30,11 +31,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Get data from POST
-    $username = $_POST["username"];
-    $password = $_POST["password"];
-    $confirm_password = $_POST["confirm_password"];
-    $email = $_POST["email"];
-    $ofAge = $_POST["ofAge"];
+    $username = validate_input($_POST["username"]);
+    $password = validate_input($_POST["password"]);
+    $confirm_password = validate_input($_POST["confirm_password"]);
+    $email = validate_input($_POST["email"]);
+    $ofAge = validate_input($_POST["ofAge"]);
 
     // Check if password and confirm password match
     if ($password != $confirm_password) {

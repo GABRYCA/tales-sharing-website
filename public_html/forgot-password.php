@@ -12,6 +12,7 @@
 session_start();
 include_once (dirname(__FILE__) . "/../private/connection.php");
 include_once (dirname(__FILE__) . "/../private/objects/User.php");
+include_once (dirname(__FILE__) . "/common/utility.php");
 
 // If session is active, send user to home.php
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
@@ -30,10 +31,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Get data from POST
-    $email = $_POST["email"];
+    $email = validate_input($_POST["email"]);
 
     // Check if an account with that email actually exists, if not stop (not existing accounts can't be reset)
-    $sql = "SELECT email FROM User WHERE email = ?";
+    $sql = "SELECT DISTINCT email FROM User WHERE email = ?";
     if ($data = $conn->execute_query($sql, [$email])) {
         $result = $data->fetch_assoc();
         if ($result["email"] != $email) {

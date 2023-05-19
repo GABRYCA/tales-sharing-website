@@ -2,6 +2,7 @@
 session_start();
 include_once (dirname(__FILE__) . "/../../private/connection.php");
 include_once (dirname(__FILE__) . "/../../private/objects/User.php");
+include_once (dirname(__FILE__) . "/../common/utility.php");
 
 // If there's already an active session, send user to home.php.
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] === false) {
@@ -94,19 +95,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo json_encode(array("success" => false, "message" => implode("\n", $errors)));
     }
 
-}
-
-// Define a function to validate and sanitize the input data
-function validate_input($data): string
-{
-    // Trim any whitespace from the data
-    $data = trim($data);
-    // Strip any slashes from the data
-    $data = stripslashes($data);
-    // Convert any special characters to HTML entities
-    $data = htmlspecialchars($data);
-    // Return the sanitized data
-    return $data;
 }
 
 ?>

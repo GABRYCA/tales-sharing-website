@@ -12,6 +12,7 @@
 session_start();
 include_once (dirname(__FILE__) . "/../private/connection.php");
 include_once (dirname(__FILE__) . "/../private/objects/User.php");
+include_once (dirname(__FILE__) . "/common/utility.php");
 
 // If there's already an active session, send user to home.php.
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
@@ -33,7 +34,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conn = connection();
 
     // Get username from POST and save it temporarily.
-    $username = $_POST["username"];
+    $username = validate_input($_POST["username"]);
+    $password = validate_input($_POST["password"]);
 
     // Prepare a select statement
     $sql = "SELECT password FROM User WHERE username = ?";
@@ -50,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Get from DB the hashed password
         $result = $data->fetch_assoc();
-        if (password_verify($_POST['password'], $result['password'])) {
+        if (password_verify($password, $result['password'])) {
             // If password is correct, start a new session.
             session_start();
 
