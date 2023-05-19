@@ -10,8 +10,8 @@
 
 <?php
 session_start();
-include (dirname(__FILE__) . "/../private/connection.php");
-include (dirname(__FILE__) . "/../private/objects/User.php");
+include_once (dirname(__FILE__) . "/../private/connection.php");
+include_once (dirname(__FILE__) . "/../private/objects/User.php");
 
 // If there's already an active session, send user to home.php.
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {

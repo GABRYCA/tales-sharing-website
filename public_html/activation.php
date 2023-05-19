@@ -8,8 +8,8 @@
 </head>
 <body class="font-monospace text-light text-center pt-5 bg-dark">
 <?php
-include (dirname(__FILE__) . "/../private/connection.php");
-include (dirname(__FILE__) . "/../private/objects/User.php");
+include_once (dirname(__FILE__) . "/../private/connection.php");
+include_once (dirname(__FILE__) . "/../private/objects/User.php");
 
 // Check if get method and code is set.
 if (isset($_GET["code"])){
