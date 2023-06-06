@@ -1,5 +1,6 @@
 <?php
 include_once (dirname(__FILE__) . "/../connection.php");
+include_once (dirname(__FILE__) . "/../objects/Gallery.php");
 
 // This class, using connection.php, is used to load or create a user like a JavaBean.
 class User
@@ -501,6 +502,16 @@ class User
         }
 
         return true;
+    }
+
+    /**
+     * Get list of Galleries of user.
+     */
+    public function getGalleries() : array
+    {
+        $galleryClass = new Gallery();
+        $galleryClass->setOwnerId($this->getUsername());
+        return $galleryClass->getGalleriesByOwnerId();
     }
 
     /**

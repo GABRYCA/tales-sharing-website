@@ -12,20 +12,16 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] === false) {
 
 // Check if the request method is POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Get the JSON data from the request body
-    $json = file_get_contents("php://input");
-    // Decode the JSON data into an associative array
-    $post = json_decode($json, true);
 
     // Initialize an empty array for errors
     $errors = array();
 
     // Validate and sanitize the post values
-    $title = validate_input($post["title"] ?? "");
-    $description = validate_input($post["description"] ?? "");
-    $public = validate_input($post["public"] ?? false);
-    $ai_generated = validate_input($post["ai_generated"] ?? false);
-    $image = validate_input($post["image"] ?? "");
+    $title = validate_input($_POST["title"] ?? "");
+    $description = validate_input($_POST["description"] ?? "");
+    $public = validate_input($_POST["public"] ?? false);
+    $ai_generated = validate_input($_POST["ai_generated"] ?? false);
+    $image = validate_input($_POST["image"] ?? "");
 
     // Check if the title is empty or too long
     if (!$title || strlen($title) > 255) {
@@ -64,9 +60,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Get the user id from the user object
         $user_id = $user->getUserId();
         // Check if the user id is not null
-        if ($user_id) {
+        if ($user_id != null) {
             // Create a new content object with the user id and image type
-            $content = new Content($user_id, "image");
+            $content = new Content();
+            $content->setOwnerId($user_id);
+            $content->setType("image");
             // Set the content properties with the post values
             $content->setTitle($title);
             $content->setDescription($description);
@@ -95,6 +93,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo json_encode(array("success" => false, "message" => implode("\n", $errors)));
     }
 
+}
+
+// Function to save the image to the server and right path using Config.php and the config.ini defaults->save_path
+function save_image($image, $user_id, $title) {
+
+    // Check if image is URL or direct file upload.
+    if (filter_var($image, FILTER_VALIDATE_URL)) {
+        // Return the image URL
+        return $image;
+    }
+
+    // If it isn't an URL but a valid image data uploaded, save it to the server, but before, convert it into a .webp if it isn't already.
+
+    // Get the image data from the UPLOAD.
+    $image_data = explode(',', $image)[1];
+    // Decode the image data.
+    $image_data = base64_decode($image_data);
+    // Create a new image from the decoded image data.
+    $image = imagecreatefromstring($image_data);
+    // Get the image width.
+    $image_width = imagesx($image);
+    // Get the image height.
+    $image_height = imagesy($image);
+    // Create a new image with the same width and height.
+    $new_image = imagecreatetruecolor($image_width, $image_height);
+    // Copy the image to the new image.
+    imagecopy($new_image, $image, 0, 0, 0, 0, $image_width, $image_height);
+    // The uniqueid
+    $uniqueid = uniqid();
+    // Save the image to the server as a .webp
+    imagewebp($new_image, dirname(__FILE__) . "/../data/profile/" . $user_id . "/gallery/images/" . $uniqueid . ".webp", 80);
+    // Get the image path.
+    $image_path = dirname(__FILE__) . "/../data/profile/" . $user_id . "/gallery/images/" . $uniqueid . ".webp";
+
+    // Return the image path
+    return $image_path;
 }
 
 ?>

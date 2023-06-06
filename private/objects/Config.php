@@ -2,6 +2,7 @@
 // default values for config
 $default_config = array(
     'defaults' => array(
+        'domain' => 'https://tales.anonymousgca.eu',
         'profile_picture' => 'https://tales.anonymousgca.eu/common/assets/default/profile_picture.webp',
         'cover_picture' => 'https://tales.anonymousgca.eu/common/assets/default/profile_cover.webp',
     ),

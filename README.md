@@ -101,11 +101,17 @@ CREATE TABLE Content (
   CONSTRAINT type_check CHECK (type IN ('image', 'text'))
 );
 
-CREATE TABLE GalleryGroup (
-  ownerId varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+CREATE TABLE GalleryAssociation (
+  galleryId int REFERENCES GalleryGroup(galleryId) ON DELETE CASCADE ON UPDATE CASCADE,
   contentId int REFERENCES Content(contentId) ON DELETE CASCADE ON UPDATE CASCADE,
-  hideGallery bit NOT NULL,
-  PRIMARY KEY (ownerId, contentId)
+  PRIMARY KEY (galleryId, contentId)
+);
+
+CREATE TABLE GalleryGroup (
+  galleryId int AUTO_INCREMENT PRIMARY KEY,  
+  ownerId varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+  name varchar(255) NOT NULL,
+  hideGallery bit NOT NULL DEFAULT 0
 );
 
 CREATE TABLE Liked (
