@@ -22,7 +22,9 @@ $galleries = $user->getGalleries();
     <?php
     include_once (dirname(__FILE__) . "/common/common-head.php");
     ?>
-    <script src="data/util/tinymce/js/tinymce/tinymce.min.js" referrerpolicy="origin"></script>    <title>Upload Content</title>
+    <script src="data/util/tinymce/js/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js" integrity="sha512-zlWWyZq71UMApAjih4WkaRpikgY9Bz1oXIW5G0fED4vk14JjGlQ1UmkGM392jEULP8jbNMiwLWdM8Z87Hu88Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <title>Upload Content</title>
     <style>
         #drop-area {}
 
@@ -49,22 +51,25 @@ $galleries = $user->getGalleries();
         // Declare a global variable to store the file data
         var fileData = null;
 
-        function loadedImage() {
-            $('#drop-area').text('File ready to upload');
-            // Remove p-5 and change it to p-3
-            $('#drop-area').removeClass('p-5');
-            $('#drop-area').addClass('p-3');
-            // Create an image element with the file data as the source
-            var image = $('<img>').attr('src', fileData);
-            // Add classes to image element
-            image.addClass('img-fluid img-thumbnail rounded-5 mt-2');
-            // Append the image element to the drop area
-            $('#drop-area').append(image);
-            // Show the input description
-            $('#inputDescription').removeClass('d-none');
-        }
-
         $(function() {
+
+            $('#createGallery').on('click', function(){
+                // Get from input fron newGallery (the name of the new gallery)
+                var newGallery = $('#newGallery').val();
+                // If the input is empty, show a toast
+                if (newGallery === "") {
+                    $.toast({
+                        heading: 'Error',
+                        text: 'Please enter a name for the new gallery.',
+                        showHideTransition: 'slide',
+                        icon: 'error',
+                        position: 'top-right'
+                    });
+                } else {
+                    // If the input is not empty, create a gallery
+                    createGallery(newGallery);
+                }
+            });
 
             // Bind dragover and dragenter events to prevent default actions
             $('#drop-area').on('dragover dragenter', function(e) {
@@ -143,6 +148,97 @@ $galleries = $user->getGalleries();
             });
         });
 
+        function createGallery(galleryName) {
+            // Using ajax, I send to galleryManager with the action type of create and the gallery name
+            $.ajax({
+                url: 'actions/galleryManager.php',
+                type: 'POST',
+                data: {
+                    action: 'create',
+                    galleryName: galleryName,
+                },
+                success: function (data) {
+                    // Send toast with data
+                    $.toast({
+                        text: data,
+                        icon: 'info',
+                        position: 'top-center',
+                        showHideTransition: 'slide',
+                        showDuration: 500,
+                        hideDuration: 500,
+                        loader: false,
+                        allowToastClose: true,
+                        hideAfter: 5000,
+                        stack: false,
+                        textAlign: 'center',
+                        positionLeft: false,
+                        positionRight: true,
+                        bgColor: '#6600e1',
+                        textColor: '#fff',
+                    });
+
+                    reloadGalleries();
+                },
+                error: function (data) {
+                    // Send toast with data
+                    $.toast({
+                        text: data,
+                        icon: 'error',
+                        position: 'top-center',
+                        showHideTransition: 'slide',
+                        showDuration: 500,
+                        hideDuration: 500,
+                        loader: false,
+                        allowToastClose: true,
+                        hideAfter: 5000,
+                        stack: false,
+                        textAlign: 'center',
+                        positionLeft: false,
+                        positionRight: true,
+                        bgColor: '#6600e1',
+                        textColor: '#fff',
+                    });
+                }
+            })
+        }
+
+        function reloadGalleries(){
+            // Clear select with id selectGallery
+            $('#selectGallery').empty();
+            // Clear also input with id newGallery
+            $('#newGallery').val('');
+            // Get galleries from user
+            $.ajax({
+                url: 'actions/galleryManager.php',
+                type: 'POST',
+                data: {
+                    action: 'list'
+                },
+                success: function (data) {
+                    // Parse data
+                    var galleries = JSON.parse(data);
+                    // For each gallery, append an option to the select
+                    galleries.forEach(function (gallery) {
+                        $('#selectGallery').append('<option value="' + gallery.galleryId + '">' + gallery.name + '</option>');
+                    });
+                }
+            });
+        }
+
+        function loadedImage() {
+            $('#drop-area').text('File ready to upload');
+            // Remove p-5 and change it to p-3
+            $('#drop-area').removeClass('p-5');
+            $('#drop-area').addClass('p-3');
+            // Create an image element with the file data as the source
+            var image = $('<img>').attr('src', fileData);
+            // Add classes to image element
+            image.addClass('img-fluid img-thumbnail rounded-5 mt-2');
+            // Append the image element to the drop area
+            $('#drop-area').append(image);
+            // Show the input description
+            $('#inputDescription').removeClass('d-none');
+        }
 
     </script>
 </head>
@@ -215,7 +311,7 @@ $galleries = $user->getGalleries();
                             <!-- List of galleries selectable (using the session user and Gallery.php I get the list of galleries) -->
                             <p class="fs-4 text-center">Gallery: (Optional)</p>
 
-                            <select class="form-select" aria-label="Select Galleries" id="selectGalleries">
+                            <select class="form-select" aria-label="Select Galleries" id="selectGallery" name="galleryName">
                                 <option selected>Select gallery</option>
                                 <?php
                                 foreach ($galleries as $gallery) {
@@ -229,7 +325,7 @@ $galleries = $user->getGalleries();
                             <p class="fs-4 text-center">Create new gallery:</p>
                             <div class="row justify-content-center">
                                 <div class="col-9 p-0">
-                                    <input type="text" class="form-control" id="newGallery" placeholder="New Gallery">
+                                    <input type="text" class="form-control" id="newGallery" placeholder="New Gallery" name="newGallery">
                                 </div>
                                 <div class="col-3 px-1">
                                     <button class="btn btn-primary w-100 border border-0" id="createGallery">+</button>

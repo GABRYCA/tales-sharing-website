@@ -1,7 +1,7 @@
 <?php
 include_once (dirname(__FILE__) . "/../connection.php");
 
-class Gallery
+class Gallery implements JsonSerializable
 {
     private $galleryId;
     private $ownerId;
@@ -33,16 +33,16 @@ class Gallery
     }
 
     /**
-     * Function to load gallery info from database following $ownerId.
+     * Function to load gallery info from database following $ownerId and $galleryName.
      * @return bool
      */
     public function loadGalleryInfoByOwnerId() : bool
     {
         $conn = connection();
 
-        $sql = "SELECT * FROM GalleryGroup WHERE ownerId = ?";
+        $sql = "SELECT * FROM GalleryGroup WHERE ownerId = ? AND name = ?";
 
-        if ($data = $conn->execute_query($sql, [$this->ownerId])){
+        if ($data = $conn->execute_query($sql, [$this->ownerId, $this->name])){
             $row = $data->fetch_assoc();
             $this->galleryId = $row["galleryId"];
             $this->name = $row["name"];
@@ -57,7 +57,7 @@ class Gallery
 
     /**
      * Function that returns the full list of galleries using $ownerId.
-     * @return array
+     * @return Gallery[]
      */
     public function getGalleriesByOwnerId() : array
     {
@@ -93,9 +93,9 @@ class Gallery
     {
         $conn = connection();
 
-        $sql = "INSERT INTO GalleryGroup (ownerId, name, hideGallery) VALUES (?, ?, ?)";
+        $sql = "INSERT INTO GalleryGroup (ownerId, name) VALUES (?, ?)";
 
-        if ($conn->execute_query($sql, [$this->ownerId, $this->name, $this->hideGallery])){
+        if ($conn->execute_query($sql, [$this->ownerId, $this->name])){
             return true;
         } else {
             $this->setErrorStatus("Error while creating gallery");
@@ -139,23 +139,7 @@ class Gallery
         }
     }
 
-    /**
-     * Function to delete gallery by $ownerId and $name.
-     * @return bool
-     */
-    public function deleteGalleryByOwnerIdAndName() : bool
-    {
-        $conn = connection();
-
-        $sql = "DELETE FROM GalleryGroup WHERE ownerId = ? AND name = ?";
-
-        if ($conn->execute_query($sql, [$this->ownerId, $this->name])){
-            return true;
-        } else {
-            $this->setErrorStatus("Error while deleting gallery");
-            return false;
-        }
-    }
+    /***/
 
     /**
      * Function to check if gallery exists by $name and $ownerId.
@@ -177,6 +161,17 @@ class Gallery
         }
 
         return false;
+    }
+
+    /**
+     * Function to rename a gallery
+     * @param string $galleryName
+     * @return bool
+     */
+    public function renameGallery(string $galleryName) : bool
+    {
+        $this->setName($galleryName);
+        return $this->updateGallery();
     }
 
     // Getters and Setters
@@ -230,4 +225,15 @@ class Gallery
         $this->errorStatus = $errorStatus;
     }
 
+    // Implements JsonSerializable
+    public function jsonSerialize()
+    {
+        return [
+            'galleryId' => $this->galleryId,
+            'ownerId' => $this->ownerId,
+            'name' => $this->name,
+            'hideGallery' => $this->hideGallery,
+            'errorStatus' => $this->errorStatus
+        ];
+    }
 }

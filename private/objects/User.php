@@ -506,12 +506,134 @@ class User
 
     /**
      * Get list of Galleries of user.
+     * @return Gallery[]
      */
     public function getGalleries() : array
     {
         $galleryClass = new Gallery();
         $galleryClass->setOwnerId($this->getUsername());
         return $galleryClass->getGalleriesByOwnerId();
+    }
+
+    /**
+     * Get gallery by id.
+     * @param int $galleryId
+     * @return Gallery
+     */
+    public function getGalleryById(int $galleryId) : Gallery
+    {
+        $galleryClass = new Gallery();
+        $galleryClass->setGalleryId($galleryId);
+        if (!$galleryClass->loadGalleryInfoByGalleryId()){
+            $this->setErrorStatus("Gallery not found!");
+        }
+        return $galleryClass;
+    }
+
+    /**
+     * Get gallery by name.
+     * @param string $galleryName
+     * @return Gallery
+     */
+    public function getGalleryByName(string $galleryName) : Gallery
+    {
+        $galleryClass = new Gallery();
+        $galleryClass->setOwnerId($this->getUsername());
+        $galleryClass->setName($galleryName);
+        if (!$galleryClass->loadGalleryInfoByOwnerId()){
+            $this->setErrorStatus("Gallery not found!");
+        }
+        return $galleryClass;
+    }
+
+
+    /**
+     * Create a new gallery.
+     * @param string $galleryName
+     * @return bool
+     */
+    public function createGallery(string $galleryName) : bool
+    {
+        $galleryClass = new Gallery();
+        $galleryClass->setOwnerId($this->getUsername());
+        $galleryClass->setName($galleryName);
+        return $galleryClass->createGallery();
+    }
+
+    /**
+     * Delete a gallery by id.
+     * @param int $galleryId
+     * @return bool
+     */
+    public function deleteGalleryById(int $galleryId): bool
+    {
+        $galleryClass = new Gallery();
+        $galleryClass->setOwnerId($this->getUsername());
+        $galleryClass->setGalleryId($galleryId);
+
+        if (!$galleryClass->loadGalleryInfoByGalleryId()){
+            $this->setErrorStatus("Gallery not found!");
+            return false;
+        }
+
+        return $galleryClass->deleteGallery();
+    }
+
+    /**
+     * Delete a gallery by name.
+     * @param string $galleryName
+     * @return bool
+     */
+    public function deleteGalleryByName(string $galleryName): bool
+    {
+        $galleryClass = new Gallery();
+        $galleryClass->setOwnerId($this->getUsername());
+        $galleryClass->setName($galleryName);
+
+        if (!$galleryClass->loadGalleryInfoByOwnerId()){
+            $this->setErrorStatus("Gallery not found!");
+            return false;
+        }
+
+        return $galleryClass->deleteGallery();
+    }
+
+    /**
+     * Rename a gallery by gallery id.
+     * @param int $galleryId
+     * @param string $newGalleryName
+     * @return bool
+     */
+    public function renameGalleryById(int $galleryId, string $newGalleryName): bool
+    {
+        $galleryClass = new Gallery();
+        $galleryClass->setOwnerId($this->getUsername());
+        $galleryClass->setGalleryId($galleryId);
+        if (!$galleryClass->loadGalleryInfoByGalleryId()){
+            $this->setErrorStatus("Gallery not found!");
+            return false;
+        }
+
+        return $galleryClass->renameGallery($newGalleryName);
+    }
+
+    /**
+     * Rename a gallery by gallery name.
+     * @param string $galleryName
+     * @param string $newGalleryName
+     * @return bool
+     */
+    public function renameGalleryByName(string $galleryName, string $newGalleryName): bool
+    {
+        $galleryClass = new Gallery();
+        $galleryClass->setOwnerId($this->getUsername());
+        $galleryClass->setName($galleryName);
+        if (!$galleryClass->loadGalleryInfoByOwnerId()){
+            $this->setErrorStatus("Gallery not found!");
+            return false;
+        }
+
+        return $galleryClass->renameGallery($newGalleryName);
     }
 
     /**
@@ -528,6 +650,15 @@ class User
     public function setUsername(string $username): void
     {
         $this->username = $username;
+    }
+
+    /**
+     * Return user id (essentially the username) since that's the key value.
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this->getUsername();
     }
 
     /**
