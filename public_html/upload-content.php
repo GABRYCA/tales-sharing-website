@@ -22,6 +22,7 @@ $galleries = $user->getGalleries();
     <?php
     include_once (dirname(__FILE__) . "/common/common-head.php");
     ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.css" integrity="sha512-wJgJNTBBkLit7ymC6vvzM1EcSWeM9mmOu+1USHaRBbHkm6W9EgM0HY27+UtUaprntaYQJF75rc8gjxllKs5OIQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="data/util/tinymce/js/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js" integrity="sha512-zlWWyZq71UMApAjih4WkaRpikgY9Bz1oXIW5G0fED4vk14JjGlQ1UmkGM392jEULP8jbNMiwLWdM8Z87Hu88Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <title>Upload Content</title>
@@ -158,17 +159,18 @@ $galleries = $user->getGalleries();
                     galleryName: galleryName,
                 },
                 success: function (data) {
+
                     // Send toast with data
                     $.toast({
                         text: data,
-                        icon: 'info',
+                        icon: 'success',
                         position: 'top-center',
                         showHideTransition: 'slide',
                         showDuration: 500,
                         hideDuration: 500,
                         loader: false,
                         allowToastClose: true,
-                        hideAfter: 5000,
+                        hideAfter: 2000,
                         stack: false,
                         textAlign: 'center',
                         positionLeft: false,
@@ -176,6 +178,7 @@ $galleries = $user->getGalleries();
                         bgColor: '#6600e1',
                         textColor: '#fff',
                     });
+
 
                     reloadGalleries();
                 },

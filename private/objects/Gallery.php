@@ -3,11 +3,11 @@ include_once (dirname(__FILE__) . "/../connection.php");
 
 class Gallery implements JsonSerializable
 {
-    private $galleryId;
-    private $ownerId;
-    private $name;
-    private $hideGallery;
-    private $errorStatus;
+    private $galleryId = null;
+    private $ownerId = null;
+    private $name = null;
+    private $hideGallery = false;
+    private $errorStatus = null;
 
     /**
      * Function to load gallery info from database following $galleryId.
@@ -93,9 +93,13 @@ class Gallery implements JsonSerializable
     {
         $conn = connection();
 
-        $sql = "INSERT INTO GalleryGroup (ownerId, name) VALUES (?, ?)";
+        $sql = "INSERT INTO GalleryGroup (ownerId, name, hideGallery) VALUES (?, ?, ?)";
 
-        if ($conn->execute_query($sql, [$this->ownerId, $this->name])){
+        if ($this->hideGallery == null) {
+            $this->hideGallery = false;
+        }
+
+        if ($conn->execute_query($sql, [$this->ownerId, $this->name, $this->hideGallery])){
             return true;
         } else {
             $this->setErrorStatus("Error while creating gallery");
