@@ -120,7 +120,7 @@ $galleries = $user->getGalleries();
             });
 
             // Bind submit event to the form element
-            $('#upload').on('submit', function(e) {
+            $('#upload').on('click', function(e) {
                 // Prevent the default form submission action
                 e.preventDefault();
                 // Check if the file data is not null
@@ -131,6 +131,7 @@ $galleries = $user->getGalleries();
                     var gallery = $('#selectGallery').val();
                     var isPrivate = $('#isPrivate').is(':checked') ? 1 : 0;
                     var isAI = $('#isAI').is(':checked') ? 1 : 0;
+
                     // Check if name is empty or null
                     if (name === "" || name === null) {
                         // Show a toast
@@ -160,18 +161,21 @@ $galleries = $user->getGalleries();
                     // The gallery is optional, so we don't need to check it
                     // Same for isPrivate and isAI
 
+                    var finalFile = new FormData();
+                    finalFile.append('file', fileData);
+                    finalFile.append('name', name);
+                    finalFile.append('description', description);
+                    finalFile.append('gallery', gallery);
+                    finalFile.append('isPrivate', isPrivate.toString());
+                    finalFile.append('isAI', isAI.toString());
+
                     // Send it to the server using jQuery AJAX along with other form data
                     $.ajax({
-                        url: 'upload.php', // The URL of your PHP script that handles the upload
+                        url: 'actions/upload.php', // The URL of your PHP script that handles the upload
                         type: 'POST', // The HTTP method to use
-                        data: {
-                            file: new FormData(fileData),
-                            name: name,
-                            description: description,
-                            gallery: gallery,
-                            isPrivate: isPrivate,
-                            isAI: isAI,
-                        }, // The file data and other form data as key-value pairs
+                        processData: false,
+                        contentType: false,
+                        data: finalFile, // The file data and other form data as key-value pairs
                         success: function(response) {
                             // Toast with output from upload.php
                             $.toast({
@@ -181,6 +185,14 @@ $galleries = $user->getGalleries();
                                 hideAfter: 10000,
 
                             });
+
+                            // Reset inputs and fileData
+                            $('#name').val('');
+                            tinyMCE.activeEditor.setContent('');
+                            $('#selectGallery').val('');
+                            $('#isPrivate').prop('checked', false);
+                            $('#isAI').prop('checked', false);
+                            fileData = null;
 
                             // After 10 seconds, reload the page
                             setTimeout(function() {

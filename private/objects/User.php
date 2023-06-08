@@ -675,8 +675,9 @@ class User implements JsonSerializable
             return false;
         }
 
-        if ($galleryClass->checkIfContentIsInGallery($contentId)){
-            $this->setErrorStatus("Content already in gallery!");
+        // Check if content is already in gallery
+        if ($galleryClass->isContentInGallery($contentId)){
+            $this->setErrorStatus("Content is already in gallery!");
             return false;
         }
 
@@ -718,7 +719,7 @@ class User implements JsonSerializable
             return false;
         }
 
-        if (!$galleryClass->checkIfContentIsInGallery($contentId)){
+        if (!$galleryClass->isContentInGallery($contentId)){
             $this->setErrorStatus("Content not in gallery!");
             return false;
         }

@@ -11,7 +11,7 @@ class Content implements JsonSerializable
     private $title;
     private $description;
     private $uploadDate;
-    private $privateOrPublic;
+    private $isPrivate;
     private $isAI;
     private $errorStatus;
 
@@ -33,13 +33,45 @@ class Content implements JsonSerializable
             $this->title = $row["title"];
             $this->description = $row["description"];
             $this->uploadDate = $row["uploadDate"];
-            $this->privateOrPublic = $row["privateOrPublic"];
+            $this->isPrivate = $row["isPrivate"];
             $this->isAI = $row["isAI"];
             return true;
         } else {
             $this->setErrorStatus("Error while loading content");
             return false;
         }
+    }
+
+    /**
+     * Load content by owner and path. Please set ownerId and url/path before using this.
+     * @return bool
+     */
+    public function loadContentByPath() : bool
+    {
+        $conn = connection();
+
+        $sql = "SELECT * FROM Content WHERE ownerId = ? AND urlImage = ?";
+
+        if ($data = $conn->execute_query($sql, [$this->ownerId, $this->urlImage])) {
+            // Check if found content
+            if ($data->num_rows == 0) {
+                $this->setErrorStatus("Error while getting content by owner and path, no content found");
+                return false;
+            }
+            $row = $data->fetch_assoc();
+            $this->contentId = $row["contentId"];
+            $this->type = $row["type"];
+            $this->textContent = $row["textContent"];
+            $this->title = $row["title"];
+            $this->description = $row["description"];
+            $this->uploadDate = $row["uploadDate"];
+            $this->isPrivate = $row["isPrivate"];
+            $this->isAI = $row["isAI"];
+            return true;
+        } else {
+            $this->setErrorStatus("Error while getting content by owner and path");
+        }
+        return false;
     }
 
     /**
@@ -58,7 +90,7 @@ class Content implements JsonSerializable
             return false;
         }
 
-        if ($conn->execute_query($sql, [$this->ownerId, $this->type, $this->urlImage, $this->textContent, $this->title, $this->description, $this->uploadDate, $this->privateOrPublic, $this->isAI])) {
+        if ($conn->execute_query($sql, [$this->ownerId, $this->type, $this->urlImage, $this->textContent, $this->title, $this->description, $this->uploadDate, $this->isPrivate, $this->isAI])) {
             return true;
         } else {
             $this->setErrorStatus("Error while adding content");
@@ -94,7 +126,7 @@ class Content implements JsonSerializable
 
         $sql = "UPDATE Content SET ownerId = ?, type = ?, urlImage = ?, textContent = ?, title = ?, description = ?, uploadDate = ?, isPrivate = ?, isAI = ? WHERE contentId = ?";
 
-        if ($conn->execute_query($sql, [$this->ownerId, $this->type, $this->urlImage, $this->textContent, $this->title, $this->description, $this->uploadDate, $this->privateOrPublic, $this->isAI, $this->contentId])) {
+        if ($conn->execute_query($sql, [$this->ownerId, $this->type, $this->urlImage, $this->textContent, $this->title, $this->description, $this->uploadDate, $this->isPrivate, $this->isAI, $this->contentId])) {
             return true;
         } else {
             $this->setErrorStatus("Error while updating content");
@@ -404,9 +436,9 @@ class Content implements JsonSerializable
     /**
      * @return mixed
      */
-    public function getPrivateOrPublic()
+    public function getIsPrivate()
     {
-        return $this->privateOrPublic;
+        return $this->isPrivate;
     }
 
     /**
@@ -414,7 +446,7 @@ class Content implements JsonSerializable
      */
     public function setPrivate($privateOrPublic): void
     {
-        $this->privateOrPublic = $privateOrPublic;
+        $this->isPrivate = $privateOrPublic;
     }
 
     /**
@@ -466,7 +498,7 @@ class Content implements JsonSerializable
             $content->setTitle($row["title"]);
             $content->setDescription($row["description"]);
             $content->setUploadDate($row["uploadDate"]);
-            $content->setPrivate($row["privateOrPublic"]);
+            $content->setPrivate($row["isPrivate"]);
             $content->setIsAI($row["isAI"]);
             $contentArray[] = $content;
         }
@@ -485,7 +517,7 @@ class Content implements JsonSerializable
             'title' => $this->title,
             'description' => $this->description,
             'uploadDate' => $this->uploadDate,
-            'privateOrPublic' => $this->privateOrPublic,
+            'isPrivate' => $this->isPrivate,
             'isAI' => $this->isAI,
             'errorStatus' => $this->errorStatus
         ];

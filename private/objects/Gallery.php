@@ -1,5 +1,6 @@
 <?php
 include_once (dirname(__FILE__) . "/../connection.php");
+include_once (dirname(__FILE__) . "/../objects/Content.php");
 
 class Gallery implements JsonSerializable
 {
@@ -217,11 +218,9 @@ class Gallery implements JsonSerializable
     }
 
     /**
-     * Function to check if $contentId is in gallery (please load gallery before).
-     * @param int $contentId
-     * @return bool (true if contains, false otherwise)
+     * Function to check if $contentId is in gallery (Please load gallery before).
      */
-    public function checkIfContentIsInGallery(int $contentId) : bool
+    public function isContentInGallery(int $contentId) : bool
     {
         $conn = connection();
 
@@ -230,14 +229,14 @@ class Gallery implements JsonSerializable
         if ($data = $conn->execute_query($sql, [$this->galleryId, $contentId])){
             if ($data->num_rows > 0) {
                 return true;
-            } else {
-                return false;
             }
         } else {
             $this->setErrorStatus("Error while checking if content is in gallery");
             return false;
         }
+        return false;
     }
+
 
 
     // Getters and Setters

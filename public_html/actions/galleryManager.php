@@ -54,6 +54,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             // Get user from session
             $user = $_SESSION["user"];
 
+            $galleries = $user->getGalleries();
+
+            foreach ($galleries as $gallery){
+                if ($gallery->getName() == $galleryName){
+                    exit("Gallery name already exists. Please enter a different gallery name.");
+                }
+            }
+
             if (!$user->createGallery($galleryName)){
                 // Send the error array to the client
                 exit("Failed to create gallery. Please try again.");
