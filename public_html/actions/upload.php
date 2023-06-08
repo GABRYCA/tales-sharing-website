@@ -1,8 +1,10 @@
 <?php
 session_start();
 include_once (dirname(__FILE__) . "/../../private/connection.php");
-include_once (dirname(__FILE__) . "/../../private/objects/User.php");
 include_once (dirname(__FILE__) . "/../common/utility.php");
+include_once (dirname(__FILE__) . "/../../private/objects/User.php");
+include_once (dirname(__FILE__) . "/../../private/objects/Content.php");
+include_once (dirname(__FILE__) . "/../../private/objects/Gallery.php");
 
 // If there's already an active session, send user to home.php.
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] === false) {
@@ -13,98 +15,124 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] === false) {
 // Check if the request method is POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    // Initialize an empty array for errors
-    $errors = array();
+    // Domain
+    $domain = "https://tales.anonymousgca.eu/";
 
-    // Validate and sanitize the post values
-    $title = validate_input($_POST["title"] ?? "");
+    // Get the file data from the POST request.
+    $file = $_FILES["file"] ?? "";
+    // Get the name from the POST request.
+    $name = validate_input($_POST["name"] ?? "");
+    // Get the description from the POST request.
     $description = validate_input($_POST["description"] ?? "");
-    $public = validate_input($_POST["public"] ?? false);
-    $ai_generated = validate_input($_POST["ai_generated"] ?? false);
-    $image = validate_input($_POST["image"] ?? "");
+    // Get the gallery from the POST request.
+    $gallery = validate_input($_POST["gallery"] ?? "");
+    // Get the isPrivate from the POST request.
+    $isPrivate = validate_input($_POST["isPrivate"] ?? "");
+    // Get the isAI from the POST request.
+    $isAI = validate_input($_POST["isAI"] ?? "");
 
-    // Check if the title is empty or too long
-    if (!$title || strlen($title) > 255) {
-        // Add an error message to the errors array
-        $errors[] = "Title is empty or too long. Please enter a valid title.";
+    // Check if the file is empty
+    if (!$file) {
+        // Send the error array to the client
+        exit("File is empty. Please select a valid file.");
     }
 
-    // Check if the description is too long
-    if (strlen($description) > 255) {
-        // Add an error message to the errors array
-        $errors[] = "Description is too long. Please enter a shorter description.";
+    // Check if the name is empty or too long
+    if (!$name || strlen($name) > 255) {
+        // Send the error array to the client
+        exit("Name is empty or too long. Please enter a valid name.");
     }
 
-    // Check if the public value is not a boolean
-    if (!is_bool($public)) {
-        // Add an error message to the errors array
-        $errors[] = "Invalid public value. Please select a valid option.";
+    // Check if the description is empty or too long
+    if (!$description || strlen($description) > 30000) {
+        // Send the error array to the client
+        exit("Description is empty or too long. Please enter a valid description.");
     }
 
-    // Check if the ai_generated value is not a boolean
-    if (!is_bool($ai_generated)) {
-        // Add an error message to the errors array
-        $errors[] = "Invalid AI generated value. Please select a valid option.";
+    // Check if the gallery is empty or invalid
+    if (!$gallery || !is_numeric($gallery)) {
+        // Send the error array to the client
+        exit("Gallery is empty or invalid. Please select a valid gallery.");
     }
 
-    // Check if the image value is not a valid data URL
-    if (!preg_match("/^data:image\/(jpg|png|gif|webp);base64,/", $image)) {
-        // Add an error message to the errors array
-        $errors[] = "Invalid image data. Please upload a valid image.";
+    // Check if the isPrivate is empty or invalid (0 or 1)
+    if (!$isPrivate || !is_numeric($isPrivate) || ($isPrivate != 0 && $isPrivate != 1)) {
+        // Send the error array to the client
+        exit("Private field is empty or invalid. Please select a valid isPrivate.");
     }
 
-    // Check if the errors array is empty
-    if (empty($errors)) {
-        // Get user from session
-        $user = $_SESSION["user"];
-        // Get the user id from the user object
-        $user_id = $user->getUserId();
-        // Check if the user id is not null
-        if ($user_id != null) {
-            // Create a new content object with the user id and image type
-            $content = new Content();
-            $content->setOwnerId($user_id);
-            $content->setType("image");
-            // Set the content properties with the post values
-            $content->setTitle($title);
-            $content->setDescription($description);
-            $content->setPrivate($public);
-            $content->setIsAI($ai_generated);
-            $content->setUrlImage($image);
-            // Set the current date as the upload date
-            $content->setUploadDate(date("Y-m-d"));
-            // Insert the content into the database using the content object method
-            $result = $content->addContent();
-            // Check if the result is true
-            if ($result) {
-                // Send a success response with a message to the client
-                echo json_encode(array("success" => true, "message" => "Your image has been posted successfully."));
-            } else {
-                // Send an error response with a message to the client
-                echo json_encode(array("success" => false, "message" => "There was an error in posting your image. Please try again later."));
-            }
-        } else {
-            // Send an error response with a message to the client
-            echo json_encode(array("success" => false, "message" => "Invalid user id. Please log in again."));
+    // Check if the isAI is empty or invalid (0 or 1)
+    if (!$isAI || !is_numeric($isAI) || ($isAI != 0 && $isAI != 1)) {
+        // Send the error array to the client
+        exit("AI field is empty or invalid. Please select a valid isAI.");
+    }
+
+    // Check if the file is an image
+    if (!getimagesize($file["tmp_name"])) {
+        // Send the error array to the client
+        exit("File is not an image. Please select a valid image.");
+    }
+
+    // Check if image is over 50MB
+    if ($file["size"] > 50000000) {
+        exit("File is too large (above 50MB). Please select a valid image.");
+    }
+
+    // Get user.
+    $user = $_SESSION["user"];
+
+    // Get the user id.
+    $user_id = $user->getUsername();
+
+    // Save image (convert it also to webp)
+    $path = save_image($file["tmp_name"], $user_id, $name);
+
+    // Load image from path (an URL now and also check if it fails)
+    $image = imagecreatefromstring(file_get_contents($path));
+
+    // Create content and save it to the database.
+    $content = new Content();
+    $content->setOwnerId($user_id);
+    $content->setType("image");
+    $content->setTitle($name);
+    $content->setDescription($description);
+    $content->setUrlImage($path);
+    $content->setIsAI($isAI);
+    $content->setPrivate($isPrivate);
+    $content->setTextContent("");
+    $content->setUploadDate(date("Y-m-d H:i:s"));
+
+    // Save the content to the database.
+    if (!$content->addContent()){
+        // Remove domain from path and add ../ to go back to the root folder.
+        $path = "../" . str_replace($domain, "", $path);
+        unlink($path);
+        // Send the error array to the client
+        exit("Error saving content to the database.");
+    }
+
+    // If gallery is specified, add the content to the gallery in the database.
+    if ($gallery != ""){
+        // Add content to gallery
+        if (!$user->addContentToGallery($content->getContentId(), $gallery)){
+            // Remove domain from path and add ../ to go back to the root folder.
+            $path = dirname(__FILE__) . "/../" . str_replace($domain, "", $path);
+            unlink($path);
+            exit("Error adding content to gallery (but content saved with success), direct image here: <a href='" . $path . "'>link</a>");
         }
-
-    } else {
-        // Send an error response with all the error messages to the client
-        echo json_encode(array("success" => false, "message" => implode("\n", $errors)));
     }
 
+    exit("Content saved with success, direct image here: <a href='" . $path . "'>link</a>");
 }
 
 // Function to save the image to the server and right path using Config.php and the config.ini defaults->save_path
 function save_image($image, $user_id, $title) {
 
-    // Check if image is URL or direct file upload.
-    if (filter_var($image, FILTER_VALIDATE_URL)) {
-        // Return the image URL
-        return $image;
-    }
+    // Domain
+    $domain = "https://tales.anonymousgca.eu/";
 
-    // If it isn't an URL but a valid image data uploaded, save it to the server, but before, convert it into a .webp if it isn't already.
+    // Make sure that title doesn't break paths.
+    $title = preg_replace("/([^\w\s\d\-_~,;[\]\(\).])/", "", $title);
 
     // Get the image data from the UPLOAD.
     $image_data = explode(',', $image)[1];
@@ -123,12 +151,11 @@ function save_image($image, $user_id, $title) {
     // The uniqueid
     $uniqueid = uniqid();
     // Save the image to the server as a .webp
-    imagewebp($new_image, dirname(__FILE__) . "/../data/profile/" . $user_id . "/gallery/images/" . $uniqueid . ".webp", 80);
+    imagewebp($new_image, dirname(__FILE__) . "/../data/profile/" . $user_id . "/gallery/images/" . $title . "-" . $uniqueid . ".webp", 80);
     // Get the image path.
-    $image_path = dirname(__FILE__) . "/../data/profile/" . $user_id . "/gallery/images/" . $uniqueid . ".webp";
 
     // Return the image path
-    return $image_path;
+    return $domain . "data/profile/" . $user_id . "/gallery/images/" . $title . "-" . $uniqueid . ".webp";
 }
 
 ?>

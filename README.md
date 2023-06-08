@@ -93,7 +93,7 @@ CREATE TABLE Content (
   urlImage varchar(255),
   textContent varchar(255),
   title varchar(255),
-  description varchar(255),
+  description mediumtext CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   uploadDate date NOT NULL,
   isPrivate TINYINT(1) NOT NULL DEFAULT 0,
   isAI TINYINT(1) NOT NULL DEFAULT 0,

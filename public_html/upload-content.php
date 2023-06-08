@@ -125,18 +125,75 @@ $galleries = $user->getGalleries();
                 e.preventDefault();
                 // Check if the file data is not null
                 if (fileData) {
+
+                    var name = $('#name').val();
+                    var description = tinyMCE.activeEditor.getContent();
+                    var gallery = $('#selectGallery').val();
+                    var isPrivate = $('#isPrivate').is(':checked') ? 1 : 0;
+                    var isAI = $('#isAI').is(':checked') ? 1 : 0;
+                    // Check if name is empty or null
+                    if (name === "" || name === null) {
+                        // Show a toast
+                        $.toast({
+                            heading: 'Error',
+                            text: 'Please enter a name for the image.',
+                            showHideTransition: 'slide',
+                            icon: 'error',
+                            position: 'top-right'
+                        });
+                        return;
+                    }
+
+                    // Check if description is empty or null
+                    if (description === "" || description === null) {
+                        // Show a toast
+                        $.toast({
+                            heading: 'Error',
+                            text: 'Please enter a description for the image.',
+                            showHideTransition: 'slide',
+                            icon: 'error',
+                            position: 'top-right'
+                        });
+                        return;
+                    }
+
+                    // The gallery is optional, so we don't need to check it
+                    // Same for isPrivate and isAI
+
                     // Send it to the server using jQuery AJAX along with other form data
                     $.ajax({
                         url: 'upload.php', // The URL of your PHP script that handles the upload
                         type: 'POST', // The HTTP method to use
-                        data: {file: fileData, name: $('#name').val(), email: $('#email').val()}, // The file data and other form data as key-value pairs
+                        data: {
+                            file: new FormData(fileData),
+                            name: name,
+                            description: description,
+                            gallery: gallery,
+                            isPrivate: isPrivate,
+                            isAI: isAI,
+                        }, // The file data and other form data as key-value pairs
                         success: function(response) {
-                            // Handle the server response here
-                            console.log(response);
+                            // Toast with output from upload.php
+                            $.toast({
+                                text: response + ' \nPlease wait for the page reload before uploading again.',
+                                icon: 'info',
+                                position: 'top-right',
+                                hideAfter: 10000,
+
+                            });
+
+                            // After 10 seconds, reload the page
+                            setTimeout(function() {
+                                location.reload();
+                            }, 10000);
                         },
                         error: function(error) {
-                            // Handle the error here
-                            console.log(error);
+                            // Toast with error from upload.php
+                            $.toast({
+                                text: error,
+                                icon: 'error',
+                                position: 'top-right'
+                            });
                         }
                     });
                 } else {
@@ -170,7 +227,7 @@ $galleries = $user->getGalleries();
                         hideDuration: 500,
                         loader: false,
                         allowToastClose: true,
-                        hideAfter: 2000,
+                        hideAfter: 3000,
                         stack: false,
                         textAlign: 'center',
                         positionLeft: false,
@@ -178,7 +235,6 @@ $galleries = $user->getGalleries();
                         bgColor: '#6600e1',
                         textColor: '#fff',
                     });
-
 
                     reloadGalleries();
                 },
@@ -193,7 +249,7 @@ $galleries = $user->getGalleries();
                         hideDuration: 500,
                         loader: false,
                         allowToastClose: true,
-                        hideAfter: 5000,
+                        hideAfter: 3000,
                         stack: false,
                         textAlign: 'center',
                         positionLeft: false,
@@ -288,7 +344,7 @@ $galleries = $user->getGalleries();
                     <!-- Title input -->
                     <p class="text-start fs-5 mb-0 mx-1">Title:</p>
                     <div class="form-floating mb-3 mt-0">
-                        <input type="text" class="form-control" id="name" placeholder="Title">
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Title">
                         <label for="name">Title</label>
                     </div>
                 </div>

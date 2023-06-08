@@ -1,7 +1,7 @@
 <?php
 include_once (dirname(__FILE__) . "/../connection.php");
 
-class Content
+class Content implements JsonSerializable
 {
     private $contentId;
     private $ownerId;
@@ -249,6 +249,31 @@ class Content
     }
 
     /**
+     * Function to get content id using path (please setPath before using this).
+     * @return bool
+     */
+    public function getContentIdFromPath() : bool
+    {
+        $conn = connection();
+
+        $sql = "SELECT contentId FROM Content WHERE urlImage = ?";
+
+        if ($data = $conn->execute_query($sql, [$this->urlImage])) {
+            // Check if found
+            if (count($data) == 0) {
+                $this->setErrorStatus("No content found with this path");
+                return false;
+            }
+            $this->contentId = $data[0]["contentId"];
+            return true;
+        } else {
+            $this->setErrorStatus("Error while getting content id from path");
+        }
+        return false;
+    }
+
+
+    /**
      * @return mixed
      */
     public function getContentId()
@@ -448,4 +473,21 @@ class Content
         return $contentArray;
     }
 
+    // Implements JsonSerializable
+    public function jsonSerialize()
+    {
+        return [
+            'contentId' => $this->contentId,
+            'ownerId' => $this->ownerId,
+            'type' => $this->type,
+            'urlImage' => $this->urlImage,
+            'textContent' => $this->textContent,
+            'title' => $this->title,
+            'description' => $this->description,
+            'uploadDate' => $this->uploadDate,
+            'privateOrPublic' => $this->privateOrPublic,
+            'isAI' => $this->isAI,
+            'errorStatus' => $this->errorStatus
+        ];
+    }
 }

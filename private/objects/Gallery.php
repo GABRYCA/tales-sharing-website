@@ -10,16 +10,16 @@ class Gallery implements JsonSerializable
     private $errorStatus = null;
 
     /**
-     * Function to load gallery info from database following $galleryId.
+     * Function to load gallery info from database following $galleryId and $ownerId.
      * @return bool
      */
     public function loadGalleryInfoByGalleryId() : bool
     {
         $conn = connection();
 
-        $sql = "SELECT * FROM GalleryGroup WHERE galleryId = ?";
+        $sql = "SELECT * FROM GalleryGroup WHERE galleryId = ? AND ownerId = ? ORDER BY galleryId DESC";
 
-        if ($data = $conn->execute_query($sql, [$this->galleryId])){
+        if ($data = $conn->execute_query($sql, [$this->galleryId, $this->ownerId])){
             $row = $data->fetch_assoc();
             $this->ownerId = $row["ownerId"];
             $this->name = $row["name"];
@@ -40,7 +40,7 @@ class Gallery implements JsonSerializable
     {
         $conn = connection();
 
-        $sql = "SELECT * FROM GalleryGroup WHERE ownerId = ? AND name = ?";
+        $sql = "SELECT * FROM GalleryGroup WHERE ownerId = ? AND name = ? ORDER BY galleryId DESC";
 
         if ($data = $conn->execute_query($sql, [$this->ownerId, $this->name])){
             $row = $data->fetch_assoc();
@@ -177,6 +177,68 @@ class Gallery implements JsonSerializable
         $this->setName($galleryName);
         return $this->updateGallery();
     }
+
+    /**
+     * Function to add content to gallery (Please load gallery before).
+     * @param int $contentId
+     * @return bool
+     */
+    public function addContentToGallery(int $contentId) : bool
+    {
+        $conn = connection();
+
+        $sql = "INSERT INTO GalleryAssociation (galleryId, contentId) VALUES (?, ?)";
+
+        if ($conn->execute_query($sql, [$this->galleryId, $contentId])){
+            return true;
+        } else {
+            $this->setErrorStatus("Error while adding content to gallery");
+            return false;
+        }
+    }
+
+    /**
+     * Function to remove content from gallery (Please load gallery before).
+     * @param int $contentId
+     * @return bool
+     */
+    public function removeContentFromGallery(int $contentId) : bool
+    {
+        $conn = connection();
+
+        $sql = "DELETE FROM GalleryAssociation WHERE galleryId = ? AND contentId = ?";
+
+        if ($conn->execute_query($sql, [$this->galleryId, $contentId])){
+            return true;
+        } else {
+            $this->setErrorStatus("Error while removing content from gallery");
+            return false;
+        }
+    }
+
+    /**
+     * Function to check if $contentId is in gallery (please load gallery before).
+     * @param int $contentId
+     * @return bool (true if contains, false otherwise)
+     */
+    public function checkIfContentIsInGallery(int $contentId) : bool
+    {
+        $conn = connection();
+
+        $sql = "SELECT * FROM GalleryAssociation WHERE galleryId = ? AND contentId = ?";
+
+        if ($data = $conn->execute_query($sql, [$this->galleryId, $contentId])){
+            if ($data->num_rows > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            $this->setErrorStatus("Error while checking if content is in gallery");
+            return false;
+        }
+    }
+
 
     // Getters and Setters
     public function getGalleryId()

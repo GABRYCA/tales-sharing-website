@@ -1,9 +1,13 @@
 <?php
 include_once (dirname(__FILE__) . "/../connection.php");
 include_once (dirname(__FILE__) . "/../objects/Gallery.php");
+include_once (dirname(__FILE__) . "/../objects/Content.php");
+include_once (dirname(__FILE__) . "/../objects/Followers.php");
+include_once (dirname(__FILE__) . "/../objects/Friends.php");
+include_once (dirname(__FILE__) . "/../objects/Likes.php");
 
 // This class, using connection.php, is used to load or create a user like a JavaBean.
-class User
+class User implements JsonSerializable
 {
     private $username = null;
     private $gender = null;
@@ -19,7 +23,7 @@ class User
     private $isMuted = false;
     private $activationCode = null;
     private $joinDate = null;
-    private $errorStatus = "No error";
+    private $errorStatus = null;
     private $isPremium = false;
     private $subscriptionType = null;
     private $subscriptionDate = null;
@@ -524,6 +528,7 @@ class User
     {
         $galleryClass = new Gallery();
         $galleryClass->setGalleryId($galleryId);
+        $galleryClass->setOwnerId($this->getUsername());
         if (!$galleryClass->loadGalleryInfoByGalleryId()){
             $this->setErrorStatus("Gallery not found!");
         }
@@ -635,6 +640,112 @@ class User
 
         return $galleryClass->renameGallery($newGalleryName);
     }
+
+    /**
+     * Function to add content to gallery.
+     * @param int $galleryId
+     * @param int $contentId
+     * @return bool
+     */
+    public function addContentToGallery(int $galleryId, int $contentId) : bool
+    {
+        $galleryClass = new Gallery();
+        $galleryClass->setOwnerId($this->getUsername());
+        $galleryClass->setGalleryId($galleryId);
+        if (!$galleryClass->loadGalleryInfoByGalleryId()){
+            $this->setErrorStatus("Gallery not found!");
+            return false;
+        }
+
+        $contentClass = new Content();
+        $contentClass->setContentId($contentId);
+        if (!$contentClass->loadContent()){
+            $this->setErrorStatus("Content not found!");
+            return false;
+        }
+
+        // Check if owner of content is the same as the owner of the gallery.
+        if ($contentClass->getOwnerId() != $this->getUsername()){
+            $this->setErrorStatus("You do not own this content!");
+            return false;
+        }
+
+        if ($galleryClass->getOwnerId() != $this->getUsername()){
+            $this->setErrorStatus("You do not own this gallery!");
+            return false;
+        }
+
+        if ($galleryClass->checkIfContentIsInGallery($contentId)){
+            $this->setErrorStatus("Content already in gallery!");
+            return false;
+        }
+
+        // Add content to gallery.
+        return $galleryClass->addContentToGallery($contentId);
+    }
+
+    /**
+     * Function to remove content from gallery.
+     * @param int $galleryId
+     * @param int $contentId
+     * @return bool
+     */
+    public function removeContentFromGallery(int $galleryId, int $contentId) : bool
+    {
+        $galleryClass = new Gallery();
+        $galleryClass->setOwnerId($this->getUsername());
+        $galleryClass->setGalleryId($galleryId);
+        if (!$galleryClass->loadGalleryInfoByGalleryId()){
+            $this->setErrorStatus("Gallery not found!");
+            return false;
+        }
+
+        $contentClass = new Content();
+        $contentClass->setContentId($contentId);
+        if (!$contentClass->loadContent()){
+            $this->setErrorStatus("Content not found!");
+            return false;
+        }
+
+        // Check if owner of content is the same as the owner of the gallery.
+        if ($contentClass->getOwnerId() != $this->getUsername()){
+            $this->setErrorStatus("You do not own this content!");
+            return false;
+        }
+
+        if ($galleryClass->getOwnerId() != $this->getUsername()){
+            $this->setErrorStatus("You do not own this gallery!");
+            return false;
+        }
+
+        if (!$galleryClass->checkIfContentIsInGallery($contentId)){
+            $this->setErrorStatus("Content not in gallery!");
+            return false;
+        }
+
+        // Remove content from gallery.
+        return $galleryClass->removeContentFromGallery($contentId);
+    }
+
+    /**
+     * Get content of user by id.
+     * @param int $contentId
+     * @return Content
+     */
+    public function getContentById(int $contentId) : Content
+    {
+        $contentClass = new Content();
+        $contentClass->setContentId($contentId);
+        $contentClass->loadContent();
+
+        if ($contentClass->getOwnerId() != $this->getUsername()){
+            $this->setErrorStatus("You do not own this content!");
+            return $contentClass;
+        }
+
+        return $contentClass;
+    }
+
 
     /**
      * @return string
@@ -947,5 +1058,31 @@ class User
     public function setJoinDate(mixed $joinDate): void
     {
         $this->joinDate = $joinDate;
+    }
+
+    // Implements JsonSerializable
+    public function jsonSerialize()
+    {
+        return [
+            'username' => $this->username,
+            'gender' => $this->gender,
+            'email' => $this->email,
+            'password' => $this->password,
+            'urlProfilePicture' => $this->urlProfilePicture,
+            'urlCoverPicture' => $this->urlCoverPicture,
+            'description' => $this->description,
+            'motto' => $this->motto,
+            'showNSFW' => $this->showNSFW,
+            'ofAge' => $this->ofAge,
+            'isActivated' => $this->isActivated,
+            'isMuted' => $this->isMuted,
+            'activationCode' => $this->activationCode,
+            'errorStatus' => $this->errorStatus,
+            'isPremium' => $this->isPremium,
+            'subscriptionType' => $this->subscriptionType,
+            'subscriptionDate' => $this->subscriptionDate,
+            'expiryDate' => $this->expiryDate,
+            'joinDate' => $this->joinDate
+        ];
     }
 }
