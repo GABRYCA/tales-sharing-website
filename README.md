@@ -114,6 +114,17 @@ CREATE TABLE GalleryGroup (
   hideGallery bit NOT NULL DEFAULT 0
 );
 
+CREATE TABLE Tag (
+  tagId int AUTO_INCREMENT PRIMARY KEY,
+  ntagName varchar(255) NOT NULL
+);
+
+CREATE TABLE TagAssociation (
+  tagId int REFERENCES Tag(tagId) ON DELETE CASCADE ON UPDATE CASCADE,
+  contentId int REFERENCES Content(contentId) ON DELETE CASCADE ON UPDATE CASCADE,
+  PRIMARY KEY (tagId, contentId)
+);
+
 CREATE TABLE Liked (
   userId varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
   contentId int REFERENCES Content(contentId) ON DELETE CASCADE ON UPDATE CASCADE,

@@ -1,5 +1,6 @@
 <?php
 include_once (dirname(__FILE__) . "/../connection.php");
+include_once (dirname(__FILE__) . "/../objects/Tag.php");
 
 class Content implements JsonSerializable
 {
@@ -292,8 +293,8 @@ class Content implements JsonSerializable
 
         if ($data = $conn->execute_query($sql, [$this->urlImage])) {
             // Check if found
-            if (count($data) == 0) {
-                $this->setErrorStatus("No content found with this path");
+            if ($data->num_rows > 0) {
+                $this->setErrorStatus("Error while getting content id from path");
                 return false;
             }
             $this->contentId = $data[0]["contentId"];
@@ -304,6 +305,39 @@ class Content implements JsonSerializable
         return false;
     }
 
+    /**
+     * Function to get tags of content using content id (please setContentId before using this).
+     * @return Tag[]
+     */
+    public function getTagsOfContent() : array
+    {
+        $tag = new Tag();
+        return $tag->getTagListByContentId($this->contentId);
+    }
+
+    /**
+     * Function to add tag to content using content id and $tagId (please setContentId before using this).
+     * @param int $tagId
+     * @return bool
+     */
+    public function addTagToContent(int $tagId) : bool
+    {
+        $tag = new Tag();
+        $tag->setTagId($tagId);
+        return $tag->addTagToContent($this->contentId);
+    }
+
+    /**
+     * Function to remove tag from content using content id and $tagId (please setContentId before using this).
+     * @param int $tagId
+     * @return bool
+     */
+    public function removeTagFromContent(int $tagId) : bool
+    {
+        $tag = new Tag();
+        $tag->setTagId($tagId);
+        return $tag->removeTagFromContent($this->contentId);
+    }
 
     /**
      * @return mixed
