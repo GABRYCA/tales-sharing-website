@@ -168,6 +168,31 @@ class Tag implements JsonSerializable
     }
 
     /**
+     * Function to add a tag only if it doesn't exists.
+     * @return bool
+     */
+    public function addTagIfNotExists() : bool
+    {
+        $conn = connection();
+
+        $sql = "SELECT * FROM Tag WHERE name = ?";
+
+        if ($data = $conn->execute_query($sql, [$this->name])){
+            if ($data->num_rows == 0){
+                return $this->addTag();
+            } else {
+                $row = $data->fetch_assoc();
+                $this->tagId = $row["tagId"];
+            }
+        } else {
+            $this->setErrorStatus("Error while adding tag");
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Update this tag in the database (please set tagId and name before).
      * @return bool
      */

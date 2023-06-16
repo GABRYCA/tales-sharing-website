@@ -82,7 +82,7 @@
                     <li><a class="dropdown-item" href="profile.php">Profile</a></li>
                     <li><a class="dropdown-item" href="settings.php">Settings</a></li>
                     <li><a class="dropdown-item" href="help.php">Help</a></li>
-                    <li><a class="dropdown-item" id="logout-button" href="logout.php">Logout</a></li>
+                    <li><a class="dropdown-item" id="logout-button" href="actions/logout.php">Logout</a></li>
                     <!-- Upload button -->
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item text-center text-light border-top border-bottom pt-2 pb-2 rounded-4 bg-gradient" id="upload-button" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right" href="upload-content.php">Upload</a></li>

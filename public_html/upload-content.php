@@ -45,6 +45,26 @@ $galleries = $user->getGalleries();
             font-weight: bolder !important;
             color: rgb(42, 42, 42) !important;
         }
+
+        .tag-input {
+            /* border: 1px solid black; */
+            padding: 5px;
+            font-family: Arial, sans-serif;
+        }
+
+        .tag {
+            display: inline-block;
+            background-color: rgba(173, 216, 230, 0.4);
+            border-radius: 5px;
+            padding: 2px 10px;
+            margin: 2px;
+            cursor: pointer;
+            transition: 0.15s ease-out;
+        }
+
+        .tag:hover {
+            background-color: rgba(173, 216, 230, 0.8);
+        }
     </style>
 
     <script>
@@ -131,6 +151,7 @@ $galleries = $user->getGalleries();
                     var gallery = $('#selectGallery').val();
                     var isPrivate = $('#isPrivate').is(':checked') ? 1 : 0;
                     var isAI = $('#isAI').is(':checked') ? 1 : 0;
+                    var tags = getTags();
 
                     // Check if name is empty or null
                     if (name === "" || name === null) {
@@ -168,6 +189,8 @@ $galleries = $user->getGalleries();
                     finalFile.append('gallery', gallery);
                     finalFile.append('isPrivate', isPrivate.toString());
                     finalFile.append('isAI', isAI.toString());
+                    finalFile.append('tags', ...tags);
+
 
                     // Send it to the server using jQuery AJAX along with other form data
                     $.ajax({
@@ -318,11 +341,11 @@ $galleries = $user->getGalleries();
     <div class="row text-light justify-content-around mt-3 p-3">
         <!-- Button to go back to home.php -->
         <div class="col-6">
-            <a href="home.php" class="btn btn-outline-light p-3 w-100">Home</a>
+            <a href="home.php" class="btn btn-outline-light p-3 w-100"><- Home |</a>
         </div>
         <!-- Button to go to profile.php -->
         <div class="col-6">
-            <a href="profile.php" class="btn btn-outline-light p-3 w-100">Profile</a>
+            <a href="profile.php" class="btn btn-outline-light p-3 w-100">| Profile -></a>
         </div>
     </div>
     <hr>
@@ -365,6 +388,19 @@ $galleries = $user->getGalleries();
                 <div class="col-12 col-lg-6">
                     <!-- Description input -->
                     <textarea id="DescriptionEditor"></textarea>
+                </div>
+            </div>
+
+            <!-- Row with tags input, separated by a "," each tag -->
+            <div class="row justify-content-center mt-2">
+                <div class="col-12 col-lg-6">
+                    <!-- Use a form-group to wrap the tag input -->
+                    <div class="form-group">
+                        <label for="tag-input" class="mb-1 mx-1">Enter tags separated by commas:</label>
+                        <br class="w-100">
+                        <!-- Use a contenteditable div as the tag input -->
+                        <div id="tag-input" class="tag-input form-control mt-1" contenteditable="true"></div>
+                    </div>
                 </div>
             </div>
 
@@ -465,6 +501,54 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
             $('.tox-promotion').remove();
         }, 1000);
     })
+
+    // Get the tag input element by id
+    var tagInput = $("#tag-input");
+
+    // Add a keyup event listener
+    tagInput.on("keyup", function(e) {
+        // Get the input value
+        var value = $(this).text();
+
+        // Check if the last character is a comma
+        if (value.slice(-1) == ",") {
+            // Remove the comma and any extra spaces
+            value = value.slice(0, -1).trim();
+
+            // Create a new tag element
+            var tag = $("<span class='tag'></span>");
+            tag.text(value);
+
+            // If clicks the button, remove the tag (but only the one clicked)
+            tag.on("click", function() {
+                $(this).remove();
+            });
+
+            // Insert the tag before the input, but not on the same line as "Enter tags separated by commas:" label.
+            $(this).before(tag);
+
+            // Clear the input
+            $(this).empty();
+        }
+    });
+
+    // Add a function to get the tags as an array
+    function getTags() {
+        // Initialize an empty array
+        var tags = [];
+
+        // Loop through each tag element
+        $(".tag").each(function() {
+            // Get the tag text without the close button
+            var tag = $(this).clone().children().remove().end().text();
+
+            // Push the tag to the array
+            tags.push(tag);
+        });
+
+        // Return the array
+        return tags;
+    }
 
 </script>
 </body>
