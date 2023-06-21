@@ -62,6 +62,29 @@
     </script>
 </head>
 <body class="font-monospace text-light bg-dark">
+
+<?php
+session_start();
+// Check if logged in.
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] === false) {
+    header("Location: ../login.php");
+    exit();
+}
+?>
+
+<?php
+// Load all necessary includes.
+include_once (dirname(__FILE__) . '/../private/objects/User.php');
+include_once (dirname(__FILE__) . '/../private/objects/Content.php');
+include_once (dirname(__FILE__) . '/../private/objects/Followers.php');
+
+// Get user from session
+$user = new User();
+$user->setUsername($_SESSION["username"]);
+$user->loadUser();
+
+?>
+
 <div class="container-fluid">
     <!-- Navbar -->
     <div class="row justify-content-between border-bottom pt-2 pb-2">
@@ -92,66 +115,36 @@
     </div>
 
     <div class="row row-horizon border-bottom text-center pt-3 pb-3 flex-nowrap" id="row-profiles">
-        <div class="col-3 col-md-2 col-xl-1">
-            <a href="/profile/name" data-bs-toggle="tooltip" title="click to open">
-                <img src="common/favicon.webp" alt="icon-user" class="img-fluid p-1 bg-light bg-opacity-10 rounded-4 user-icon-top" width="50" height="50">
-            </a>
-        </div>
-        <div class="col-3 col-md-2 col-xl-1">
-            <a href="/profile/name" data-bs-toggle="tooltip" title="click to open">
-                <img src="common/favicon.webp" alt="icon-user" class="img-fluid p-1 bg-light bg-opacity-10 rounded-4 user-icon-top" width="50" height="50">
-            </a>
-        </div>
-        <div class="col-3 col-md-2 col-xl-1">
-            <a href="/profile/name" data-bs-toggle="tooltip" title="click to open">
-                <img src="common/favicon.webp" alt="icon-user" class="img-fluid p-1 bg-light bg-opacity-10 rounded-4 user-icon-top" width="50" height="50">
-            </a>
-        </div>
-        <div class="col-3 col-md-2 col-xl-1">
-            <a href="/profile/name" data-bs-toggle="tooltip" title="click to open">
-                <img src="common/favicon.webp" alt="icon-user" class="img-fluid p-1 bg-light bg-opacity-10 rounded-4 user-icon-top" width="50" height="50">
-            </a>
-        </div>
-        <div class="col-3 col-md-2 col-xl-1">
-            <a href="/profile/name" data-bs-toggle="tooltip" title="click to open">
-                <img src="common/favicon.webp" alt="icon-user" class="img-fluid p-1 bg-light bg-opacity-10 rounded-4 user-icon-top" width="50" height="50">
-            </a>
-        </div>
-        <div class="col-3 col-md-2 col-xl-1">
-            <a href="/profile/name" data-bs-toggle="tooltip" title="click to open">
-                <img src="common/favicon.webp" alt="icon-user" class="img-fluid p-1 bg-light bg-opacity-10 rounded-4 user-icon-top" width="50" height="50">
-            </a>
-        </div>
-        <div class="col-3 col-md-2 col-xl-1">
-            <a href="/profile/name" data-bs-toggle="tooltip" title="click to open">
-                <img src="common/favicon.webp" alt="icon-user" class="img-fluid p-1 bg-light bg-opacity-10 rounded-4 user-icon-top" width="50" height="50">
-            </a>
-        </div>
-        <div class="col-3 col-md-2 col-xl-1">
-            <a href="/profile/name" data-bs-toggle="tooltip" title="click to open">
-                <img src="common/favicon.webp" alt="icon-user" class="img-fluid p-1 bg-light bg-opacity-10 rounded-4 user-icon-top" width="50" height="50">
-            </a>
-        </div>
-        <div class="col-3 col-md-2 col-xl-1">
-            <a href="/profile/name" data-bs-toggle="tooltip" title="click to open">
-                <img src="common/favicon.webp" alt="icon-user" class="img-fluid p-1 bg-light bg-opacity-10 rounded-4 user-icon-top" width="50" height="50">
-            </a>
-        </div>
-        <div class="col-3 col-md-2 col-xl-1">
-            <a href="/profile/name" data-bs-toggle="tooltip" title="click to open">
-                <img src="common/favicon.webp" alt="icon-user" class="img-fluid p-1 bg-light bg-opacity-10 rounded-4 user-icon-top" width="50" height="50">
-            </a>
-        </div>
-        <div class="col-3 col-md-2 col-xl-1">
-            <a href="/profile/name" data-bs-toggle="tooltip" title="click to open">
-                <img src="common/favicon.webp" alt="icon-user" class="img-fluid p-1 bg-light bg-opacity-10 rounded-4 user-icon-top" width="50" height="50">
-            </a>
-        </div>
-        <div class="col-3 col-md-2 col-xl-1">
-            <a href="/profile/name" data-bs-toggle="tooltip" title="click to open">
-                <img src="common/favicon.webp" alt="icon-user" class="img-fluid p-1 bg-light bg-opacity-10 rounded-4 user-icon-top" width="50" height="50">
-            </a>
-        </div>
+
+        <?php
+        // Get followed users and print them out.
+
+        $followers = new Followers($user->getUsername());
+        $followers->loadFollowing(); // Load following.
+        $followedUsers = $followers->getFollowing(); // Get following.
+
+        // If there are no followed users, print out a message.
+        if (count($followedUsers) === 0) {
+            echo '<div class="col-12"><h1 class="display-6">You are not following anyone!</h1></div>';
+        } else {
+
+            // For each user, make a div like this:
+            // <div class="col-3 col-md-2 col-xl-1">
+            //            <a href="/profile/name" data-bs-toggle="tooltip" title="click to open">
+            //                <img src="common/favicon.webp" alt="icon-user" class="img-fluid p-1 bg-light bg-opacity-10 rounded-4 user-icon-top" width="50" height="50">
+            //            </a>
+            //        </div>
+            // Replacing name with the username of the user.
+            foreach ($followedUsers as $followedUser) {
+                echo '<div class="col-3 col-md-2 col-xl-1">';
+                echo '<a href="profile.php?user=' . $followedUser->getUsername() . '" data-bs-toggle="tooltip" title="click to open">';
+                echo '<img src="' . $followedUser->getUrlProfilePicture() . '" alt="icon-user" class="img-fluid p-1 bg-light bg-opacity-10 rounded-4 user-icon-top" width="50" height="50">';
+                echo '</a>';
+                echo '</div>';
+            }
+        }
+
+        ?>
     </div>
 
     <!-- Content and images will be here in an array, some will be square, other rectangular, there shouldn't be empty spaces -->

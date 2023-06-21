@@ -139,8 +139,8 @@ class User implements JsonSerializable
         }
 
         $this->gender = "unspecified";
-        $this->urlProfilePicture = "assets/img/profile.png";
-        $this->urlCoverPicture = "assets/img/cover.jpg";
+        $this->urlProfilePicture = "common/assets/profile.webp";
+        $this->urlCoverPicture = "common/assets/cover.webp";
         $this->description = "I'm a new user!";
         $this->motto = "I'm a new user!";
         $this->showNSFW = 0;

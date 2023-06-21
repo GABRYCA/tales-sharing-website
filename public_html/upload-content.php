@@ -189,8 +189,16 @@ $galleries = $user->getGalleries();
                     finalFile.append('gallery', gallery);
                     finalFile.append('isPrivate', isPrivate.toString());
                     finalFile.append('isAI', isAI.toString());
-                    finalFile.append('tags', ...tags);
 
+                    // Add tags to the FormData using a for loop to make an array
+                    for (var i = 0; i < tags.length; i++) {
+                        finalFile.append('tags[]', tags[i]);
+                    }
+
+                    // For debug, print in console finalFile and tags.
+                    //console.log(...finalFile);
+                    //console.log(tags);
+                    //return;
 
                     // Send it to the server using jQuery AJAX along with other form data
                     $.ajax({

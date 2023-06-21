@@ -6,7 +6,7 @@ include_once (dirname(__FILE__) . "/../../private/objects/User.php");
 include_once (dirname(__FILE__) . "/../../private/objects/Content.php");
 include_once (dirname(__FILE__) . "/../../private/objects/Gallery.php");
 
-// If there's already an active session, send user to home.php.
+// Check if user logged in.
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] === false) {
     header("Location: ../login.php");
     exit();
@@ -30,8 +30,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $isPrivate = validate_input($_POST["isPrivate"] ?? "");
     // Get the isAI from the POST request.
     $isAI = validate_input($_POST["isAI"] ?? "");
+    // Get tags (validate too)
+    $tags = $_POST["tags"];
 
+    // Validate each tag if there's any.
+    foreach ($tags as $key => $tag) {
+        $tags[$key] = validate_input($tag);
+    }
 
+    // Check if the file is empty
     if ($file == "") {
         // Send the error array to the client
         exit("File is empty. Please select a valid file.");
@@ -113,6 +120,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $content->setPrivate($isPrivate);
     $content->setTextContent("");
     $content->setUploadDate(date("Y-m-d H:i:s"));
+    $content->setTags($tags);
 
     // Save the content to the database.
     if (!$content->addContent()){

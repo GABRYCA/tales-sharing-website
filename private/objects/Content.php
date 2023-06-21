@@ -14,6 +14,7 @@ class Content implements JsonSerializable
     private $uploadDate;
     private $isPrivate;
     private $isAI;
+    private $tagList = [];
     private $errorStatus;
 
     /**
@@ -92,6 +93,23 @@ class Content implements JsonSerializable
         }
 
         if ($conn->execute_query($sql, [$this->ownerId, $this->type, $this->urlImage, $this->textContent, $this->title, $this->description, $this->uploadDate, $this->isPrivate, $this->isAI])) {
+
+            // If there're tags in tagList I load the content.
+
+            if (count($this->tagList) == 0){
+                return true;
+            }
+
+            $this->loadContentByPath(); // Load content by path.
+
+            // Now, if there're, I can link the tags to the content.
+            foreach ($this->tagList as $tag) {
+                if (!$tag->addTagToContent($this->contentId)){
+                    $this->setErrorStatus("Error while adding content, error while adding tag to content");
+                    return false;
+                }
+            }
+
             return true;
         } else {
             $this->setErrorStatus("Error while adding content");
@@ -513,6 +531,31 @@ class Content implements JsonSerializable
     public function setIsAI($isAI): void
     {
         $this->isAI = $isAI;
+    }
+
+    /**
+     * Function to set tags to content using content id (please setContentId before using this).
+     * array of tags
+     * @param array $tags
+     * @return bool
+     */
+    public function setTags(array $tags) : bool
+    {
+        // For each tag, create a new tag object and add it to the taglist.
+        foreach ($tags as $tag) {
+            $tagObject = new Tag();
+            // Set tag name.
+            $tagObject->setName($tag);
+            // Check if tag exists.
+            if (!$tagObject->addTagIfNotExists()){
+                $this->setErrorStatus("Error while adding tag to database");
+                return false;
+            }
+            // Add tag to array internal (will be saved later).
+            $this->tagList[] = $tagObject;
+        }
+
+        return true;
     }
 
     /**
