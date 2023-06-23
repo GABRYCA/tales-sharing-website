@@ -161,7 +161,7 @@ class Content implements JsonSerializable
     {
         $conn = connection();
 
-        $sql = "SELECT * FROM Content";
+        $sql = "SELECT * FROM Content ORDER BY uploadDate DESC";
 
         if ($data = $conn->execute_query($sql)) {
             return $this->contentDataArray($data);
@@ -198,7 +198,7 @@ class Content implements JsonSerializable
     {
         $conn = connection();
 
-        $sql = "SELECT * FROM Content WHERE isPrivate = 0";
+        $sql = "SELECT * FROM Content WHERE isPrivate = 0 ORDER BY uploadDate DESC";
 
         if ($data = $conn->execute_query($sql)) {
             return $this->contentDataArray($data);
@@ -216,7 +216,7 @@ class Content implements JsonSerializable
     {
         $conn = connection();
 
-        $sql = "SELECT * FROM Content WHERE isPrivate = 1";
+        $sql = "SELECT * FROM Content WHERE isPrivate = 1 ORDER BY uploadDate DESC";
 
         if ($data = $conn->execute_query($sql)) {
             return $this->contentDataArray($data);
@@ -234,7 +234,7 @@ class Content implements JsonSerializable
     {
         $conn = connection();
 
-        $sql = "SELECT * FROM Content WHERE isAI = 1";
+        $sql = "SELECT * FROM Content WHERE isAI = 1 ORDER BY uploadDate DESC";
 
         if ($data = $conn->execute_query($sql)) {
             return $this->contentDataArray($data);
@@ -252,7 +252,7 @@ class Content implements JsonSerializable
     {
         $conn = connection();
 
-        $sql = "SELECT * FROM Content WHERE isAI = 0";
+        $sql = "SELECT * FROM Content WHERE isAI = 0 ORDER BY uploadDate DESC";
 
         if ($data = $conn->execute_query($sql)) {
             return $this->contentDataArray($data);
@@ -264,13 +264,13 @@ class Content implements JsonSerializable
 
     /**
      * Function to get all the content from the database that is public and not AI generated.
-     * @return array
+     * @return Content[]
      */
     public function getAllPublicNotAIGeneratedContent(): array
     {
         $conn = connection();
 
-        $sql = "SELECT * FROM Content WHERE isPrivate = 0 AND isAI = 0";
+        $sql = "SELECT * FROM Content WHERE isPrivate = 0 AND isAI = 0 ORDER BY uploadDate DESC";
 
         if ($data = $conn->execute_query($sql)) {
             return $this->contentDataArray($data);

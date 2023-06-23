@@ -128,13 +128,7 @@ $user->loadUser();
             echo '<div class="col-12"><h1 class="display-6">You are not following anyone!</h1></div>';
         } else {
 
-            // For each user, make a div like this:
-            // <div class="col-3 col-md-2 col-xl-1">
-            //            <a href="/profile/name" data-bs-toggle="tooltip" title="click to open">
-            //                <img src="common/favicon.webp" alt="icon-user" class="img-fluid p-1 bg-light bg-opacity-10 rounded-4 user-icon-top" width="50" height="50">
-            //            </a>
-            //        </div>
-            // Replacing name with the username of the user.
+            // For each user make an icon to visit his profile
             foreach ($followedUsers as $followedUser) {
                 echo '<div class="col-3 col-md-2 col-xl-1">';
                 echo '<a href="profile.php?user=' . $followedUser->getUsername() . '" data-bs-toggle="tooltip" title="click to open">';
@@ -149,16 +143,27 @@ $user->loadUser();
 
     <!-- Content and images will be here in an array, some will be square, other rectangular, there shouldn't be empty spaces -->
     <div class="row p-3 gap-0 justify-content-evenly gy-3">
-        <div class="col-12 col-lg-4 col-xxl-3">
-            <div class="img-wrapper position-relative">
-                <img src="data/profile/anonymousgca/gallery/images/Dragon%20-%20Fire%20-%20Dark.webp" alt="image" class="img-fluid rounded-4 img-thumbnail bg-placeholder img-home" loading="lazy" onclick="window.location.href = '/share.php?id=1'" onload="hideSpinner(this)" style="opacity: 0;" data-aos="fade-up">
-            </div>
-        </div>
-        <div class="col-12 col-lg-4 col-xxl-3">
-            <div class="img-wrapper position-relative">
-                <img src="data/profile/anonymousgca/gallery/images/Dragon%20-%20Electric%20-%20Dark.webp" alt="image" class="img-fluid rounded-4 img-thumbnail bg-placeholder img-home" loading="lazy" onclick="window.location.href = '/share.php?id=1'" onload="hideSpinner(this)" style="opacity: 0;" data-aos="fade-up">
-            </div>
-        </div>
+
+        <?php
+        $content = new Content();
+        $contentArray = $content->getAllPublicContent();
+
+        // For each Content, print it out.
+        // If there are no content, print out a message.
+        if (count($contentArray) === 0) {
+            echo '<div class="col-12"><h1 class="display-6 text-center">There is no content to show!</h1></div>';
+        } else {
+
+            // For each content make an icon to visit his profile
+            foreach ($contentArray as $content) {
+                echo '<div class="col-12 col-lg-4 col-xxl-3">';
+                echo '<div class="img-wrapper position-relative">';
+                echo '<img src="' . $content->getUrlImage() . '" alt="image" class="img-fluid rounded-4 img-thumbnail bg-placeholder img-home" loading="lazy" onclick="window.location.href = \'/share.php?id=' . $content->getContentId() . '\'" onload="hideSpinner(this)" style="opacity: 0;" data-aos="fade-up">';
+                echo '</div>';
+                echo '</div>';
+            }
+        }
+        ?>
     </div>
 
 </div>

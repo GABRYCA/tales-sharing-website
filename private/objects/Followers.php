@@ -58,7 +58,8 @@ class Followers
     public function loadFollowing() : bool {
         $conn = connection();
 
-        $sql = "SELECT userId FROM Follower WHERE followerId = ?";
+        // Query to get all users following $username and ordered by their last upload (using necessary inner join)
+        $sql = "SELECT userId FROM Follower INNER JOIN Content ON Follower.userId = Content.ownerId WHERE followerId = ? GROUP BY userId ORDER BY MAX(Content.uploadDate) DESC";
 
         if ($data = $conn->execute_query($sql, [$this->username])) {
             // Array of User following $username
