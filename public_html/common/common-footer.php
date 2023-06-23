@@ -13,7 +13,7 @@
                 <a href="https://github.com/GABRYCA" target="_blank" class="text-decoration-none text-light"><i class="fab fa-github"></i></a>
                 <a href="https://twitter.com/GABRYCA1" target="_blank" class="text-decoration-none text-light"><i class="fab fa-twitter"></i></a>
                 <a href="https://instagram.com/anonymousgca" target="_blank" class="text-decoration-none text-light"><i class="fab fa-instagram"></i></a>
-                <a href="https://discord.gg/KCPUtMZtjQ" target="_blank" class="text-decoration-none text-light"><i class="fab fa-discord"></i></a>
+                <a href="https://discord.io/AnonymousGCA" target="_blank" class="text-decoration-none text-light"><i class="fab fa-discord"></i></a>
                 <a href="https://www.linkedin.com/in/gabriele-caretti-046408270/" target="_blank" class="text-decoration-none text-light"><i class="fab fa-linkedin"></i></a>
             </p>
         </div>

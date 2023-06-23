@@ -65,6 +65,47 @@ $galleries = $user->getGalleries();
         .tag:hover {
             background-color: rgba(173, 216, 230, 0.8);
         }
+
+        /* Hide the suggestion list by default */
+        .suggestion-list {
+            display: none;
+        }
+
+        /* Show the suggestion list as a dropdown list */
+        .suggestion-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            border: 1px solid #343a40;
+            border-top: none;
+            max-height: 200px;
+            overflow-y: auto;
+            border-radius: 5px; /* Aggiungi il bordo arrotondato alla lista */
+        }
+
+        /* Show the list items with a dark background and a pointer cursor */
+        .suggestion-list li {
+            background-color: rgb(14, 17, 22);
+            color: white;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        /* Change the background color of the list items when the mouse hovers over them */
+        .suggestion-list li:hover {
+            background: linear-gradient(90deg, rgb(0, 0, 139) 0%, rgb(139, 0, 139) 100%);
+        }
+
+        /* Style the caret on open */
+        .suggestion-list li:first-child {
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+
+        .suggestion-list li:last-child {
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
     </style>
 
     <script>
@@ -408,6 +449,10 @@ $galleries = $user->getGalleries();
                         <br class="w-100">
                         <!-- Use a contenteditable div as the tag input -->
                         <div id="tag-input" class="tag-input form-control mt-1" contenteditable="true"></div>
+                        <!-- Use a hidden input to store the tags -->
+                        <input id="tag-input-hidden" type="hidden" name="tags" value="" />
+                        <!-- Use a ul to display suggestions -->
+                        <ul id="suggestion-list" class="suggestion-list"></ul>
                     </div>
                 </div>
             </div>
@@ -513,8 +558,8 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
     // Get the tag input element by id
     var tagInput = $("#tag-input");
 
-    // Add a keyup event listener
-    tagInput.on("keyup", function(e) {
+    // Add an input event listener
+    tagInput.on("input", function (e) {
         // Get the input value
         var value = $(this).text();
 
@@ -523,39 +568,134 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
             // Remove the comma and any extra spaces
             value = value.slice(0, -1).trim();
 
-            // Create a new tag element
-            var tag = $("<span class='tag'></span>");
-            tag.text(value);
-
-            // If clicks the button, remove the tag (but only the one clicked)
-            tag.on("click", function() {
-                $(this).remove();
-            });
-
-            // Insert the tag before the input, but not on the same line as "Enter tags separated by commas:" label.
-            $(this).before(tag);
+            // Add the tag to the hidden input and create the tag element
+            addTag(value);
 
             // Clear the input
             $(this).empty();
+        } else {
+            if (value !== "") {
+                // Send an ajax request to get suggestions
+                $.ajax({
+                    url: "actions/tagService.php", // Your PHP service that returns tags in JSON format
+                    type: "GET",
+                    data: { q: value }, // The query to send to the service
+                    dataType: "json",
+                    success: function (data) {
+                        // If the request succeeds, show the results in the dropdown list
+                        showSuggestions(data);
+                    },
+                    error: function (error) {
+                        // If the request fails, show an error message
+                        console.log(error);
+                    },
+                });
+            } else {
+                // If the value is empty, hide the suggestions list
+                hideSuggestions();
+            }
         }
     });
 
-    // Add a function to get the tags as an array
-    function getTags() {
-        // Initialize an empty array
-        var tags = [];
-
-        // Loop through each tag element
-        $(".tag").each(function() {
-            // Get the tag text without the close button
-            var tag = $(this).clone().children().remove().end().text();
-
-            // Push the tag to the array
-            tags.push(tag);
+    function showSuggestions(data) {
+        // Get the dropdown list element by id
+        var list = $("#suggestion-list");
+        // Empty the list content
+        list.empty();
+        // Get the tags as an array
+        var tags = getTags();
+        // Filter the data to remove the tags that already exist in the input
+        data = data.filter(function (item) {
+            return tags.indexOf(item.name) == -1;
         });
+        // For each item of the data received, create a li element with the tag name
+        $.each(data, function (index, item) {
+            var li = $("<li></li>").text(item.name);
+            // Add a click event on the li element to add the selected tag to the input
+            li.click(function () {
+                addTag(item.name);
+                // Clear the input content
+                $("#tag-input").empty();
+                // Hide the suggestions list
+                hideSuggestions();
+            });
+            // Append the li element to the list
+            list.append(li);
+        });
+        // Show the dropdown list
+        list.show();
+    }
 
-        // Return the array
-        return tags;
+    // Function to hide suggestions in the dropdown list
+    function hideSuggestions() {
+        // Get the dropdown list element by id
+        var list = $("#suggestion-list");
+        // Hide the dropdown list
+        list.hide();
+    }
+
+    // Function to add a tag to the hidden input
+    function addTag(tag) {
+        // Get the hidden input element by id
+        var input = $("#tag-input-hidden");
+        // Get the current input value
+        var value = input.val();
+        // Get the tags as an array
+        var tags = getTags();
+        // Check if the tag already exists in the array
+        if (tags.indexOf(tag) == -1) {
+            // If not, add the tag to the input value
+            // If the value is not empty, add a comma before the tag
+            if (value != "") {
+                value += ",";
+            }
+            value += tag;
+            // Set the new input value
+            input.val(value);
+            // Create a new tag element
+            var tagElement = $("<span class='tag'></span>");
+            tagElement.text(tag);
+            // If clicks the button, remove the tag (but only the one clicked)
+            tagElement.on("click", function () {
+                removeTag(tag);
+                $(this).remove();
+            });
+            // Insert the tag before the input
+            $("#tag-input").before(tagElement);
+        }
+    }
+
+    // Function to remove a tag from the hidden input
+    function removeTag(tag) {
+        // Get the hidden input element by id
+        var input = $("#tag-input-hidden");
+        // Get the current input value
+        var value = input.val();
+        // Check if the value exists
+        if (value) {
+            // Split the value by comma
+            var tags = value.split(",");
+            // Find the index of the tag to remove
+            var index = tags.indexOf(tag);
+            // If the index is found, remove the tag from the array
+            if (index > -1) {
+                tags.splice(index, 1);
+            }
+            // Join the array by comma
+            value = tags.join(",");
+            // Set the new input value
+            input.val(value);
+        }
+    }
+
+    // Function to get the tags as an array
+    function getTags() {
+        // Get the hidden input element by id
+        var input = $("#tag-input-hidden");
+        // Get the current input value
+        var value = input.val();
+        // Split the value by comma and return the array
+        return value.split(",");
     }
 
 </script>
