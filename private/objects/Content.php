@@ -161,7 +161,7 @@ class Content implements JsonSerializable
     {
         $conn = connection();
 
-        $sql = "SELECT * FROM Content ORDER BY uploadDate DESC";
+        $sql = "SELECT * FROM Content ORDER BY uploadDate DESC, contentId DESC";
 
         if ($data = $conn->execute_query($sql)) {
             return $this->contentDataArray($data);
@@ -180,7 +180,7 @@ class Content implements JsonSerializable
     {
         $conn = connection();
 
-        $sql = "SELECT * FROM Content ORDER BY uploadDate DESC LIMIT ?";
+        $sql = "SELECT * FROM Content ORDER BY uploadDate DESC, contentId DESC LIMIT ?";
 
         if ($data = $conn->execute_query($sql, [$amount])) {
             return $this->contentDataArray($data);
@@ -198,7 +198,7 @@ class Content implements JsonSerializable
     {
         $conn = connection();
 
-        $sql = "SELECT * FROM Content WHERE isPrivate = 0 ORDER BY uploadDate DESC";
+        $sql = "SELECT * FROM Content WHERE isPrivate = 0 ORDER BY uploadDate DESC, contentId DESC";
 
         if ($data = $conn->execute_query($sql)) {
             return $this->contentDataArray($data);
@@ -216,7 +216,7 @@ class Content implements JsonSerializable
     {
         $conn = connection();
 
-        $sql = "SELECT * FROM Content WHERE isPrivate = 1 ORDER BY uploadDate DESC";
+        $sql = "SELECT * FROM Content WHERE isPrivate = 1 ORDER BY uploadDate DESC, contentId DESC";
 
         if ($data = $conn->execute_query($sql)) {
             return $this->contentDataArray($data);
@@ -234,7 +234,7 @@ class Content implements JsonSerializable
     {
         $conn = connection();
 
-        $sql = "SELECT * FROM Content WHERE isAI = 1 ORDER BY uploadDate DESC";
+        $sql = "SELECT * FROM Content WHERE isAI = 1 ORDER BY uploadDate DESC, contentId DESC";
 
         if ($data = $conn->execute_query($sql)) {
             return $this->contentDataArray($data);
@@ -252,7 +252,7 @@ class Content implements JsonSerializable
     {
         $conn = connection();
 
-        $sql = "SELECT * FROM Content WHERE isAI = 0 ORDER BY uploadDate DESC";
+        $sql = "SELECT * FROM Content WHERE isAI = 0 ORDER BY uploadDate DESC, contentId DESC";
 
         if ($data = $conn->execute_query($sql)) {
             return $this->contentDataArray($data);
@@ -270,7 +270,7 @@ class Content implements JsonSerializable
     {
         $conn = connection();
 
-        $sql = "SELECT * FROM Content WHERE isPrivate = 0 AND isAI = 0 ORDER BY uploadDate DESC";
+        $sql = "SELECT * FROM Content WHERE isPrivate = 0 AND isAI = 0 ORDER BY uploadDate DESC, contentId DESC";
 
         if ($data = $conn->execute_query($sql)) {
             return $this->contentDataArray($data);

@@ -106,6 +106,22 @@ $galleries = $user->getGalleries();
             border-bottom-left-radius: 5px;
             border-bottom-right-radius: 5px;
         }
+
+        #loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid transparent;
+            border-image: linear-gradient(90deg, rgba(0,97,255,1) 0%, rgba(255,15,123,1) 100%);
+            border-image-slice: 1;
+            border-radius: 50%;
+            margin: auto;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
     </style>
 
     <script>
@@ -114,6 +130,12 @@ $galleries = $user->getGalleries();
         var fileData = null;
 
         $(function() {
+
+            // Create a variable to store the loader element
+            var $loader = $('#loader');
+
+            // Hide the loader element initially
+            $loader.hide();
 
             $('#createGallery').on('click', function(){
                 // Get from input fron newGallery (the name of the new gallery)
@@ -248,13 +270,21 @@ $galleries = $user->getGalleries();
                         processData: false,
                         contentType: false,
                         data: finalFile, // The file data and other form data as key-value pairs
+                        beforeSend: function() {
+                            // Show the loader element before sending the request
+                            $loader.show();
+                        },
+                        complete: function() {
+                            // Hide the loader element after completing the request
+                            $loader.hide();
+                        },
                         success: function(response) {
                             // Toast with output from upload.php
                             $.toast({
                                 text: response + ' \nPlease wait for the page reload before uploading again.',
                                 icon: 'info',
                                 position: 'top-right',
-                                hideAfter: 10000,
+                                hideAfter: 3000,
 
                             });
 
@@ -269,7 +299,7 @@ $galleries = $user->getGalleries();
                             // After 10 seconds, reload the page
                             setTimeout(function() {
                                 location.reload();
-                            }, 10000);
+                            }, 3000);
                         },
                         error: function(error) {
                             // Toast with error from upload.php
@@ -520,6 +550,12 @@ $galleries = $user->getGalleries();
             <div class="row justify-content-center">
                 <div class="col-12 col-lg-6">
                     <hr>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-12 col-lg-6 text-center d-flex align-items-center">
+                    <div id="loader"></div>
                 </div>
             </div>
 
