@@ -4,7 +4,7 @@
     <?php
     include_once (dirname(__FILE__) . '/common/common-head.php');
     ?>
-    <title>Home - Tales</title>
+    <title>Share - Tales</title>
     <style>
         #upload-button {
             background: rgb(0,97,255) !important;
@@ -27,31 +27,6 @@
         #logout-button {
             color: #FF0F7BFF !important;
         }
-
-        .user-icon-top {
-            transition: 0.2s ease-out !important;
-        }
-
-        .user-icon-top:hover {
-            background-color: rgba(255, 15, 123, 0.54) !important;
-            box-shadow: 0 0 0 0.2rem rgba(255, 15, 123, 0.25) !important;
-        }
-
-        .img-home {
-            transition: 0.2s ease-out !important;
-        }
-
-        .row-horizon {
-            overflow-x: auto;
-            white-space: nowrap;
-        }
-
-        .img-home:hover {
-            background-color: rgba(255, 15, 123, 0.54) !important;
-            box-shadow: 0 0 0 0.2rem rgba(255, 15, 123, 0.25) !important;
-            filter: brightness(1.1);
-            cursor: pointer;
-        }
     </style>
 
     <script>
@@ -70,19 +45,36 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] === false) {
     header("Location: ../login.php");
     exit();
 }
+
+if (!isset($_GET["id"])) {
+    header("Location: ../home.php");
+    exit();
+}
+
 ?>
 
 <?php
 // Load all necessary includes.
 include_once (dirname(__FILE__) . '/../private/objects/User.php');
 include_once (dirname(__FILE__) . '/../private/objects/Content.php');
-include_once (dirname(__FILE__) . '/../private/objects/Followers.php');
 
 // Get user from session
 $user = new User();
 $user->setUsername($_SESSION["username"]);
 $user->loadUser();
 
+// Get content from id, if not found or it is private, redirect to home.
+$content = new Content();
+$content->setContentId($_GET["id"]);
+if (!$content->loadContent()) {
+    header("Location: ../home.php");
+    exit();
+}
+
+if ($content->getIsPrivate() === true) {
+    header("Location: ../home.php");
+    exit();
+}
 ?>
 
 <div class="container-fluid">
@@ -114,57 +106,7 @@ $user->loadUser();
         </div>
     </div>
 
-    <div class="row row-horizon border-bottom text-center pt-3 pb-3 flex-nowrap" id="row-profiles">
 
-        <?php
-        // Get followed users and print them out.
-
-        $followers = new Followers($user->getUsername());
-        $followers->loadFollowing(); // Load following.
-        $followedUsers = $followers->getFollowing(); // Get following.
-
-        // If there are no followed users, print out a message.
-        if (count($followedUsers) === 0) {
-            echo '<div class="col-12"><h1 class="display-6">You are not following anyone!</h1></div>';
-        } else {
-
-            // For each user make an icon to visit his profile
-            foreach ($followedUsers as $followedUser) {
-                echo '<div class="col-3 col-md-2 col-xl-1">';
-                echo '<a href="profile.php?user=' . $followedUser->getUsername() . '" data-bs-toggle="tooltip" title="click to open">';
-                echo '<img src="' . $followedUser->getUrlProfilePicture() . '" alt="icon-user" class="img-fluid p-1 bg-light bg-opacity-10 rounded-4 user-icon-top" width="50" height="50">';
-                echo '</a>';
-                echo '</div>';
-            }
-        }
-
-        ?>
-    </div>
-
-    <!-- Content and images will be here in an array, some will be square, other rectangular, there shouldn't be empty spaces -->
-    <div class="row p-3 gap-0 justify-content-evenly gy-3">
-
-        <?php
-        $content = new Content();
-        $contentArray = $content->getAllPublicContent();
-
-        // For each Content, print it out.
-        // If there are no content, print out a message.
-        if (count($contentArray) === 0) {
-            echo '<div class="col-12"><h1 class="display-6 text-center">There is no content to show!</h1></div>';
-        } else {
-
-            // For each content make an icon to visit his profile
-            foreach ($contentArray as $content) {
-                echo '<div class="col-12 col-lg-4 col-xxl-3">';
-                echo '<div class="img-wrapper position-relative">';
-                echo '<img src="' . $content->getUrlImage() . '" alt="image" class="img-fluid rounded-4 img-thumbnail bg-placeholder img-home" loading="lazy" onclick="window.location.href = \'/share.php?id=' . $content->getContentId() . '\'" onload="hideSpinner(this)" style="opacity: 0;" data-aos="fade-up">';
-                echo '</div>';
-                echo '</div>';
-            }
-        }
-        ?>
-    </div>
 
 </div>
 
