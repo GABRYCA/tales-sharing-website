@@ -27,6 +27,11 @@ class Content implements JsonSerializable
         $sql = "SELECT * FROM Content WHERE contentId = ?";
 
         if ($data = $conn->execute_query($sql, [$this->contentId])) {
+            // Check if found content
+            if ($data->num_rows == 0) {
+                $this->setErrorStatus("Error while getting content by owner and path, no content found");
+                return false;
+            }
             $row = $data->fetch_assoc();
             $this->ownerId = $row["ownerId"];
             $this->type = $row["type"];

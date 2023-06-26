@@ -4,6 +4,8 @@
     <?php
     include_once (dirname(__FILE__) . '/common/common-head.php');
     ?>
+    <script src="data/util/tinymce/js/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.3/purify.min.js" integrity="sha512-TBmnYz6kBCpcGbD55K7f4LZ+ykn3owqujFnUiTSHEto6hMA7aV4W7VDPvlqDjQImvZMKxoR0dNY5inyhxfZbmA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <title>Share - Tales</title>
     <style>
         #upload-button {
@@ -20,7 +22,7 @@
 
         #dropdownMenuLink {
             background: rgb(0,97,255) !important;
-            background: linear-gradient(90deg, rgba(0,97,255,1) 0%, rgba(255,15,123,1) 100%) !important;
+            background: linear-gradient(90deg, rgba(0,97,255,1) 0%, rgb(255, 15, 123) 100%) !important;
             transition: 0.4s ease-out !important;
         }
 
@@ -46,17 +48,20 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] === false) {
     exit();
 }
 
-if (!isset($_GET["id"])) {
+if (empty($_GET["id"])) {
     header("Location: ../home.php");
     exit();
 }
 
-?>
-
-<?php
-// Load all necessary includes.
+// Includes
+include_once (dirname(__FILE__) . '/common/utility.php');
 include_once (dirname(__FILE__) . '/../private/objects/User.php');
 include_once (dirname(__FILE__) . '/../private/objects/Content.php');
+
+// tinyMCE which's in data/util/tinymce/js/tinymce/tinymce.min.js
+    include_once
+
+$id = validate_input($_GET["id"]);
 
 // Get user from session
 $user = new User();
@@ -65,16 +70,21 @@ $user->loadUser();
 
 // Get content from id, if not found or it is private, redirect to home.
 $content = new Content();
-$content->setContentId($_GET["id"]);
+$content->setContentId($id);
 if (!$content->loadContent()) {
     header("Location: ../home.php");
     exit();
 }
 
-if ($content->getIsPrivate() === true) {
+if ($content->getIsPrivate() === true && $content->getOwnerId() !== $user->getUsername()) {
     header("Location: ../home.php");
     exit();
 }
+
+// Get owner of content
+$owner = new User();
+$owner->setUsername($content->getOwnerId());
+$owner->loadUser();
 ?>
 
 <div class="container-fluid">
@@ -106,7 +116,38 @@ if ($content->getIsPrivate() === true) {
         </div>
     </div>
 
-
+    <!-- Content -->
+    <div class="container-xxl">
+        <div class="row mt-4">
+            <div class="col">
+                <div class="row justify-content-center p-3">
+                    <!-- Image -->
+                    <div class="col-12 col-xxl-7 rounded-3">
+                        <img src="<?php echo $content->getUrlImage(); ?>" class="img-fluid rounded-3 border-gradient" alt="Image" onerror="hideSpinner(this)">
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="row justify-content-center d-flex align-items-center">
+                <!-- Icon of user -->
+                <div class="col-3 text-end">
+                    <a href="profile.php?username=<?php echo $content->getOwnerId(); ?>" class="m-auto">
+                        <img src="<?php echo $owner->getUrlProfilePicture(); ?>" class="img-fluid rounded-circle border-gradient" alt="Profile Picture" width="100" onerror="hideSpinner(this)">
+                    </a>
+                </div>
+                <!-- Title and owner name of content -->
+                <div class="col-9 text-start">
+                    <h2><?php echo $content->getTitle(); ?></h2>
+                    <h6>by <a href="profile.php?username=<?php echo $content->getOwnerId(); ?>"><?php echo $content->getOwnerId(); ?></a></h6>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col" id="description">
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
 

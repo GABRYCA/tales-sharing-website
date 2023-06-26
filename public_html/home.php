@@ -132,7 +132,7 @@ $user->loadUser();
             foreach ($followedUsers as $followedUser) {
                 echo '<div class="col-3 col-md-2 col-xl-1">';
                 echo '<a href="profile.php?user=' . $followedUser->getUsername() . '" data-bs-toggle="tooltip" title="click to open">';
-                echo '<img src="' . $followedUser->getUrlProfilePicture() . '" alt="icon-user" class="img-fluid p-1 bg-light bg-opacity-10 rounded-4 user-icon-top" width="50" height="50">';
+                echo '<img src="' . $followedUser->getUrlProfilePicture() . '" alt="icon-user" class="img-fluid bg-placeholder bg-opacity-10 rounded-4 user-icon-top" width="50" height="50">';
                 echo '</a>';
                 echo '</div>';
             }
