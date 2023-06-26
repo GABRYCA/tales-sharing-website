@@ -169,4 +169,9 @@ CREATE TABLE Premium (
 
 ### Diagram (Requires revision and may not be updated):
 
-![Diagram.png](assets%2Fimg%2FDiagram.webp)
+![Diagram.webp](assets%2Fimg%2FDiagram.webp)
+
+## Preview (Work-In-Progress)
+
+#### Shares:
+![Shares.webp](assets%2Fimg%2FShares.webp)
