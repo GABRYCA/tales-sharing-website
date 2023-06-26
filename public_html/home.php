@@ -38,6 +38,7 @@
         }
 
         .img-home {
+            max-height: 80vh !important;
             transition: 0.2s ease-out !important;
         }
 
@@ -90,7 +91,7 @@ $user->loadUser();
     <div class="row justify-content-between border-bottom pt-2 pb-2">
         <div class="col-3">
             <!-- Logo (common/favicon.webp) -->
-            <a href="index.php">
+            <a href="home.php">
                 <img src="common/favicon.webp" alt="GCA's Baseline" width="40" height="40">
             </a>
         </div>
@@ -157,7 +158,7 @@ $user->loadUser();
             // For each content make an icon to visit his profile
             foreach ($contentArray as $content) {
                 echo '<div class="col-12 col-lg-4 col-xxl-3">';
-                echo '<div class="img-wrapper position-relative">';
+                echo '<div class="img-wrapper position-relative text-center">';
                 echo '<img src="' . $content->getUrlImage() . '" alt="image" class="img-fluid rounded-4 img-thumbnail bg-placeholder img-home" loading="lazy" onclick="window.location.href = \'/share.php?id=' . $content->getContentId() . '\'" onload="hideSpinner(this)" style="opacity: 0;" data-aos="fade-up">';
                 echo '</div>';
                 echo '</div>';

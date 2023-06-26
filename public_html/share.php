@@ -29,6 +29,11 @@
         #logout-button {
             color: #FF0F7BFF !important;
         }
+
+        #image {
+            max-height: 90vh !important;
+        }
+
     </style>
 
     <script>
@@ -92,7 +97,7 @@ $owner->loadUser();
     <div class="row justify-content-between border-bottom pt-2 pb-2">
         <div class="col-3">
             <!-- Logo (common/favicon.webp) -->
-            <a href="index.php">
+            <a href="home.php">
                 <img src="common/favicon.webp" alt="GCA's Baseline" width="40" height="40">
             </a>
         </div>
@@ -120,10 +125,10 @@ $owner->loadUser();
     <div class="container-xxl">
         <div class="row mt-4">
             <div class="col">
-                <div class="row justify-content-center p-3">
+                <div class="row justify-content-center px-xxl-3 pt-2 pb-3">
                     <!-- Image -->
-                    <div class="col-12 col-xxl-7 rounded-3">
-                        <img src="<?php echo $content->getUrlImage(); ?>" class="img-fluid rounded-3 border-gradient" alt="Image" onerror="hideSpinner(this)">
+                    <div class="col-12 rounded-3 text-center px-0">
+                        <img src="<?php echo $content->getUrlImage(); ?>" class="img-fluid rounded-3" id="image" alt="Image" onerror="hideSpinner(this)">
                     </div>
                 </div>
             </div>
