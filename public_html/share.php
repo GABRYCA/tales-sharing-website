@@ -62,6 +62,7 @@ if (empty($_GET["id"])) {
 include_once (dirname(__FILE__) . '/common/utility.php');
 include_once (dirname(__FILE__) . '/../private/objects/User.php');
 include_once (dirname(__FILE__) . '/../private/objects/Content.php');
+include_once (dirname(__FILE__) . '/../private/objects/Tag.php');
 
 // tinyMCE which's in data/util/tinymce/js/tinymce/tinymce.min.js
     include_once
@@ -123,32 +124,54 @@ $owner->loadUser();
 
     <!-- Content -->
     <div class="container-xxl">
-        <div class="row mt-4">
+        <div class="row mt-4 justify-content-center">
             <div class="col">
                 <div class="row justify-content-center px-xxl-3 pt-2 pb-3">
                     <!-- Image -->
                     <div class="col-12 rounded-3 text-center px-0">
-                        <img src="<?php echo $content->getUrlImage(); ?>" class="img-fluid rounded-3" id="image" alt="Image" onerror="hideSpinner(this)">
+                        <a href="<?= $content->getUrlImage() ?>" target="_blank">
+                            <img src="<?= $content->getUrlImage() ?>" class="img-fluid rounded-3" id="image" alt="Image" onerror="hideSpinner(this)">
+                        </a>
                     </div>
                 </div>
             </div>
-            <hr>
+            <hr class="mb-2">
             <div class="row justify-content-center d-flex align-items-center">
-                <!-- Icon of user -->
-                <div class="col-3 text-end">
-                    <a href="profile.php?username=<?php echo $content->getOwnerId(); ?>" class="m-auto">
-                        <img src="<?php echo $owner->getUrlProfilePicture(); ?>" class="img-fluid rounded-circle border-gradient" alt="Profile Picture" width="100" onerror="hideSpinner(this)">
-                    </a>
+                <!-- User's icon, title, owner -->
+                <div class="col-12 col-lg-6">
+                    <div class="row justify-content-center d-flex align-items-center">
+                        <!-- Icon of user -->
+                        <div class="col-3 text-end">
+                            <a href="profile.php?username=<?= $content->getOwnerId(); ?>" class="m-auto">
+                                <img src="<?= $owner->getUrlProfilePicture(); ?>" class="img-fluid rounded-circle border-gradient" alt="Profile Picture" width="100" onerror="hideSpinner(this)">
+                            </a>
+                        </div>
+                        <!-- Title and owner name of content -->
+                        <div class="col-9 text-center text-lg-start">
+                            <h2><?= $content->getTitle() ?></h2>
+                            <h6>by <a href="profile.php?username=<?= $content->getOwnerId(); ?>"><?php echo $content->getOwnerId(); ?></a></h6>
+                        </div>
+                    </div>
                 </div>
-                <!-- Title and owner name of content -->
-                <div class="col-9 text-start">
-                    <h2><?php echo $content->getTitle(); ?></h2>
-                    <h6>by <a href="profile.php?username=<?php echo $content->getOwnerId(); ?>"><?php echo $content->getOwnerId(); ?></a></h6>
+                <!-- Tags -->
+                <div class="col-12 col-lg-6 mt-3 mb-2 mt-lg-0 mb-lg-0">
+                    <!-- Get all tags of post, print them out, they should be clickable and redirect to search.php?tag=tagname -->
+                    <div class="row justify-content-evenly">
+                        <?php
+                        $tags = $content->getTagsOfContent();
+                        foreach ($tags as $tag) {
+                            echo '<div class="col-auto text-center p-0">';
+                            echo '<a href="search.php?tag=' . $tag->getName() . '" class="btn btn-outline-light m-1">' . $tag->getName() . '</a>';
+                            echo '</div>';
+                        }
+                        ?>
+                    </div>
                 </div>
             </div>
             <hr>
             <div class="row">
                 <div class="col" id="description">
+                    <p><?= html_entity_decode($content->getDescription())?></>
                 </div>
             </div>
         </div>

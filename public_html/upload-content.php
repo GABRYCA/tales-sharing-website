@@ -204,6 +204,7 @@ $galleries = $user->getGalleries();
 
             // Bind submit event to the form element
             $('#upload').on('click', function(e) {
+                tinymce.triggerSave();
                 // Prevent the default form submission action
                 e.preventDefault();
                 // Check if the file data is not null
