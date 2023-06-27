@@ -149,7 +149,7 @@ $owner->loadUser();
                         <!-- Title and owner name of content -->
                         <div class="col-9 text-center text-lg-start">
                             <h2><?= $content->getTitle() ?></h2>
-                            <h6>by <a href="profile.php?username=<?= $content->getOwnerId(); ?>"><?php echo $content->getOwnerId(); ?></a></h6>
+                            <h6>by <a href="profile.php?username=<?= $content->getOwnerId(); ?>"><?= $content->getOwnerId(); ?></a></h6>
                         </div>
                     </div>
                 </div>
@@ -170,7 +170,7 @@ $owner->loadUser();
             </div>
             <hr>
             <div class="row">
-                <div class="col" id="description">
+                <div class="col-12">
                     <p><?= html_entity_decode($content->getDescription())?></>
                 </div>
             </div>

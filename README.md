@@ -145,11 +145,13 @@ CREATE TABLE Comment (
 );
 
 CREATE TABLE Notification (
+  notificationId int AUTO_INCREMENT PRIMARY KEY,
   userId varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
-  contentId int REFERENCES Content(contentId),
+  title varchar(255) NOT NULL,
+  description TEXT CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   notificationType varchar(20),
   notificationDate date NOT NULL,
-  viewedOrNot bit NOT NULL
+  viewedOrNot bit NOT NULL DEFAULT 0
 );
 
 CREATE TABLE StatsForContent (
