@@ -151,7 +151,7 @@ CREATE TABLE Notification (
   description TEXT CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   notificationType varchar(20),
   notificationDate date NOT NULL,
-  viewedOrNot bit NOT NULL DEFAULT 0
+  viewed bit NOT NULL DEFAULT 0
 );
 
 CREATE TABLE StatsForContent (

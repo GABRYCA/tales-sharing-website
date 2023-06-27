@@ -56,6 +56,35 @@ class Friends
     }
 
     /**
+     * Function to load friends that accepted the request.
+     * @return bool
+     */
+    public function loadAcceptedFriends() : bool
+    {
+        $conn = connection();
+
+        $sql = "SELECT * FROM Friend WHERE senderId = ? AND accepted = 1";
+
+        if ($data = $conn->execute_query($sql, [$this->username])){
+            // If accepted is true, then the friend is accepted and add it to friends array, if not, add it to pendingOutFriends array.
+            $this->friends = array();
+            foreach ($data as $row) {
+                $user = new User();
+                $user->setUsername($row[1]);
+                // Load user from database
+                if ($user->loadUser()) {
+                    $this->friends[] = $user;
+                }
+            }
+        } else {
+            $this->setErrorStatus("Error while loading accepted friends");
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Function to get incoming friends requests.
      * @return bool
      */

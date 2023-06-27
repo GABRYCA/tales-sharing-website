@@ -100,7 +100,6 @@ class Content implements JsonSerializable
         if ($conn->execute_query($sql, [$this->ownerId, $this->type, $this->urlImage, $this->textContent, $this->title, $this->description, $this->uploadDate, $this->isPrivate, $this->isAI])) {
 
             // If there're tags in tagList I load the content.
-
             if (count($this->tagList) == 0){
                 return true;
             }

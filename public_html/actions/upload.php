@@ -131,10 +131,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit("Error saving content to the database.");
     }
 
+    $content->loadContentByPath();
+
     // If gallery is specified, add the content to the gallery in the database.
     if ($galleryId != "" && is_numeric($galleryId)) {
-
-        $content->loadContentByPath();
 
         // Add content to gallery
         if (!$user->addContentToGallery($galleryId, $content->getContentId())){
@@ -145,10 +145,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    exit("Content saved with success, direct image here: <a href='" . $path . "'>link</a>");
+    exit("Content saved with success, direct image here: <a href='" . $domain . "share.php?id=" . $content->getContentId() .  "'>link</a>");
 }
 
-// Function to save the image to the server and right path using Config.php and the config.ini defaults->save_path
+// Function to save the image to the server and returns the path.
 function save_image($image, $user_id, $title) {
 
     // Domain
