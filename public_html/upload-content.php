@@ -217,6 +217,11 @@ $galleries = $user->getGalleries();
                     var isAI = $('#isAI').is(':checked') ? 1 : 0;
                     var tags = getTags();
 
+                    // Check if gallery is number, if not set to "";
+                    if (isNaN(gallery)) {
+                        gallery = "";
+                    }
+
                     // Check if name is empty or null
                     if (name === "" || name === null) {
                         // Show a toast

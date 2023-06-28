@@ -5,6 +5,7 @@ include_once (dirname(__FILE__) . "/../common/utility.php");
 include_once (dirname(__FILE__) . "/../../private/objects/User.php");
 include_once (dirname(__FILE__) . "/../../private/objects/Content.php");
 include_once (dirname(__FILE__) . "/../../private/objects/Gallery.php");
+include_once (dirname(__FILE__) . "/../../private/objects/Notification.php");
 
 // Check if user logged in.
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] === false) {
@@ -68,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check if the gallery is empty or invalid
     if ($galleryId != "" && !is_numeric($galleryId)) {
         // Send the error array to the client
-        exit("Gallery is empty or invalid. Please select a valid gallery.");
+        exit("Gallery is empty or invalid. Please select a valid gallery." . $galleryId);
     }
 
     // Check if the isPrivate is empty or invalid (0 or 1)
@@ -132,6 +133,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     $content->loadContentByPath();
+
+    // Send notification to all friends and followers of user.
+    $notification = new Notification();
+    $notification->setTitle("New content from " . $user->getUsername());
+    $notification->setDescription("New content from " . $user->getUsername() . " was uploaded.
+    <br><a href='" . $domain . "share.php?id=" . $content->getContentId() . "'>Click here to see it.</a>");
+    $notification->setNotificationType("new_content"); // Types can be new_content, new_comment, new_like, new_friend, new_follow, advertisement
+    $notification->setNotificationDate(date("Y-m-d H:i:s"));
+    $notification->setViewed(false);
+    $notification->insertNotificationToFollowersAndFriends($content->getOwnerId());
 
     // If gallery is specified, add the content to the gallery in the database.
     if ($galleryId != "" && is_numeric($galleryId)) {

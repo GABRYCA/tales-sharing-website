@@ -171,7 +171,7 @@ class Notification implements JsonSerializable
         $friends = $friends->getFriends();
         foreach ($friends as $friend) {
             $notification = new Notification();
-            $notification->setUserId($friend->getFriendId());
+            $notification->setUserId($friend->getUsername());
             $notification->setTitle($this->title);
             $notification->setDescription($this->description);
             $notification->setNotificationType($this->notificationType);
@@ -181,7 +181,7 @@ class Notification implements JsonSerializable
                 $this->setErrorStatus("Error while inserting notification to friend");
                 return false;
             }
-            $friendsAndFollowers[] = $friend->getFriendId();
+            $friendsAndFollowers[] = $friend->getUsername();
         }
 
         $followers = new Followers($username);
@@ -189,12 +189,12 @@ class Notification implements JsonSerializable
         foreach ($followers as $follower) {
 
             // Check if follower is already a friend (and should've already received the notification)
-            if (in_array($follower->getFollowerId(), $friendsAndFollowers)) {
+            if (in_array($follower->getUsername(), $friendsAndFollowers)) {
                 continue;
             }
 
             $notification = new Notification();
-            $notification->setUserId($follower->getFollowerId());
+            $notification->setUserId($follower->getUsername());
             $notification->setTitle($this->title);
             $notification->setDescription($this->description);
             $notification->setNotificationType($this->notificationType);

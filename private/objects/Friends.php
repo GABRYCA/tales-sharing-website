@@ -31,16 +31,15 @@ class Friends
             // If accepted is true, then the friend is accepted and add it to friends array, if not, add it to pendingOutFriends array.
             $this->friends = array();
             $this->pendingOutFriends = array();
-            foreach ($data as $row) {
+            while ($row = $data->fetch_assoc()){
                 $user = new User();
-                if ($row[2] == 1) {
-                    $user->setUsername($row[1]);
+                $user->setUsername($row['receiverId']);
+                if ($row['accepted'] == 1) {
                     // Load user from database
                     if ($user->loadUser()) {
                         $this->friends[] = $user;
                     }
                 } else {
-                    $user->setUsername($row[1]);
                     // Load user from database
                     if ($user->loadUser()) {
                         $this->pendingOutFriends[] = $user;
@@ -68,9 +67,9 @@ class Friends
         if ($data = $conn->execute_query($sql, [$this->username])){
             // If accepted is true, then the friend is accepted and add it to friends array, if not, add it to pendingOutFriends array.
             $this->friends = array();
-            foreach ($data as $row) {
+            while ($row = $data->fetch_assoc()){
                 $user = new User();
-                $user->setUsername($row[1]);
+                $user->setUsername($row['receiverId']);
                 // Load user from database
                 if ($user->loadUser()) {
                     $this->friends[] = $user;
@@ -97,9 +96,9 @@ class Friends
         if ($data = $conn->execute_query($sql, [$this->username])){
             // If accepted is true, then the friend is accepted and add it to friends array, if not, add it to pendingOutFriends array.
             $this->pendingInFriends = array();
-            foreach ($data as $row) {
+            while ($row = $data->fetch_assoc()){
                 $user = new User();
-                $user->setUsername($row[0]);
+                $user->setUsername($row['senderId']);
                 // Load user from database
                 if ($user->loadUser()) {
                     $this->pendingInFriends[] = $user;

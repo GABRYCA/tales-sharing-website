@@ -35,7 +35,7 @@ class Followers
         if ($data = $conn->execute_query($sql, [$this->username])) {
             // Array of User using followerId
             $this->followers = array();
-            foreach ($data as $row) {
+            while ($row = $data->fetch_assoc()){
                 $user = new User();
                 $user->setUsername($row["followerId"]);
                 // Load user from database
@@ -59,12 +59,12 @@ class Followers
         $conn = connection();
 
         // Query to get all users following $username and ordered by their last upload (using necessary inner join)
-        $sql = "SELECT userId FROM Follower INNER JOIN Content ON Follower.userId = Content.ownerId WHERE followerId = ? GROUP BY userId ORDER BY MAX(Content.uploadDate) DESC";
+        $sql = "SELECT userId FROM Follower LEFT JOIN Content ON Follower.userId = Content.ownerId WHERE followerId = ? GROUP BY userId ORDER BY MAX(Content.uploadDate) DESC";
 
         if ($data = $conn->execute_query($sql, [$this->username])) {
             // Array of User following $username
             $this->following = array();
-            foreach ($data as $row) {
+            while ($row = $data->fetch_assoc()){
                 $user = new User();
                 $user->setUsername($row["userId"]);
                 // Load user from database

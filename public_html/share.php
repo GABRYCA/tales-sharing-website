@@ -64,9 +64,6 @@ include_once (dirname(__FILE__) . '/../private/objects/User.php');
 include_once (dirname(__FILE__) . '/../private/objects/Content.php');
 include_once (dirname(__FILE__) . '/../private/objects/Tag.php');
 
-// tinyMCE which's in data/util/tinymce/js/tinymce/tinymce.min.js
-    include_once
-
 $id = validate_input($_GET["id"]);
 
 // Get user from session
