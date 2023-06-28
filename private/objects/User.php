@@ -5,6 +5,7 @@ include_once (dirname(__FILE__) . "/../objects/Content.php");
 include_once (dirname(__FILE__) . "/../objects/Followers.php");
 include_once (dirname(__FILE__) . "/../objects/Friends.php");
 include_once (dirname(__FILE__) . "/../objects/Likes.php");
+include_once (dirname(__FILE__) . "/../objects/Notification.php");
 
 // This class, using connection.php, is used to load or create a user like a JavaBean.
 class User implements JsonSerializable
@@ -726,6 +727,28 @@ class User implements JsonSerializable
 
         // Remove content from gallery.
         return $galleryClass->removeContentFromGallery($contentId);
+    }
+
+    /**
+     * Function to get all notifications of user.
+     * @return array
+     */
+    public function getAllNotifications() : array
+    {
+        $notificationClass = new Notification();
+        $notificationClass->setUserId($this->getUsername());
+        return $notificationClass->loadNotificationsByUser();
+    }
+
+    /**
+     * Function to get the unread notifications of user.
+     * @return array
+     */
+    public function getUnreadNotifications() : array
+    {
+        $notificationClass = new Notification();
+        $notificationClass->setUserId($this->getUsername());
+        return $notificationClass->loadNotificationsByUserNotViewed();
     }
 
     /**

@@ -83,6 +83,39 @@ class Notification implements JsonSerializable
     }
 
     /**
+     * Function to load all notifications of $userId that aren't viewed.
+     * Please set $userId before calling this function.
+     * @return Notification[]
+     */
+    public function loadNotificationsByUserNotViewed() : array
+    {
+        $conn = connection();
+
+        $sql = "SELECT * FROM Notification WHERE userId = ? AND viewed = 0 ORDER BY notificationDate DESC";
+
+        $notifications = [];
+
+        if ($data = $conn->execute_query($sql, [$this->userId])){
+            while ($row = $data->fetch_assoc()) {
+                $notification = new Notification();
+                $notification->setNotificationId($row["notificationId"]);
+                $notification->setUserId($row["userId"]);
+                $notification->setTitle($row["title"]);
+                $notification->setDescription($row["description"]);
+                $notification->setNotificationType($row["notificationType"]);
+                $notification->setNotificationDate($row["notificationDate"]);
+                $notification->setViewed($row["viewed"]);
+                $notifications[] = $notification;
+            }
+        } else {
+            $this->setErrorStatus("Error while loading notifications");
+            return [];
+        }
+
+        return $notifications;
+    }
+
+    /**
      * Function that insert the notification into the database.
      * Please set $userId, $title, $description, $notificationType, $notificationDate, $viewed before calling this function.
      * @return bool
@@ -339,12 +372,10 @@ class Notification implements JsonSerializable
     /**
      * Set the userId.
      * @param $userId
-     * @return bool
      */
-    public function setUserId($userId) : bool
+    public function setUserId($userId)
     {
         $this->userId = $userId;
-        return true;
     }
 
     /**

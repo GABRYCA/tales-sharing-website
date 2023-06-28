@@ -2,14 +2,19 @@
 // Verifico se loggato
 session_start();
 include_once (dirname(__FILE__) . "/../../private/objects/Tag.php");
+include_once (dirname(__FILE__) . "/../common/utility.php");
 
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     header("Location: ../login.php");
     exit();
 }
 
+if ($_SERVER["REQUEST_METHOD"] != "GET") {
+    exit("Invalid request method.");
+}
+
 // PHP Service, returns tags in JSON format
-$query = $_GET["q"];
+$query = validate_input($_GET["q"]);
 // Create a new Tag object
 $tag = new Tag();
 // Get the full list of tags
