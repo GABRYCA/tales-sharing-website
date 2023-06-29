@@ -1,6 +1,7 @@
 <?php
 include_once (dirname(__FILE__) . "/../connection.php");
 include_once (dirname(__FILE__) . "/../objects/Tag.php");
+include_once (dirname(__FILE__) . "/../objects/Likes.php");
 
 class Content implements JsonSerializable
 {
@@ -335,6 +336,80 @@ class Content implements JsonSerializable
     {
         $tag = new Tag();
         return $tag->getTagListByContentId($this->contentId);
+    }
+
+    /**
+     * Function to get all likes of content using content id (please setContentId before using this).
+     * @return Likes[]
+     */
+    public function getLikesOfContent() : array
+    {
+        $like = new Likes();
+        $like->setContentId($this->contentId);
+        return $like->getLikesInternal();
+    }
+
+    /**
+     * Function that returns the number of likes (please setContentId before using this).
+     * @return int
+     */
+    public function getNumberOfLikes() : int
+    {
+        $like = new Likes();
+        $like->setContentId($this->contentId);
+        return count($like->getLikesInternal());
+    }
+
+    /**
+     * Function to like the content given $userId (please setContentId before using this).
+     * @param string $userId
+     * @return bool
+     */
+    public function likeContent(string $userId) : bool
+    {
+        $like = new Likes();
+        $like->setContentId($this->contentId);
+        $like->setUserId($userId);
+        return $like->addLikeInternal();
+    }
+
+    /**
+     * Function to unlike the content given $userId (please setContentId before using this).
+     * @param string $userId
+     * @return bool
+     */
+    public function unlikeContent(string $userId) : bool
+    {
+        $like = new Likes();
+        $like->setContentId($this->contentId);
+        $like->setUserId($userId);
+        return $like->removeLikeInternal();
+    }
+
+    /**
+     * Function that reverse a like if there's already given $userId. (please setContentId before using this).
+     * @param string $userId
+     * @return bool
+     */
+    public function reverseLike(string $userId) : bool
+    {
+        $like = new Likes();
+        $like->setContentId($this->contentId);
+        $like->setUserId($userId);
+        return $like->reverseLikeInternal();
+    }
+
+    /**
+     * Function to check if the content is liked by the user given $userId (please setContentId before using this).
+     * @param string $userId
+     * @return bool
+     */
+    public function isLikedByUser(string $userId) : bool
+    {
+        $like = new Likes();
+        $like->setContentId($this->contentId);
+        $like->setUserId($userId);
+        return $like->isLikedInternal();
     }
 
     /**

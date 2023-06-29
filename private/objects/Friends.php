@@ -1,7 +1,7 @@
 <?php
 include_once (dirname(__FILE__) . "/../connection.php");
 
-class Friends
+class Friends implements JsonSerializable
 {
     private $username;
     private $friends;
@@ -178,5 +178,17 @@ class Friends
     public function setPendingOutFriends($pendingOutFriends): void
     {
         $this->pendingOutFriends = $pendingOutFriends;
+    }
+
+    // Implement jsonSerialize function
+    public function jsonSerialize()
+    {
+        return [
+            'username' => $this->username,
+            'friends' => $this->friends,
+            'pendingInFriends' => $this->pendingInFriends,
+            'pendingOutFriends' => $this->pendingOutFriends,
+            'errorStatus' => $this->errorStatus
+        ];
     }
 }
