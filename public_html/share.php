@@ -2,15 +2,17 @@
 <html lang="en" data-bs-theme="dark">
 <head>
     <?php
-    include_once (dirname(__FILE__) . '/common/common-head.php');
+    include_once(dirname(__FILE__) . '/common/common-head.php');
     ?>
     <script src="data/util/tinymce/js/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.3/purify.min.js" integrity="sha512-TBmnYz6kBCpcGbD55K7f4LZ+ykn3owqujFnUiTSHEto6hMA7aV4W7VDPvlqDjQImvZMKxoR0dNY5inyhxfZbmA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.3/purify.min.js"
+            integrity="sha512-TBmnYz6kBCpcGbD55K7f4LZ+ykn3owqujFnUiTSHEto6hMA7aV4W7VDPvlqDjQImvZMKxoR0dNY5inyhxfZbmA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <title>Share - Tales</title>
     <style>
         #upload-button {
-            background: rgb(0,97,255) !important;
-            background: linear-gradient(90deg, rgba(0,97,255,1) 0%, rgba(255,15,123,1) 100%) !important;
+            background: rgb(0, 97, 255) !important;
+            background: linear-gradient(90deg, rgba(0, 97, 255, 1) 0%, rgba(255, 15, 123, 1) 100%) !important;
             transition: 0.7s ease-out !important;
         }
 
@@ -21,8 +23,8 @@
         }
 
         #dropdownMenuLink {
-            background: rgb(0,97,255) !important;
-            background: linear-gradient(90deg, rgba(0,97,255,1) 0%, rgb(255, 15, 123) 100%) !important;
+            background: rgb(0, 97, 255) !important;
+            background: linear-gradient(90deg, rgba(0, 97, 255, 1) 0%, rgb(255, 15, 123) 100%) !important;
             transition: 0.4s ease-out !important;
         }
 
@@ -34,6 +36,29 @@
             max-height: 90vh !important;
         }
 
+        #bell:hover {
+            cursor: pointer;
+        }
+
+        .new-notification {
+            background-color: rgba(255, 15, 123, 0.54) !important;
+        }
+
+        #content-stats {
+            background: linear-gradient(90deg, rgb(255, 15, 123, 0.5) 0%, rgba(0, 97, 255, 0.5) 100%) !important;
+
+        }
+
+        .fa-heart {
+            color: #FF0F7BFF !important;
+            transition: 0.2s ease-out !important;
+        }
+
+        .fa-heart:hover {
+            color: #FF0F7BFF !important;
+            cursor: pointer;
+            transform: scale(1.2) !important;
+        }
     </style>
 
     <script>
@@ -59,10 +84,13 @@ if (empty($_GET["id"])) {
 }
 
 // Includes
-include_once (dirname(__FILE__) . '/common/utility.php');
-include_once (dirname(__FILE__) . '/../private/objects/User.php');
-include_once (dirname(__FILE__) . '/../private/objects/Content.php');
-include_once (dirname(__FILE__) . '/../private/objects/Tag.php');
+include_once(dirname(__FILE__) . '/common/utility.php');
+include_once(dirname(__FILE__) . '/../private/objects/User.php');
+include_once(dirname(__FILE__) . '/../private/objects/Content.php');
+include_once(dirname(__FILE__) . '/../private/objects/Tag.php');
+include_once(dirname(__FILE__) . '/../private/objects/Likes.php');
+include_once(dirname(__FILE__) . '/../private/objects/Comment.php');
+
 
 $id = validate_input($_GET["id"]);
 
@@ -83,6 +111,12 @@ if ($content->getIsPrivate() === true && $content->getOwnerId() !== $user->getUs
     header("Location: ../home.php");
     exit();
 }
+
+// Get IP of user.
+$ip = getUserIP();
+
+// Increment views of content (This includes many checks to avoid a user to reload the page and get free views).
+$content->incrementNumberOfViews($user->getUsername(), $ip);
 
 // Get owner of content
 $owner = new User();
@@ -213,7 +247,8 @@ $owner->loadUser();
                     <!-- Image -->
                     <div class="col-12 rounded-3 text-center px-0">
                         <a href="<?= $content->getUrlImage() ?>" target="_blank">
-                            <img src="<?= $content->getUrlImage() ?>" class="img-fluid rounded-3" id="image" alt="Image" onerror="hideSpinner(this)">
+                            <img src="<?= $content->getUrlImage() ?>" class="img-fluid rounded-3" id="image" alt="Image"
+                                 onerror="hideSpinner(this)">
                         </a>
                     </div>
                 </div>
@@ -226,13 +261,17 @@ $owner->loadUser();
                         <!-- Icon of user -->
                         <div class="col-3 text-end">
                             <a href="profile.php?username=<?= $content->getOwnerId(); ?>" class="m-auto">
-                                <img src="<?= $owner->getUrlProfilePicture(); ?>" class="img-fluid rounded-circle border-gradient" alt="Profile Picture" width="100" onerror="hideSpinner(this)">
+                                <img src="<?= $owner->getUrlProfilePicture(); ?>"
+                                     class="img-fluid rounded-circle border-gradient" alt="Profile Picture" width="100"
+                                     onerror="hideSpinner(this)">
                             </a>
                         </div>
                         <!-- Title and owner name of content -->
                         <div class="col-9 text-center text-lg-start">
                             <h2><?= $content->getTitle() ?></h2>
-                            <h6>by <a href="profile.php?username=<?= $content->getOwnerId(); ?>"><?= $content->getOwnerId(); ?></a></h6>
+                            <h6>by
+                                <a href="profile.php?username=<?= $content->getOwnerId(); ?>"><?= $content->getOwnerId(); ?></a>
+                            </h6>
                         </div>
                     </div>
                 </div>
@@ -251,24 +290,145 @@ $owner->loadUser();
                     </div>
                 </div>
             </div>
-            <hr>
-            <!-- Number of Likes (With like and unlike when clicked, and onhover you can see who liked the content), number of comments, and follow/unfollow button -->
-            <div class="row">
 
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <p><?= html_entity_decode($content->getDescription())?></>
+            <hr>
+
+            <div class="row justify-content-between px-lg-5 pt-2 pb-2 bg-light bg-opacity-10 rounded-3 d-flex align-items-center" id="content-stats">
+                <?php
+                if ($user->getUsername() == $content->getOwnerId()) {
+                    echo '<div class="col-auto">';
+                    echo '<div class="row justify-content-center">';
+                    echo '<div class="col-auto">';
+                    echo '<button class="btn btn-outline-light fs-6" id="delete-button" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right"><i class="fas fa-trash"></i> Delete</button>';
+                    echo '</div>';
+                    echo '</div>';
+                    echo '</div>';
+                } else {
+                ?>
+                <!-- Follow/Unfollow -->
+                <div class="col-auto">
+                    <div class="row justify-content-center d-flex align-items-center">
+                        <div class="col-auto">
+                            <div class="row justify-content-center">
+                                <div class="col-auto">
+                                    <?php
+                                    if ($user->isFollowing($content->getOwnerId())) {
+                                        echo '<button class="btn btn-outline-light fs-6" id="unfollow-button" data-bs-toggle="tooltip" data-bs-placement="top" title="Unfollow" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right"><i class="fas fa-user-minus"></i> Unfollow</button>';
+                                    } else {
+                                        echo '<button class="btn btn-outline-light fs-6" id="follow-button" data-bs-toggle="tooltip" data-bs-placement="top" title="Follow" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right"><i class="fas fa-user-plus"></i> Follow</button>';
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <?php }?>
+                <!-- Likes -->
+                <div class="col-auto">
+                    <div class="row justify-content-center">
+                        <div class="col-auto">
+                            <div class="row justify-content-center d-flex align-items-center">
+                                <div class="col-auto pe-0 d-flex align-items-center">
+                                    <?php
+                                    // If has liked content, use fas fa-heart, else use far fa-heart
+                                    if ($user->hasLikedContent($content->getContentId())) {
+                                        echo '<i class="fas fa-heart text-danger" style="font-size: 24px;"></i>';
+                                    } else {
+                                        echo '<i class="far fa-heart text-danger" style="font-size: 24px;"></i>';
+                                    }
+                                    ?>
+                                </div>
+                                <div class="col-auto pe-0">
+                                    <h6 class="d-inline"><?= $content->getNumberOfLikes() ?></h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Views -->
+                <div class="col-auto">
+                    <div class="row justify-content-center d-flex align-items-center">
+                        <div class="col-auto">
+                            <div class="row justify-content-center d-flex align-items-center">
+                                <div class="col-auto pe-0 d-flex align-items-center">
+                                    <i class="fas fa-eye text-primary-emphasis opacity-75" style="font-size: 24px;"></i>
+                                </div>
+                                <div class="col-auto pe-0">
+                                    <h6 class="d-inline"><?= $content->getNumberOfViews() ?></h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Comments -->
+                <div class="col-auto">
+                    <div class="row justify-content-center d-flex align-items-center">
+                        <div class="col-auto">
+                            <div class="row justify-content-center d-flex align-items-center">
+                                <div class="col-auto pe-0 d-flex align-items-center">
+                                    <i class="fas fa-comment text-light opacity-50" style="font-size: 24px;"></i>
+                                </div>
+                                <div class="col-auto">
+                                    <h6 class="d-inline"><?= $content->getNumberOfComments() ?></h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <div class="row mt-4">
+                <div class="col-12">
+                    <p><?= html_entity_decode($content->getDescription()) ?></>
+                </div>
+            </div>
+
         </div>
     </div>
 
 </div>
 
 <?php
-include_once (dirname(__FILE__) . '/common/common-footer.php');
-include_once (dirname(__FILE__) . '/common/common-body.php');
+include_once(dirname(__FILE__) . '/common/common-footer.php');
+include_once(dirname(__FILE__) . '/common/common-body.php');
 ?>
+<script>
+    $(function () {
+        // Get the bell element
+        var bell = document.getElementById("bell");
+        // Add a click event listener to the bell
+        $('#bell').on("click", function () {
+            // Get the dropdown menu element
+            var dropdown = document.querySelector(".notifications-dropdown");
+            // Set a timeout of 1 second after the dropdown is opened
+            setTimeout(function () {
+                // Check if the dropdown is still open
+                if (dropdown.classList.contains("show")) {
+                    // Get the new-notification elements
+                    var newNotifications = document.querySelectorAll(".new-notification");
+                    // Remove the new-notification class from the newNotifications
+                    for (var i = 0; i < newNotifications.length; i++) {
+                        newNotifications[i].classList.remove("new-notification");
+                    }
+                    // Send a post request to the server to mark all notifications as read
+                    $.ajax({
+                        type: "POST",
+                        url: "actions/notifications.php",
+                        data: {read: true},
+                        success: function () {
+                            // Remove the element notification-count
+                            $('#notification-count').remove();
+                        },
+                        error: function () {
+                            // Show an error message
+                            console.log("Error while marking notifications as read");
+                        }
+                    });
+                }
+            }, 1000);
+        });
+    })
+</script>
 </body>
 </html>

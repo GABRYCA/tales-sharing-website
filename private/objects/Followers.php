@@ -182,9 +182,9 @@ class Followers
     /**
      * IF called with empty constructor.
      * Before please call loadFollowers() to load followers from database.
-     * @return mixed
+     * @return Followers[]
      */
-    public function getFollowers()
+    public function getFollowers() : array
     {
         return $this->followers;
     }
@@ -224,9 +224,9 @@ class Followers
     /**
      * IF Called with empty constructor.
      * Before please call loadFollowing() to load following from database.
-     * @return mixed
+     * @return Followers[]
      */
-    public function getFollowing()
+    public function getFollowing() : array
     {
         return $this->following;
     }

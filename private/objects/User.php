@@ -7,7 +7,6 @@ include_once (dirname(__FILE__) . "/../objects/Friends.php");
 include_once (dirname(__FILE__) . "/../objects/Likes.php");
 include_once (dirname(__FILE__) . "/../objects/Notification.php");
 
-// This class, using connection.php, is used to load or create a user like a JavaBean.
 class User implements JsonSerializable
 {
     private $username = null;
@@ -770,6 +769,98 @@ class User implements JsonSerializable
         return $contentClass;
     }
 
+    /**
+     * Get Followers of user.
+     * @return Followers[]
+     */
+    public function getFollowers() : array
+    {
+        $followersClass = new Followers($this->getUsername());
+        return $followersClass->getFollowers();
+    }
+
+    /**
+     * Get Following of user.
+     * @return Followers[]
+     */
+    public function getFollowing() : array
+    {
+        $followingClass = new Followers($this->getUsername());
+        return $followingClass->getFollowing();
+    }
+
+    /**
+     * Get number of followers of user.
+     * @return int
+     */
+    public function getNumberOfFollowers() : int
+    {
+        $followersClass = new Followers($this->getUsername());
+        return count($followersClass->getFollowers());
+    }
+
+    /**
+     * Get number of following of user.
+     * @return int
+     */
+    public function getNumberOfFollowing() : int
+    {
+        $followingClass = new Followers($this->getUsername());
+        return count($followingClass->getFollowing());
+    }
+
+    /**
+     * Follow a user by given $userId.
+     * @param string $userId
+     * @return bool
+     */
+    public function followUser(string $userId) : bool
+    {
+        $followersClass = new Followers($this->getUsername());
+        return $followersClass->addFollower($userId);
+    }
+
+    /**
+     * Unfollow a user by given $userId.
+     * @param string $userId
+     * @return bool
+     */
+    public function unfollowUser(string $userId) : bool
+    {
+        $followersClass = new Followers($this->getUsername());
+        return $followersClass->removeFollower($userId);
+    }
+
+    /**
+     * Check if user is following given $userId.
+     * @param string $userId
+     * @return bool
+     */
+    public function isFollowing(string $userId) : bool
+    {
+        $followersClass = new Followers($this->getUsername());
+        // Get followed users.
+        $following = $followersClass->getFollowing();
+        // Check if given $userId is in the list.
+        foreach ($following as $follow){
+            if ($follow->getUsername() == $userId){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Function that returns if a user has likes a contentId.
+     * Please set $username before calling this function.
+     * @param int $contentId
+     * @return bool
+     */
+    public function hasLikedContent(int $contentId) : bool
+    {
+        $likes = new Likes();
+        return $likes->hasLiked($this->username, $contentId);
+    }
 
     /**
      * @return string

@@ -348,7 +348,12 @@ class Content implements JsonSerializable
     {
         $views = new StatsForContent();
         $views->setContentId($this->contentId);
-        return $views->getCounter();
+        // Check if getCounter is null, if it's, return 1.
+        $counter = $views->getSumCounter();
+        if ($counter == null) {
+            return 1;
+        }
+        return $counter;
     }
 
     /**

@@ -159,7 +159,7 @@ CREATE TABLE StatsForContent (
   contentId int REFERENCES Content(contentId) ON DELETE CASCADE ON UPDATE CASCADE,
   counter int NOT NULL DEFAULT 1,
   viewerId varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
-  viewerIP varchar(15),
+  viewerIP varchar(39),
   dateViewed DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
