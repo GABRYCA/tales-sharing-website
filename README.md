@@ -70,7 +70,7 @@ CREATE TABLE User (
     isActivated TINYINT(1) NOT NULL DEFAULT 0,
     isMuted TINYINT(1) NOT NULL DEFAULT 0,
     activationCode varchar(50),
-    joinDate date DEFAULT CURRENT_DATE
+    joinDate DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Friend (
@@ -94,7 +94,7 @@ CREATE TABLE Content (
   textContent varchar(255),
   title varchar(255),
   description mediumtext CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  uploadDate date NOT NULL,
+  uploadDate DATETIME DEFAULT CURRENT_TIMESTAMP,
   isPrivate TINYINT(1) NOT NULL DEFAULT 0,
   isAI TINYINT(1) NOT NULL DEFAULT 0,
   FOREIGN KEY (ownerId) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -138,10 +138,11 @@ CREATE TABLE Repost (
 );
 
 CREATE TABLE Comment (
+  commentId int AUTO_INCREMENT PRIMARY KEY,
   userId varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
   contentId int REFERENCES Content(contentId) ON DELETE CASCADE ON UPDATE CASCADE,
   commentText varchar(255) NOT NULL,
-  commentDate date NOT NULL
+  commentDate DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Notification (
@@ -150,22 +151,24 @@ CREATE TABLE Notification (
   title varchar(255) NOT NULL,
   description TEXT CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   notificationType varchar(20),
-  notificationDate date NOT NULL,
+  notificationDate DATETIME DEFAULT CURRENT_TIMESTAMP,
   viewed bit NOT NULL DEFAULT 0
 );
 
 CREATE TABLE StatsForContent (
   contentId int REFERENCES Content(contentId) ON DELETE CASCADE ON UPDATE CASCADE,
-  viewerId varchar(255),
-  viewerIP varchar(15)
+  counter int NOT NULL DEFAULT 1,
+  viewerId varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
+  viewerIP varchar(15),
+  dateViewed DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Premium (
   userid varchar(255) REFERENCES User(username) ON UPDATE CASCADE ON DELETE CASCADE,
   isPremium boolean DEFAULT false CHECK (isPremium IN (0,1)),
   subscriptionType varchar(255) DEFAULT 'plus' CHECK (subscriptionType IN ('plus', 'pro', 'premium')),
-  subscriptionDate date DEFAULT CURRENT_DATE,
-  expiryDate date DEFAULT DATE_ADD (current_date, INTERVAL 1 month)
+  subscriptionDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+  expiryDate DATETIME DEFAULT DATE_ADD (CURRENT_TIMESTAMP, INTERVAL 1 month)
 );
 ```
 

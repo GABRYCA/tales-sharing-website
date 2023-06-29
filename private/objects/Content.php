@@ -2,6 +2,8 @@
 include_once (dirname(__FILE__) . "/../connection.php");
 include_once (dirname(__FILE__) . "/../objects/Tag.php");
 include_once (dirname(__FILE__) . "/../objects/Likes.php");
+include_once (dirname(__FILE__) . "/../objects/StatsForContent.php");
+include_once (dirname(__FILE__) . "/../objects/Comment.php");
 
 class Content implements JsonSerializable
 {
@@ -336,6 +338,108 @@ class Content implements JsonSerializable
     {
         $tag = new Tag();
         return $tag->getTagListByContentId($this->contentId);
+    }
+
+    /**
+     * Function to get number of views of content using content id (please setContentId before using this).
+     * @return int
+     */
+    public function getNumberOfViews() : int
+    {
+        $views = new StatsForContent();
+        $views->setContentId($this->contentId);
+        return $views->getCounter();
+    }
+
+    /**
+     * Function to increment the counter of views of content using content id and given parameter $viewerId and optional ViewerIP (please setContentId before using this).
+     * @param string $viewerId
+     * @param string $viewerIP
+     * @return bool
+     * @throws Exception
+     */
+    public function incrementNumberOfViews(string $viewerId, string $viewerIP = "0.0.0.0") : bool
+    {
+        $views = new StatsForContent();
+        $views->setContentId($this->contentId);
+        $views->setViewerId($viewerId);
+        $views->setViewerIP($viewerIP);
+        return $views->incrementCounter();
+    }
+
+    /**
+     * Function to get all comments of content using content id (please setContentId before using this).
+     * @return Comment[]
+     */
+    public function getCommentsOfContent() : array
+    {
+        $comment = new Comment();
+        $comment->setContentId($this->contentId);
+        return $comment->getComments();
+    }
+
+    /**
+     * Function that returns the number of comments of a content using content id (please setContentId before using this).
+     * @return int
+     */
+    public function getNumberOfComments() : int
+    {
+        $comment = new Comment();
+        $comment->setContentId($this->contentId);
+        return count($comment->getComments());
+    }
+
+    /**
+     * Function to add a comment to the contentId using parameters $userId, $commentText (please setContentId before using this).
+     * @param string $userId
+     * @param string $commentText
+     * @return bool
+     */
+    public function addCommentToContent(string $userId, string $commentText) : bool
+    {
+        $comment = new Comment();
+        $comment->setContentId($this->contentId);
+        $comment->setUserId($userId);
+        $comment->setCommentText($commentText);
+        return $comment->addComment();
+    }
+
+    /**
+     * Function to delete a comment from the contentId using parameters $commentId (please setContentId before using this).
+     * @param string $commentId
+     * @return bool
+     */
+    public function deleteCommentFromContent(string $commentId) : bool
+    {
+        $comment = new Comment();
+        $comment->setCommentId($commentId);
+        return $comment->deleteComment();
+    }
+
+    /**
+     * Function to edit a comment from the contentId using parameters $commentId, $commentText, $userId (please setContentId before using this).
+     * UserId is used to check if the user is the owner of the comment.
+     * @param string $commentId
+     * @param string $commentText
+     * @param string $userId
+     * @return bool
+     */
+    public function editCommentOfContent(string $commentId, string $commentText, string $userId) : bool
+    {
+        $comment = new Comment();
+        $comment->setCommentId($commentId);
+        // Load comment.
+        if (!$comment->loadComment()) {
+            $this->setErrorStatus("Error while loading comment");
+            return false;
+        }
+        // Check if user is owner of comment.
+        if ($comment->getUserId() != $userId) {
+            $this->setErrorStatus("User is not owner of comment");
+            return false;
+        }
+        $comment->setCommentText($commentText);
+        return $comment->updateComment();
     }
 
     /**
