@@ -1,5 +1,5 @@
 <?php
-// Verifico se loggato
+// Check if logged in
 session_start();
 include_once (dirname(__FILE__) . "/../../private/objects/Tag.php");
 include_once (dirname(__FILE__) . "/../common/utility.php");

@@ -1,5 +1,7 @@
 <?php
 include_once (dirname(__FILE__) . "/../connection.php");
+include_once (dirname(__FILE__) . "/../objects/Notification.php");
+include_once (dirname(__FILE__) . "/../objects/Content.php");
 
 class Likes implements JsonSerializable
 {
@@ -46,6 +48,24 @@ class Likes implements JsonSerializable
         $sql = "INSERT INTO Liked (userId, contentId) VALUES (?, ?)";
 
         if ($conn->execute_query($sql, [$this->userId, $this->contentId])) {
+
+            // Load content by contentId
+            $content = new Content();
+            $content->setContentId($this->contentId);
+            $content->loadContent();
+
+            // Add notification of type new_like
+            $notification = new Notification();
+            $notification->setUserId($content->getOwnerId());
+            $notification->setNotificationType("new_like");
+            $notification->setNotificationDate(date("Y-m-d H:i:s"));
+            $notification->setViewed(false);
+            // Set title and description of notification.
+            $notification->setTitle("Received Like");
+            // Description of notification, with also link to content that received the like and the user that liked it to visit his profile.
+            $notification->setDescription("Your content <a href='share.php?id=" . $content->getContentId() . "'>" . $content->getTitle() . "</a> received a like from <a href='profile.php?username=" . $this->userId . "'>" . $this->userId . "</a>.");
+            $notification->insertNotification();
+
             return true;
         } else {
             $this->setErrorStatus("Error while adding like");

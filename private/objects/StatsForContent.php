@@ -167,7 +167,7 @@ class StatsForContent implements JsonSerializable
             $dateViewed = new DateTime($this->getDateViewed());
             $dateNow = new DateTime();
             $diff = $dateViewed->diff($dateNow);
-            if ($diff->h >= 24){
+            if ($diff->d >= 1){
                 $this->setCounter($this->getCounter() + 1);
                 $this->setDateViewed($dateNow->format("Y-m-d H:i:s"));
                 if ($this->updateStat()){

@@ -49,16 +49,38 @@
 
         }
 
-        .fa-heart {
-            color: #FF0F7BFF !important;
-            transition: 0.2s ease-out !important;
+        .fa-heart:hover {
+            cursor: pointer;
         }
 
-        .fa-heart:hover {
-            color: #FF0F7BFF !important;
-            cursor: pointer;
-            transform: scale(1.2) !important;
+        .animate__animated {
+            animation-duration: 1s;
+            animation-fill-mode: both;
         }
+
+        .animate__heartBeat {
+            animation-name: heartBeat;
+        }
+
+        @keyframes heartBeat {
+            0% {
+                transform: scale(1);
+            }
+            14% {
+                transform: scale(1.3);
+            }
+            28% {
+                transform: scale(1);
+            }
+            42% {
+                transform: scale(1.3);
+            }
+            70% {
+                transform: scale(1);
+            }
+        }
+
+
     </style>
 
     <script>
@@ -91,7 +113,6 @@ include_once(dirname(__FILE__) . '/../private/objects/Tag.php');
 include_once(dirname(__FILE__) . '/../private/objects/Likes.php');
 include_once(dirname(__FILE__) . '/../private/objects/Comment.php');
 
-
 $id = validate_input($_GET["id"]);
 
 // Get user from session
@@ -116,7 +137,10 @@ if ($content->getIsPrivate() === true && $content->getOwnerId() !== $user->getUs
 $ip = getUserIP();
 
 // Increment views of content (This includes many checks to avoid a user to reload the page and get free views).
-$content->incrementNumberOfViews($user->getUsername(), $ip);
+try {
+    $content->incrementNumberOfViews($user->getUsername(), $ip);
+} catch (Exception $e) {
+}
 
 // Get owner of content
 $owner = new User();
@@ -333,14 +357,14 @@ $owner->loadUser();
                                     <?php
                                     // If has liked content, use fas fa-heart, else use far fa-heart
                                     if ($user->hasLikedContent($content->getContentId())) {
-                                        echo '<i class="fas fa-heart text-danger" style="font-size: 24px;"></i>';
+                                        echo '<i class="fas fa-heart text-danger" style="font-size: 24px;" id="likeButton"></i>';
                                     } else {
-                                        echo '<i class="far fa-heart text-danger" style="font-size: 24px;"></i>';
+                                        echo '<i class="far fa-heart text-danger" style="font-size: 24px;" id="likeButton"></i>';
                                     }
                                     ?>
                                 </div>
                                 <div class="col-auto pe-0">
-                                    <h6 class="d-inline"><?= $content->getNumberOfLikes() ?></h6>
+                                    <h6 class="d-inline" id="likesCount"><?= $content->getNumberOfLikes() ?></h6>
                                 </div>
                             </div>
                         </div>
@@ -396,7 +420,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
 <script>
     $(function () {
         // Get the bell element
-        var bell = document.getElementById("bell");
+        //var bell = document.getElementById("bell");
         // Add a click event listener to the bell
         $('#bell').on("click", function () {
             // Get the dropdown menu element
@@ -428,6 +452,52 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                 }
             }, 1000);
         });
+    })
+
+    $(function (){
+        // Like dislike button on click of #likeButton
+        $('#likeButton').on("click", function () {
+
+            // Check if far or fas
+            var like = !!$('#likeButton').hasClass("far");
+
+            // Send a post request to the server to like or dislike the content
+            $.ajax({
+                type: "POST",
+                url: "actions/likesManager.php",
+                data: {contentId: <?= $content->getContentId() ?>},
+                success: function (data) {
+                    // Set the number of likes
+                    $('#likesCount').html(data);
+                    // Check if like or dislike
+                    if (like) {
+                        // Change the icon to fas fa-heart
+                        $('#likeButton').removeClass("far");
+                        $('#likeButton').addClass("fas");
+
+                        // Animation
+                        $('#likeButton').addClass("animate__animated animate__heartBeat");
+                        setTimeout(function(){
+                            $('#likeButton').removeClass("animate__animated animate__heartBeat");
+                        }, 1000);
+                    } else {
+                        // Change the icon to far fa-heart
+                        $('#likeButton').removeClass("fas");
+                        $('#likeButton').addClass("far");
+
+                        // Animation
+                        $('#likeButton').addClass("animate__animated animate__heartBeat");
+                        setTimeout(function(){
+                            $('#likeButton').removeClass("animate__animated animate__heartBeat");
+                        }, 1000);
+                    }
+                },
+                error: function () {
+                    // Show an error message
+                    console.log("Error while liking/disliking content");
+                },
+            });
+        })
     })
 </script>
 </body>

@@ -674,9 +674,9 @@ class Content implements JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
-    public function getIsPrivate()
+    public function getIsPrivate() : bool
     {
         return $this->isPrivate;
     }
