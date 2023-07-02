@@ -14,6 +14,21 @@ if ($_SERVER["REQUEST_METHOD"] != "POST") {
     exit("Invalid request method.");
 }
 
+if (!empty($_POST["delete"])){
+
+    if (validate_input($_POST["delete"]) != "true") {
+        exit("Is this false or invalid?");
+    }
+
+    $notification = new Notification();
+    $notification->setUserId($_SESSION["username"]);
+    if ($notification->deleteAllNotificationsOfUser()){
+        exit("success");
+    } else {
+        exit("error");
+    }
+}
+
 if (empty($_POST["read"])) {
     exit("Read boolean value is empty..");
 }

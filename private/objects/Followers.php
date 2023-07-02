@@ -1,5 +1,7 @@
 <?php
 include_once (dirname(__FILE__) . "/../connection.php");
+include_once (dirname(__FILE__) . "/../objects/Notification.php");
+
 
 /**
  * Class Followers
@@ -33,6 +35,7 @@ class Followers
         $sql = "SELECT followerId FROM Follower WHERE userId = ?";
 
         if ($data = $conn->execute_query($sql, [$this->username])) {
+
             // Array of User using followerId
             $this->followers = array();
             while ($row = $data->fetch_assoc()){
@@ -62,6 +65,7 @@ class Followers
         $sql = "SELECT userId FROM Follower LEFT JOIN Content ON Follower.userId = Content.ownerId WHERE followerId = ? GROUP BY userId ORDER BY MAX(Content.uploadDate) DESC";
 
         if ($data = $conn->execute_query($sql, [$this->username])) {
+
             // Array of User following $username
             $this->following = array();
             while ($row = $data->fetch_assoc()){
@@ -92,6 +96,17 @@ class Followers
 
         if ($conn->execute_query($sql, [$usernameToFollow, $this->username])) {
             $this->reloadFollowers();
+
+            // Send notification to the guy who received a new follower.
+            $notification = new Notification();
+            $notification->setUserId($usernameToFollow);
+            $notification->setNotificationType("new_follow");
+            $notification->setNotificationDate(date("Y-m-d H:i:s"));
+            $notification->setTitle("New follower");
+            $notification->setDescription($this->username . " is now following you!");
+            // Send notification
+            $notification->insertNotification();
+
             return true;
         } else {
             $this->setErrorStatus("Error while following");
@@ -169,7 +184,6 @@ class Followers
             $this->setErrorStatus("Username not set");
             return false;
         }
-
 
         if (!$this->loadFollowers() || !$this->loadFollowing()) {
             $this->setErrorStatus("Error while reloading followers");

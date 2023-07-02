@@ -50,9 +50,3 @@ if (!$content->reverseLike($user->getUsername())) {
 // Return the number of likes, just the number
 exit('' . $content->getNumberOfLikes());
 ?>
-
-
-
-
-
-

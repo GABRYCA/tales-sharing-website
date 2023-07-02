@@ -817,7 +817,7 @@ class User implements JsonSerializable
     public function followUser(string $userId) : bool
     {
         $followersClass = new Followers($this->getUsername());
-        return $followersClass->addFollower($userId);
+        return $followersClass->follow($userId);
     }
 
     /**
@@ -828,7 +828,7 @@ class User implements JsonSerializable
     public function unfollowUser(string $userId) : bool
     {
         $followersClass = new Followers($this->getUsername());
-        return $followersClass->removeFollower($userId);
+        return $followersClass->unfollow($userId);
     }
 
     /**

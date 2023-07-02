@@ -179,6 +179,9 @@ $owner->loadUser();
                         if (empty($notifications)) {
                             echo '<p class="text-white">You have no notifications.</p>';
                         } else {
+                            // Button to delete all notification that appears only on hover of the dropdown.
+                            echo '<button class="btn btn-outline-danger w-100 btn-sm" id="delete-notifications" title="Click to delete all notifications">Clear all</button>';
+                            echo '<hr class="text-white notification-divider">';
                             foreach ($notifications as $notification) {
                                 $title = $notification->getTitle();
                                 $description = $notification->getDescription();
@@ -218,9 +221,9 @@ $owner->loadUser();
                                 $date = date('d/m/y', strtotime($date));
                                 // If not viewed, add class new-notification
                                 if ($viewed == 0) {
-                                    echo '<div class="d-flex align-items-start mb-2 rounded-3 new-notification">';
+                                    echo '<div class="d-flex align-items-start mb-2 rounded-3 notification new-notification pt-2 pb-2">';
                                 } else {
-                                    echo '<div class="d-flex align-items-start mb-2 rounded-3">';
+                                    echo '<div class="d-flex align-items-start mb-2 notification rounded-3">';
                                 }
                                 echo '<i class="' . $icon . '" style="color: ' . $color . '; font-size: 24px;"></i>';
                                 echo '<div class="ms-2">';
@@ -229,6 +232,7 @@ $owner->loadUser();
                                 echo '<small class="text-white">' . $date . '</small>';
                                 echo '</div>';
                                 echo '</div>';
+                                echo '<hr class="text-white notification-divider">';
                             }
                         }
                         ?>
@@ -323,7 +327,7 @@ $owner->loadUser();
                     echo '<div class="col-auto">';
                     echo '<div class="row justify-content-center">';
                     echo '<div class="col-auto">';
-                    echo '<button class="btn btn-outline-light fs-6" id="delete-button" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right"><i class="fas fa-trash"></i> Delete</button>';
+                    echo '<a href="edit.php?id=' . $content->getContentId() . '" class="btn btn-outline-light fs-6" id="edit-button" title="Edit" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right"><i class="fas fa-edit"></i> Edit</a>';
                     echo '</div>';
                     echo '</div>';
                     echo '</div>';
@@ -337,9 +341,9 @@ $owner->loadUser();
                                 <div class="col-auto">
                                     <?php
                                     if ($user->isFollowing($content->getOwnerId())) {
-                                        echo '<button class="btn btn-outline-light fs-6" id="unfollow-button" data-bs-toggle="tooltip" data-bs-placement="top" title="Unfollow" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right"><i class="fas fa-user-minus"></i> Unfollow</button>';
+                                        echo '<button class="btn btn-outline-light fs-6" id="followButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Unfollow" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right"><i class="fas fa-user-minus"></i> Unfollow</button>';
                                     } else {
-                                        echo '<button class="btn btn-outline-light fs-6" id="follow-button" data-bs-toggle="tooltip" data-bs-placement="top" title="Follow" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right"><i class="fas fa-user-plus"></i> Follow</button>';
+                                        echo '<button class="btn btn-outline-light fs-6" id="followButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Follow" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right"><i class="fas fa-user-plus"></i> Follow</button>';
                                     }
                                     ?>
                                 </div>
@@ -497,8 +501,78 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     console.log("Error while liking/disliking content");
                 },
             });
-        })
-    })
+        });
+    });
+
+    $(function(){
+        // Handle follow and unfollow
+        // If it has child <i> with class fa-user-minus, it means it is already following, so handle unfollow onClick, else
+        // if it has fa-user-plus, it means it is not following, so handle follow onClick
+        $('#followButton').on("click", function () {
+            // Check if it has fa-user-minus
+            var unfollow = !!$('#followButton').children().hasClass("fa-user-minus");
+            var contents = $("#followButton").contents();
+
+            // Send a post request to the server to follow or unfollow the user
+            $.ajax({
+                type: "POST",
+                url: "actions/followManager.php",
+                data: {userId: "<?= $content->getOwnerId() ?>"},
+                success: function () {
+                    // Check if unfollow
+                    if (unfollow) {
+                        // Change the icon to fa-user-plus
+                        $('#followButton').children().removeClass("fa-user-minus");
+                        $('#followButton').children().addClass("fa-user-plus");
+                        // Change the button text (without thouching the children <i> to Follow
+                        contents[contents.length - 1].nodeValue = " Follow";
+                        // Change button title
+                        $('#followButton').attr("title", "Follow");
+                    } else {
+                        // Change the icon to fa-user-minus
+                        $('#followButton').children().removeClass("fa-user-plus");
+                        $('#followButton').children().addClass("fa-user-minus");
+                        // Change the text to Unfollow
+                        contents[contents.length - 1].nodeValue = " Unfollow";
+                        // Change button title
+                        $('#followButton').attr("title", "Unfollow");
+                    }
+                },
+                error: function (data) {
+                    // Show an error message
+                    console.log("Error while following/unfollowing user, error: " + data);
+                },
+            });
+        });
+    });
+
+    $(function(){
+        // Handle the deletion of all notifications on click of button #delete-notifications.
+        $('#delete-notifications').on("click", function() {
+            // Send a post request to the server to delete all notifications
+            $.ajax({
+                type: "POST",
+                url: "actions/notifications.php",
+                data: {delete: true},
+                success: function() {
+                    // Remove all the elements with class .notification
+                    $('.notification').remove();
+                    // Remove the element notification-count
+                    $('#notification-count').remove();
+                    // Remove notification-divider
+                    $('.notification-divider').remove();
+                    // Remove button #delete-notifications
+                    $('#delete-notifications').remove();
+                    // And replace it with text: You have no notifications.
+                    $('.notifications-dropdown').append('<p class="text-white">You have no notifications.</p>');
+                },
+                error: function() {
+                    // Show an error message
+                    console.log("Error while deleting notifications");
+                }
+            });
+        });
+    });
 </script>
 </body>
 </html>

@@ -125,6 +125,9 @@ $user->loadUser();
                         if (empty($notifications)) {
                             echo '<p class="text-white">You have no notifications.</p>';
                         } else {
+                            // Button to delete all notification that appears only on hover of the dropdown.
+                            echo '<button class="btn btn-outline-danger w-100 btn-sm" id="delete-notifications" title="Click to delete all notifications">Clear all</button>';
+                            echo '<hr class="text-white notification-divider">';
                             foreach ($notifications as $notification) {
                                 $title = $notification->getTitle();
                                 $description = $notification->getDescription();
@@ -164,9 +167,9 @@ $user->loadUser();
                                 $date = date('d/m/y', strtotime($date));
                                 // If not viewed, add class new-notification
                                 if ($viewed == 0) {
-                                    echo '<div class="d-flex align-items-start mb-2 rounded-3 new-notification">';
+                                    echo '<div class="d-flex align-items-start mb-2 rounded-3 notification new-notification pt-2 pb-2">';
                                 } else {
-                                    echo '<div class="d-flex align-items-start mb-2 rounded-3">';
+                                    echo '<div class="d-flex align-items-start mb-2 notification rounded-3">';
                                 }
                                 echo '<i class="' . $icon . '" style="color: ' . $color . '; font-size: 24px;"></i>';
                                 echo '<div class="ms-2">';
@@ -175,6 +178,7 @@ $user->loadUser();
                                 echo '<small class="text-white">' . $date . '</small>';
                                 echo '</div>';
                                 echo '</div>';
+                                echo '<hr class="text-white notification-divider">';
                             }
                         }
                         ?>
@@ -302,7 +306,35 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                 }
             }, 1000);
         });
-    })
+    });
+
+    $(function(){
+        // Handle the deletion of all notifications on click of button #delete-notifications.
+        $('#delete-notifications').on("click", function() {
+            // Send a post request to the server to delete all notifications
+            $.ajax({
+                type: "POST",
+                url: "actions/notifications.php",
+                data: {delete: true},
+                success: function() {
+                    // Remove all the elements with class .notification
+                    $('.notification').remove();
+                    // Remove the element notification-count
+                    $('#notification-count').remove();
+                    // Remove notification-divider
+                    $('.notification-divider').remove();
+                    // Remove button #delete-notifications
+                    $('#delete-notifications').remove();
+                    // And replace it with text: You have no notifications.
+                    $('.notifications-dropdown').append('<p class="text-white">You have no notifications.</p>');
+                },
+                error: function() {
+                    // Show an error message
+                    console.log("Error while deleting notifications");
+                }
+            });
+        });
+    });
 </script>
 </body>
 </html>

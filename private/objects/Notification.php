@@ -124,6 +124,16 @@ class Notification implements JsonSerializable
     {
         $conn = connection();
 
+        // Check if notificationDate is set, if not use current date
+        if ($this->notificationDate == null) {
+            $this->notificationDate = date("Y-m-d H:i:s");
+        }
+
+        // Check if viewed is set, if not set to 0
+        if ($this->viewed == null) {
+            $this->viewed = false;
+        }
+
         $sql = "INSERT INTO Notification (userId, title, description, notificationType, notificationDate, viewed) VALUES (?, ?, ?, ?, ?, ?)";
 
         if (!$conn->execute_query($sql, [$this->userId, $this->title, $this->description, $this->notificationType, $this->notificationDate, $this->viewed])){
@@ -274,6 +284,25 @@ class Notification implements JsonSerializable
 
         if (!$conn->execute_query($sql, [$this->notificationId])){
             $this->setErrorStatus("Error while deleting notification");
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Function to delete all notifications of a user.
+     * Please set $userId before calling this function.
+     * @return bool
+     */
+    public function deleteAllNotificationsOfUser() : bool
+    {
+        $conn = connection();
+
+        $sql = "DELETE FROM Notification WHERE userId = ?";
+
+        if (!$conn->execute_query($sql, [$this->userId])){
+            $this->setErrorStatus("Error while deleting notifications of user");
             return false;
         }
 
