@@ -10,7 +10,9 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] === false) {
 }
 
 // Get user from session
-$user = $_SESSION["user"];
+$user = new User();
+$user->setUsername($_SESSION["username"]);
+$user->loadUser();
 
 // Get Galleries of user and also cast
 $galleries = $user->getGalleries();
@@ -434,6 +436,12 @@ $galleries = $user->getGalleries();
         </div>
     </div>
     <hr>
+    <?php
+    if (!$user->canUpload()){
+        echo '<h1 class="text-center text-danger text-decoration-underline">You are not allowed to upload content!</h1>';
+        echo '<h3 class="text-center text-danger">Please contact an administrator if you think this is a mistake. <a class="link-danger" href="mailto:anonymousgca@anonymousgca.eu">anonymousgca@anonymousgca.eu</a></h3>';
+    }
+    ?>
     <div class="row justify-content-center">
         <div class="col mx-0 mt-2">
             <h1 class="text-center">Upload Content</h1>

@@ -28,6 +28,7 @@ class User implements JsonSerializable
     private $subscriptionType = null;
     private $subscriptionDate = null;
     private $expiryDate = null;
+    private $canUpload = null;
 
     /**
      * Load user by username from database.
@@ -56,6 +57,7 @@ class User implements JsonSerializable
                 $this->setIsMuted($row["isMuted"]);
                 $this->setActivationCode($row["activationCode"]);
                 $this->setJoinDate($row["joinDate"]);
+                $this->setCanUpload($row["canUpload"]);
             } else {
                 $this->setErrorStatus("User not found");
                 return false;
@@ -1175,6 +1177,22 @@ class User implements JsonSerializable
         $this->joinDate = $joinDate;
     }
 
+    /**
+     * @return bool
+     */
+    public function canUpload(): bool
+    {
+        return $this->canUpload;
+    }
+
+     /**
+     * @param bool $canUpload
+     */
+    public function setCanUpload(bool $canUpload): void
+    {
+        $this->canUpload = $canUpload;
+    }
+
     // Implements JsonSerializable
     public function jsonSerialize()
     {
@@ -1197,7 +1215,8 @@ class User implements JsonSerializable
             'subscriptionType' => $this->subscriptionType,
             'subscriptionDate' => $this->subscriptionDate,
             'expiryDate' => $this->expiryDate,
-            'joinDate' => $this->joinDate
+            'joinDate' => $this->joinDate,
+            'canUpload' => $this->canUpload
         ];
     }
 }

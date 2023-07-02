@@ -69,6 +69,7 @@ CREATE TABLE User (
     ofAge TINYINT(1) NOT NULL DEFAULT 1,
     isActivated TINYINT(1) NOT NULL DEFAULT 0,
     isMuted TINYINT(1) NOT NULL DEFAULT 0,
+    canUpload TINYINT(1) DEFAULT 0,
     activationCode varchar(50),
     joinDate DATETIME DEFAULT CURRENT_TIMESTAMP
 );

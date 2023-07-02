@@ -101,6 +101,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user->setUsername($_SESSION["username"]);
     $user->loadUser();
 
+    // Check if user canUpload
+    if (!$user->canUpload()) {
+        // Send the error array to the client
+        exit("You can't upload anything. Please call for an administrator.");
+    }
+
     // Get the user id.
     $user_id = $user->getUsername();
 
