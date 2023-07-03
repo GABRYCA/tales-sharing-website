@@ -260,6 +260,7 @@ $galleries = $user->getGalleries();
                     finalFile.append('gallery', gallery);
                     finalFile.append('isPrivate', isPrivate.toString());
                     finalFile.append('isAI', isAI.toString());
+                    finalFile.append("action", "upload");
 
                     // Add tags to the FormData using a for loop to make an array
                     for (var i = 0; i < tags.length; i++) {
