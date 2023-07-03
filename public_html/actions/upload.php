@@ -172,8 +172,64 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit("Content saved with success, direct image here: <a href='" . $domain . "share.php?id=" . $content->getContentId() . "'>link</a>");
     } else if ($action == "edit"){
 
+        // Checks if the content id is empty or invalid
+        if ($contentId == "" || !is_numeric($contentId)) {
+            // Send the error array to the client
+            exit("Content id is empty or invalid. Please select a valid content id.");
+        }
 
-        exit("TODO");
+        // Check if there's a content for given id
+        $content = new Content();
+        $content->setContentId($contentId);
+        if (!$content->loadContent()) {
+            // Send the error array to the client
+            exit("Content id is empty or invalid. Please select a valid content id.");
+        }
+
+        // Check if owner is the same as the user
+        if ($content->getOwnerId() != $user->getUsername()) {
+            // Send the error array to the client
+            exit("You don't have permission to edit this content.");
+        }
+
+        // Check if the name is empty or too long
+        if ($name == "" || strlen($name) > 255) {
+            // Send the error array to the client
+            exit("Name is empty or too long. Please enter a valid name.");
+        }
+
+        // Check if the description is empty or too long
+        if ($description == "" || strlen($description) > 30000) {
+            // Send the error array to the client
+            exit("Description is empty or too long. Please enter a valid description.");
+        }
+
+        // Check if the isPrivate is empty or invalid (0 or 1)
+        if ($isPrivate == "" || !is_numeric($isPrivate) || ($isPrivate != 0 && $isPrivate != 1)) {
+            // Send the error array to the client
+            exit("Private field is empty or invalid. Please select a valid isPrivate.");
+        }
+
+        // Check if the isAI is empty or invalid (0 or 1)
+        if ($isAI == "" || !is_numeric($isAI) || ($isAI != 0 && $isAI != 1)) {
+            // Send the error array to the client
+            exit("AI field is empty or invalid. Please select a valid isAI.");
+        }
+
+        // Set new values to content.
+        $content->setTitle($name);
+        $content->setDescription($description);
+        $content->setIsAI($isAI);
+        $content->setPrivate($isPrivate);
+        $content->setTags($tags);
+
+        // Save the content to the database.
+        if (!$content->updateContent()) {
+            // Send the error array to the client
+            exit("Error saving content to the database.");
+        }
+
+        exit("Content saved with success, direct image here: <a href='" . $domain . "share.php?id=" . $content->getContentId() . "'>link</a>");
     }
 }
 

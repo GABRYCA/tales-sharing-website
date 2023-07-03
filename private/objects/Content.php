@@ -154,6 +154,25 @@ class Content implements JsonSerializable
         $sql = "UPDATE Content SET ownerId = ?, type = ?, urlImage = ?, textContent = ?, title = ?, description = ?, uploadDate = ?, isPrivate = ?, isAI = ? WHERE contentId = ?";
 
         if ($conn->execute_query($sql, [$this->ownerId, $this->type, $this->urlImage, $this->textContent, $this->title, $this->description, $this->uploadDate, $this->isPrivate, $this->isAI, $this->contentId])) {
+
+            $tag = new Tag();
+            $tag->removeAllTagsFromContent($this->contentId); // Delete all tags from content.
+
+            // If there're tags in tagList I load the content.
+            if (count($this->tagList) == 0){
+                return true;
+            }
+
+            $this->loadContentByPath(); // Load content by path.
+
+            // Now, if there're, I can link the tags to the content, but only those that there aren't already.
+            foreach ($this->tagList as $tag) {
+                if (!$tag->addTagToContent($this->contentId)){
+                    $this->setErrorStatus("Error while updating content, error while adding tag to content");
+                    return false;
+                }
+            }
+
             return true;
         } else {
             $this->setErrorStatus("Error while updating content");

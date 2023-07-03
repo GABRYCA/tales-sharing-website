@@ -259,6 +259,14 @@ class Tag implements JsonSerializable
     {
         $conn = connection();
 
+        // Check if tag is already associated with content
+        $sql = "SELECT * FROM TagAssociation WHERE tagId = ? AND contentId = ?";
+        if ($data = $conn->execute_query($sql, [$this->tagId, $contentId])){
+            if ($data->num_rows > 0){
+                return true;
+            }
+        }
+
         $sql = "INSERT INTO TagAssociation (tagId, contentId) VALUES (?, ?)";
 
         if ($conn->execute_query($sql, [$this->tagId, $contentId])){
@@ -287,15 +295,17 @@ class Tag implements JsonSerializable
     }
 
     /**
-     * Remove all tags from a content (please set contentId before).
+     * Remove all tags from a content.
+     * @param int $contentId
+     * @return bool
      */
-    public function removeAllTagsFromContent() : bool
+    public function removeAllTagsFromContent(int $contentId) : bool
     {
         $conn = connection();
 
         $sql = "DELETE FROM TagAssociation WHERE contentId = ?";
 
-        if ($conn->execute_query($sql, [$this->contentId])){
+        if ($conn->execute_query($sql, [$contentId])){
             return true;
         } else {
             $this->setErrorStatus("Error while removing all tags from content");
