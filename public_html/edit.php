@@ -193,7 +193,7 @@ $user->loadUser();
                 finalFile.append('description', description);
                 finalFile.append('isPrivate', isPrivate.toString());
                 finalFile.append('isAI', isAI.toString());
-                finalFile.append('contentId', <?php echo $_GET['id']; ?>); // Add the id of the image to edit (passed in the URL
+                finalFile.append('contentId', <?= $contentId ?>); // Add the id of the image to edit (passed in the URL
                 finalFile.append("action", "edit");
 
                 // Add tags to the FormData using a for loop to make an array
@@ -251,6 +251,42 @@ $user->loadUser();
             $('#cancel').on('click', function(e) {
                 e.preventDefault();
                 window.location.href = "share.php?id=" + <?= $contentId ?>;
+            });
+
+            // If I click confirm-deletion button, delete the image and go back to home.php
+            $('#confirm-deletion').on('click', function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: 'actions/upload.php', // The URL of your PHP script that handles the upload
+                    type: 'POST', // The HTTP method to use
+                    data: {
+                        contentId: <?= $contentId ?>,
+                        action: "delete"
+                    },
+                    success: function(response) {
+                        // Toast with output from upload.php
+                        $.toast({
+                            text: response + ' \n- You are about to be redirected to the homepage.',
+                            icon: 'info',
+                            position: 'top-right',
+                            hideAfter: 3000,
+                        });
+
+                        // After 3 seconds, go home.php
+                        setTimeout(function() {
+                            // Send user to home.php
+                            window.location.href = "home.php";
+                        }, 3000);
+                    },
+                    error: function(error) {
+                        // Toast with error from upload.php
+                        $.toast({
+                            text: error,
+                            icon: 'error',
+                            position: 'top-right'
+                        });
+                    }
+                });
             });
 
         });
@@ -378,17 +414,40 @@ $user->loadUser();
             </div>
 
             <div class="row mb-3 mt-5 justify-content-center">
-                <div class="col-6 col-lg-3">
+                <div class="col-5 col-lg-2">
                     <!-- Cancel button -->
                     <button class="btn btn-secondary w-100 pt-2 pb-2 border border-0 fs-4" id="cancel">Cancel</button>
                 </div>
-                <div class="col-6 col-lg-3">
+                <div class="col-5 col-lg-2 ps-0">
                     <!-- Submit button -->
                     <button class="btn btn-success w-100 pt-2 pb-2 border border-0 fs-4" id="upload">Save</button>
+                </div>
+                <div class="col-2 col-lg-2 ps-0">
+                    <!-- Trash button fontawesome to delete content, on click will open modal for confirmation -->
+                    <button class="btn btn-danger w-100 pt-2 pb-2 border border-0 fs-4" id="delete" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fas fa-trash-alt"></i></button>
                 </div>
             </div>
         </div>
 
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this content?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirm-deletion">Confirm</button>
+                </div>
+            </div>
+        </div>
     </div>
 
 </div>

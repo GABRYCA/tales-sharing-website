@@ -230,6 +230,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         exit("Content saved with success, direct image here: <a href='" . $domain . "share.php?id=" . $content->getContentId() . "'>link</a>");
+    } else if ($action == "delete") {
+
+        // Checks if the content id is empty or invalid
+        if ($contentId == "" || !is_numeric($contentId)) {
+            // Send the error array to the client
+            exit("Content id is empty or invalid. Please select a valid content id.");
+        }
+
+        // Check if there's a content for given id
+        $content = new Content();
+        $content->setContentId($contentId);
+        if (!$content->loadContent()) {
+            // Send the error array to the client
+            exit("Content id is empty or invalid. Please select a valid content id.");
+        }
+
+        // Check if owner is the same as the user
+        if ($content->getOwnerId() != $user->getUsername()) {
+            // Send the error array to the client
+            exit("You don't have permission to edit this content.");
+        }
+
+        // Delete the content from the database.
+        if (!$content->removeContent()) {
+            // Send the error array to the client
+            exit("Error deleting content from the database.");
+        }
+
+        exit("Content deleted with success.");
     }
 }
 
