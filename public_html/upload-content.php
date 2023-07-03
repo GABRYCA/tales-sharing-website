@@ -14,7 +14,7 @@ $user = new User();
 $user->setUsername($_SESSION["username"]);
 $user->loadUser();
 
-// Get Galleries of user and also cast
+// Get Galleries of user
 $galleries = $user->getGalleries();
 
 ?>
@@ -305,7 +305,7 @@ $galleries = $user->getGalleries();
                             $('#isAI').prop('checked', false);
                             fileData = null;
 
-                            // After 10 seconds, reload the page
+                            // After 3 seconds, reload the page
                             setTimeout(function() {
                                 location.reload();
                             }, 3000);

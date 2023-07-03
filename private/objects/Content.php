@@ -4,6 +4,7 @@ include_once (dirname(__FILE__) . "/../objects/Tag.php");
 include_once (dirname(__FILE__) . "/../objects/Likes.php");
 include_once (dirname(__FILE__) . "/../objects/StatsForContent.php");
 include_once (dirname(__FILE__) . "/../objects/Comment.php");
+include_once (dirname(__FILE__) . "/../objects/Gallery.php");
 
 class Content implements JsonSerializable
 {
