@@ -272,6 +272,9 @@ $user->loadUser();
                             hideAfter: 3000,
                         });
 
+                        // Close modal.
+                        $('#deleteModal').modal('hide');
+
                         // After 3 seconds, go home.php
                         setTimeout(function() {
                             // Send user to home.php

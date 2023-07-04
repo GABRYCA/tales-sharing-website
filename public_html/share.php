@@ -46,7 +46,6 @@
 
         #content-stats {
             background: linear-gradient(90deg, rgb(255, 15, 123, 0.5) 0%, rgba(0, 97, 255, 0.5) 100%) !important;
-
         }
 
         .fa-heart:hover {

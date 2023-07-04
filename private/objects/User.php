@@ -865,6 +865,23 @@ class User implements JsonSerializable
     }
 
     /**
+     * Function to get total number of likes received by user contents.
+     * @return int
+     */
+    public function getTotalLikesReceived() : int
+    {
+        // Get all contents of user and do a sum of the likes.
+        $contents = new Content();
+        $contents = $contents->getAllContentOfUser($this->getUsername());
+        $totalLikes = 0;
+        foreach ($contents as $content){
+            $totalLikes += $content->getNumberOfLikes();
+        }
+
+        return $totalLikes;
+    }
+
+    /**
      * @return string
      */
     public function getUsername(): string
@@ -1167,6 +1184,24 @@ class User implements JsonSerializable
     public function getJoinDate(): mixed
     {
         return $this->joinDate;
+    }
+
+    /**
+     * Returns the date the user joined in a human readable format.
+     * @return string
+     */
+    public function getJoinDateHuman(): string
+    {
+        return date('F jS, Y', strtotime($this->joinDate));
+    }
+
+    /**
+     * Returns the registering date year and month only, month as a name.
+     * @return string
+     */
+    public function getJoinDateYearMonth(): string
+    {
+        return date('F Y', strtotime($this->joinDate));
     }
 
     /**

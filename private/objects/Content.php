@@ -309,10 +309,10 @@ class Content implements JsonSerializable
 
     /**
      * Function to get all the content of a specific user from the database.
-     * @param int $userId
-     * @return array
+     * @param string $userId
+     * @return Content[]
      */
-    public function getAllContentOfUser(int $userId): array
+    public function getAllContentOfUser(string $userId): array
     {
         $conn = connection();
 
@@ -322,6 +322,25 @@ class Content implements JsonSerializable
             return $this->contentDataArray($data);
         } else {
             $this->setErrorStatus("Error while getting all content of user");
+            return array();
+        }
+    }
+
+    /**
+     * Function to get all the public content of a specific user from the database.
+     * @param string $userId
+     * @return Content[]
+     */
+    public function getAllPublicContentOfUser(string $userId): array
+    {
+        $conn = connection();
+
+        $sql = "SELECT * FROM Content WHERE ownerId = ? AND isPrivate = 0";
+
+        if ($data = $conn->execute_query($sql, [$userId])) {
+            return $this->contentDataArray($data);
+        } else {
+            $this->setErrorStatus("Error while getting all public content of user");
             return array();
         }
     }

@@ -87,6 +87,36 @@ class Gallery implements JsonSerializable
     }
 
     /**
+     * Function that returns the list of galleries using $ownerId that aren't hidden.
+     * @return Gallery[]
+     */
+    public function getGalleriesByOwnerIdNotHidden() : array
+    {
+        $conn = connection();
+
+        $sql = "SELECT * FROM GalleryGroup WHERE ownerId = ? AND hideGallery = 0";
+
+        $galleries = array();
+        if ($data = $conn->execute_query($sql, [$this->ownerId])){
+            foreach ($data as $row) {
+                $gallery = new Gallery();
+                $gallery->setGalleryId($row["galleryId"]);
+                $gallery->setOwnerId($row["ownerId"]);
+                $gallery->setName($row["name"]);
+                $gallery->setHideGallery($row["hideGallery"]);
+                $galleries[] = $gallery;
+            }
+        }
+
+        // If the array is empty set error status
+        if (empty($galleries)) {
+            $this->setErrorStatus("There are no galleries to show");
+        }
+
+        return $galleries;
+    }
+
+    /**
      * Function to create a new gallery.
      * @return bool
      */

@@ -4,7 +4,7 @@
     <?php
     include_once(dirname(__FILE__) . '/common/common-head.php');
     ?>
-    <title>Home - Tales</title>
+    <title>User Profile</title>
     <style>
         #upload-button {
             background: rgb(0, 97, 255) !important;
@@ -61,6 +61,10 @@
         .new-notification {
             background-color: rgba(255, 15, 123, 0.54) !important;
         }
+
+        #profile-stats {
+            background: linear-gradient(90deg, rgb(255, 15, 123, 0.5) 0%, rgba(0, 97, 255, 0.5) 100%) !important;
+        }
     </style>
 
     <script>
@@ -79,18 +83,34 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] === false) {
     header("Location: ../login.php");
     exit();
 }
-?>
 
-<?php
 // Load all necessary includes.
 include_once(dirname(__FILE__) . '/../private/objects/User.php');
 include_once(dirname(__FILE__) . '/../private/objects/Content.php');
-include_once(dirname(__FILE__) . '/../private/objects/Followers.php');
+include_once(dirname(__FILE__) . '/../private/objects/Gallery.php');
+include_once(dirname(__FILE__) . '/common/utility.php');
 
 // Get user from session
 $user = new User();
 $user->setUsername($_SESSION["username"]);
 $user->loadUser();
+
+$userProfile = new User();
+
+if (!empty($_GET['username'])){
+    $userProfile->setUsername(validate_input($_GET['username']));
+    if (!$userProfile->loadUser()){
+        // Say user not found and after 3 seconds redirect to home.
+        echo '<div class="container-fluid text-center mt-5">';
+        echo '<h1 class="display-1 text-danger">User not found ' . $userProfile->getUsername() . '</h1>';
+        echo '<p class="text-white">Redirecting to home in 3 seconds...</p>';
+        echo '</div>';
+        header("refresh:3;url=home.php");
+        exit();
+    }
+} else {
+    $userProfile = $user;
+}
 
 ?>
 
@@ -213,57 +233,171 @@ $user->loadUser();
         </div>
     </div>
 
-    <div class="row row-horizon border-bottom text-center pt-1 pb-1 pt-lg-3 pb-lg-3 flex-nowrap" id="row-profiles">
-
-        <?php
-        // Get followed users and print them out.
-
-        $followers = new Followers($user->getUsername());
-        $followers->loadFollowing(); // Load following.
-        $followedUsers = $followers->getFollowing(); // Get following.
-
-        // If there are no followed users, print out a message.
-        if (count($followedUsers) === 0) {
-            echo '<div class="col-12"><h1 class="display-6">You are not following anyone!</h1></div>';
-        } else {
-
-            // For each user make an icon to visit his profile
-            foreach ($followedUsers as $followedUser) {
-                echo '<div class="col-3 col-md-2 col-xl-1">';
-                echo '<a href="profile.php?username=' . $followedUser->getUsername() . '" data-bs-toggle="tooltip" title="click to open">';
-                echo '<img src="' . $followedUser->getUrlProfilePicture() . '" alt="icon-user" class="img-fluid bg-placeholder bg-opacity-10 rounded-4 user-icon-top" width="50" height="50">';
-                echo '</a>';
-                echo '</div>';
-            }
-        }
-
-        ?>
+    <!-- Main content -->
+    <div class="row justify-content-center">
+        <!-- Profile icon and name -->
+        <div class="col">
+            <!-- Cover image as background -->
+            <div class="bg-image rounded-bottom-5" style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0)), url('<?php echo $user->getUrlCoverPicture(); ?>'), linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0)); height: 300px; background-repeat: no-repeat; background-position: center; background-size: cover;">
+                <!-- Profile icon in the center and name under id -->
+                <div class="row justify-content-center align-items-end" style="height: 100%;">
+                    <div class="col-auto">
+                        <img src="<?php echo $user->getUrlProfilePicture(); ?>" class="rounded-circle bg-dark shadow" width="150px"
+                             height="150px">
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Content -->
-    <div class="row p-3 gap-0 justify-content-evenly gy-3">
+    <!-- Username and follow or edit -->
+    <div class="row justify-content-center mt-4 mt-lg-3">
+        <div class="col-auto d-flex justify-content-center">
+            <h1 class="text-white mt-2"><?php echo $user->getUsername(); ?></h1>
+        </div>
 
+        <!-- Buttons -->
         <?php
-        $content = new Content();
-        $contentArray = $content->getAllPublicContent();
-
-        // For each Content, print it out.
-        // If there are no content, print out a message.
-        if (count($contentArray) === 0) {
-            echo '<div class="col-12"><h1 class="display-6 text-center">There is no content to show!</h1></div>';
-        } else {
-
-            // For each content make an icon to visit his profile
-            foreach ($contentArray as $content) {
-                echo '<div class="col-12 col-lg-4 col-xxl-3">';
-                echo '<div class="img-wrapper position-relative text-center">';
-                echo '<img src="' . $content->getUrlImage() . '" alt="image" class="img-fluid rounded-4 img-thumbnail bg-placeholder img-home" loading="lazy" onclick="window.location.href = \'/share.php?id=' . $content->getContentId() . '\'" onload="hideSpinner(this)" style="opacity: 0;" data-aos="fade-up">';
+        if ($user->getUsername() != $userProfile->getUsername()) {
+            // Follow or unfollow button.
+            if ($user->isFollowing($userProfile->getUsername())) {
+                echo '<div class="col-auto d-flex justify-content-center">';
+                echo '<button class="btn btn-outline-light fs-6" id="followButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Unfollow" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right"><i class="fas fa-user-minus"></i> Unfollow</button>';
                 echo '</div>';
+            } else {
+                echo '<div class="col-auto d-flex justify-content-center">';
+                echo '<button class="btn btn-outline-light fs-6" id="followButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Follow" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right"><i class="fas fa-user-plus"></i> Follow</button>';
                 echo '</div>';
             }
+        } else {
+            // Edit profile
+            echo '<div class="col-auto d-flex justify-content-center">';
+            echo '<button class="btn btn-outline-light fs-6" id="editButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Profile" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right"><i class="fa fa-edit"></i> Edit profile</button>';
+            echo '</div>';
         }
         ?>
+
     </div>
+
+    <!-- User info (number of followers, registering date, etc.) -->
+    <div class="row justify-content-evenly mt-3 mb-3 mx-1 pt-3 pb-3 bg-light bg-opacity-10 rounded-4 d-flex align-items-center" id="profile-stats">
+        <!-- Number of followers -->
+        <div class="col-auto" data-bs-toggle="tooltip" data-bs-placement="top" title="Followers" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right" style="cursor: help">
+            <div class="row justify-content-center d-flex align-items-center">
+                <div class="col-auto pe-0 d-flex align-items-center">
+                    <i class="fas fa-user text-light opacity-75" style="font-size: 24px;"></i>
+                </div>
+                <div class="col-auto pe-0">
+                    <h6 class="d-inline"><?= $userProfile->getNumberOfFollowers() ?></h6>
+                </div>
+            </div>
+        </div>
+        <!-- Total likes received by user in all of its contents -->
+        <div class="col-auto" data-bs-toggle="tooltip" data-bs-placement="top" title="Total likes received" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right" style="cursor: help">
+            <div class="row justify-content-center d-flex align-items-center">
+                <div class="col-auto pe-0 d-flex align-items-center">
+                    <i class="fas fa-heart text-light opacity-75" style="font-size: 24px;"></i>
+                </div>
+                <div class="col-auto pe-0">
+                    <h6 class="d-inline"><?= $userProfile->getTotalLikesReceived() ?></h6>
+                </div>
+            </div>
+        </div>
+        <!-- Registering date -->
+        <div class="col-auto" data-bs-toggle="tooltip" data-bs-placement="top" title="Join date" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right" style="cursor: help">
+            <div class="row justify-content-center d-flex align-items-center">
+                <div class="col-auto pe-0 d-flex align-items-center">
+                    <i class="fas fa-calendar-alt text-light opacity-75" style="font-size: 24px;"></i>
+                </div>
+                <div class="col-auto pe-0">
+                    <h6 class="d-inline"><?= $userProfile->getJoinDateYearMonth() ?></h6>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+
+        <hr>
+
+        <!-- Toggle to show content or galleries -->
+        <div class="row justify-content-center">
+            <div class="col-auto bg-light bg-opacity-10 pt-2 pb-2 rounded-3">
+                <div class="form-check form-switch">
+                    <input id="toggle-btn" class="form-check-input" type="checkbox" checked>
+                    <label id="toggle-label" class="form-check-label" for="toggle-btn">Show Content</label>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- Content of user -->
+        <div class="row p-3 gap-0 justify-content-evenly gy-3" id="content">
+
+            <?php
+            $content = new Content();
+            if ($user->getUsername() === $userProfile->getUsername()) {
+                // If the user is visiting his own profile, show all his content (public and private)
+                $contentArray = $content->getAllContentOfUser($userProfile->getUsername());
+            } else {
+                // If the user is visiting another profile, show only his public content (not private
+                $contentArray = $content->getAllPublicContentOfUser($userProfile->getUsername());
+            }
+
+            // For each Content, print it out.
+            // If there are no content, print out a message.
+            if (count($contentArray) === 0) {
+                echo '<div class="col-12"><h1 class="display-6 text-center">There is no content to show!</h1></div>';
+            } else {
+
+                // For each content make an icon to visit his profile
+                foreach ($contentArray as $content) {
+                    echo '<div class="col-12 col-lg-4 col-xxl-3">';
+                    echo '<div class="img-wrapper position-relative text-center">';
+                    echo '<img src="' . $content->getUrlImage() . '" alt="image" class="img-fluid rounded-4 img-thumbnail bg-placeholder img-home" loading="lazy" onclick="window.location.href = \'/share.php?id=' . $content->getContentId() . '\'" onload="hideSpinner(this)" style="opacity: 0;" data-aos="fade-up">';
+                    echo '</div>';
+                    echo '</div>';
+                }
+            }
+            ?>
+        </div>
+        <!-- Galleries of user -->
+        <div class="row p-3 gap-0 justify-content-evenly gy-3 d-none" id="galleries">
+
+            <?php
+            $gallery = new Gallery();
+            $gallery->setOwnerId($userProfile->getUsername());
+            if ($user->getUsername() === $userProfile->getUsername()) {
+                // If the user is visiting his own profile, show all his content (public and private)
+                $galleryArray = $gallery->getGalleriesByOwnerId();
+            } else {
+                // If the user is visiting another profile, show only his public content (not private
+                $galleryArray = $gallery->getGalleriesByOwnerIdNotHidden();
+            }
+
+            // For each Content, print it out.
+            // If there are no content, print out a message.
+            if (count($galleryArray) === 0) {
+                echo '<div class="col-12"><h1 class="display-6 text-center">There are not galleries to show!</h1></div>';
+            } else {
+                // Show galleries and also their name.
+                foreach ($galleryArray as $gallery) {
+                    echo '<div class="col-12 col-lg-4 col-xxl-3">';
+                    echo '<div class="img-wrapper position-relative text-center">';
+                    echo '<img src="common/assets/cover.webp" alt="image" class="img-fluid rounded-4 img-thumbnail bg-placeholder img-home" loading="lazy" onclick="window.location.href = \'/gallery.php?id=' . $gallery->getGalleryId() . '\'" onload="hideSpinner(this)" style="opacity: 0;" data-aos="fade-up">';
+                    echo '<div class="img-overlay position-absolute top-0 start-0 w-100 h-100 rounded-4" style="background-color: rgba(0, 0, 0, 0.5);"></div>';
+                    echo '<div class="img-text position-absolute top-50 start-50 translate-middle text-light">';
+                    echo '<h1 class="display-6">' . $gallery->getName() . '</h1>';
+                    echo '</div>';
+                    echo '</div>';
+                    echo '</div>';
+                }
+            }
+            ?>
+        </div>
+    </div>
+
 
 </div>
 
@@ -335,6 +469,30 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
             });
         });
     });
+
+    $(function(){
+        // Get the toggle button, the toggle label and the container elements
+        var toggleBtn = $("#toggle-btn");
+        var toggleLabel = $("#toggle-label");
+        var container = $("#container");
+        // Set a flag to indicate the current mode
+        var showAll = true;
+        // Add a change event listener to the toggle button
+        toggleBtn.on('change', function () {
+            // Hide or show content and galleries based on the current mode
+            if (showAll) {
+                $('#content').addClass('d-none');
+                $('#galleries').removeClass('d-none');
+                toggleLabel.text("Show Content");
+                showAll = false;
+            } else {
+                $('#content').removeClass('d-none');
+                $('#galleries').addClass('d-none');
+                toggleLabel.text("Show Galleries");
+                showAll = true;
+            }
+        });
+    })
 </script>
 </body>
 </html>
