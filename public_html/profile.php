@@ -288,7 +288,7 @@ if (!empty($_GET['username'])){
                     <i class="fas fa-user text-light opacity-75" style="font-size: 24px;"></i>
                 </div>
                 <div class="col-auto pe-0">
-                    <h6 class="d-inline"><?= $userProfile->getNumberOfFollowers() ?></h6>
+                    <h6 class="d-inline" id="followersNumber"><?= $userProfile->getNumberOfFollowers() ?></h6>
                 </div>
             </div>
         </div>
@@ -470,6 +470,54 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
         });
     });
 
+    // Follow and unfollow.
+    $(function(){
+        // Handle follow and unfollow
+        // If it has child <i> with class fa-user-minus, it means it is already following, so handle unfollow onClick, else
+        // if it has fa-user-plus, it means it is not following, so handle follow onClick
+        $('#followButton').on("click", function () {
+            // Check if it has fa-user-minus
+            var unfollow = !!$('#followButton').children().hasClass("fa-user-minus");
+            var contents = $("#followButton").contents();
+
+            // Send a post request to the server to follow or unfollow the user
+            $.ajax({
+                type: "POST",
+                url: "actions/followManager.php",
+                data: {userId: "<?= $userProfile->getUsername() ?>"},
+                success: function (data) {
+                    // Check if unfollow
+                    if (unfollow) {
+                        // Change the icon to fa-user-plus
+                        $('#followButton').children().removeClass("fa-user-minus");
+                        $('#followButton').children().addClass("fa-user-plus");
+                        // Change the button text (without thouching the children <i> to Follow
+                        contents[contents.length - 1].nodeValue = " Follow";
+                        // Change button title
+                        $('#followButton').attr("title", "Follow");
+                        // Update the followersNumber element using data from the server
+                        $('#followersNumber').text(data);
+                    } else {
+                        // Change the icon to fa-user-minus
+                        $('#followButton').children().removeClass("fa-user-plus");
+                        $('#followButton').children().addClass("fa-user-minus");
+                        // Change the text to Unfollow
+                        contents[contents.length - 1].nodeValue = " Unfollow";
+                        // Change button title
+                        $('#followButton').attr("title", "Unfollow");
+                        // Update the followersNumber element using data from the server
+                        $('#followersNumber').text(data);
+                    }
+                },
+                error: function (data) {
+                    // Show an error message
+                    console.log("Error while following/unfollowing user, error: " + data);
+                },
+            });
+        });
+    });
+
+    // Show all content or galleries handler.
     $(function(){
         // Get the toggle button, the toggle label and the container elements
         var toggleBtn = $("#toggle-btn");
