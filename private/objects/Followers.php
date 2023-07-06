@@ -14,6 +14,7 @@ class Followers
     private $followers;
     private $following;
     private $errorStatus;
+    private $domain = "https://tales.anonymousgca.eu/";
 
     // Constructor with username
     public function __construct($username)
@@ -103,7 +104,7 @@ class Followers
             $notification->setNotificationType("new_follow");
             $notification->setNotificationDate(date("Y-m-d H:i:s"));
             $notification->setTitle("New follower");
-            $notification->setDescription($this->username . " is now following you!");
+            $notification->setDescription("<a href='" . $this->domain . "profile.php?username=" . $this->username . "'>" .  $this->username . "</a> is now following you!");
             // Send notification
             $notification->insertNotification();
 

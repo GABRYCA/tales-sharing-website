@@ -242,7 +242,7 @@ if (!empty($_GET['username'])){
                 <!-- Profile icon in the center and name under id -->
                 <div class="row justify-content-center align-items-end" style="height: 100%;">
                     <div class="col-auto">
-                        <img src="<?php echo $user->getUrlProfilePicture(); ?>" class="rounded-circle bg-dark shadow" width="150px"
+                        <img src="<?php echo $userProfile->getUrlProfilePicture(); ?>" class="rounded-circle bg-dark shadow" width="150px"
                              height="150px">
                     </div>
                 </div>
@@ -253,7 +253,7 @@ if (!empty($_GET['username'])){
     <!-- Username and follow or edit -->
     <div class="row justify-content-center mt-4 mt-lg-3">
         <div class="col-auto d-flex justify-content-center">
-            <h1 class="text-white mt-2"><?php echo $user->getUsername(); ?></h1>
+            <h1 class="text-white mt-2"><?= $userProfile->getUsername(); ?></h1>
         </div>
 
         <!-- Buttons -->
