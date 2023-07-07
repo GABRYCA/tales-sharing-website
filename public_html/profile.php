@@ -517,26 +517,27 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
         });
     });
 
+    // Set a flag to indicate the current mode
+    var showAll = true;
+
     // Show all content or galleries handler.
     $(function(){
         // Get the toggle button, the toggle label and the container elements
         var toggleBtn = $("#toggle-btn");
         var toggleLabel = $("#toggle-label");
         var container = $("#container");
-        // Set a flag to indicate the current mode
-        var showAll = true;
         // Add a change event listener to the toggle button
         toggleBtn.on('change', function () {
             // Hide or show content and galleries based on the current mode
             if (showAll) {
                 $('#content').addClass('d-none');
                 $('#galleries').removeClass('d-none');
-                toggleLabel.text("Show Content");
+                toggleLabel.text("Show Gallery");
                 showAll = false;
             } else {
                 $('#content').removeClass('d-none');
                 $('#galleries').addClass('d-none');
-                toggleLabel.text("Show Galleries");
+                toggleLabel.text("Show Content");
                 showAll = true;
             }
         });

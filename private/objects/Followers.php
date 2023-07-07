@@ -197,11 +197,21 @@ class Followers
     /**
      * IF called with empty constructor.
      * Before please call loadFollowers() to load followers from database.
-     * @return Followers[]
+     * @return User[]
      */
     public function getFollowers() : array
     {
         return $this->followers;
+    }
+
+    /**
+     * IF Called with empty constructor.
+     * Before please call loadFollowing() to load following from database.
+     * @return User[]
+     */
+    public function getFollowing() : array
+    {
+        return $this->following;
     }
 
     /**
@@ -234,15 +244,5 @@ class Followers
     public function setErrorStatus($errorStatus): void
     {
         $this->errorStatus = $errorStatus;
-    }
-
-    /**
-     * IF Called with empty constructor.
-     * Before please call loadFollowing() to load following from database.
-     * @return Followers[]
-     */
-    public function getFollowing() : array
-    {
-        return $this->following;
     }
 }

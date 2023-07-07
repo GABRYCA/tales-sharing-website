@@ -83,6 +83,7 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] === false) {
 
 <?php
 // Load all necessary includes.
+include_once(dirname(__FILE__) . '/common/utility.php');
 include_once(dirname(__FILE__) . '/../private/objects/User.php');
 include_once(dirname(__FILE__) . '/../private/objects/Content.php');
 include_once(dirname(__FILE__) . '/../private/objects/Followers.php');
@@ -240,29 +241,28 @@ $user->loadUser();
         ?>
     </div>
 
-    <!-- Content -->
+    <!-- New Content (New design) -->
     <div class="row p-3 gap-0 justify-content-evenly gy-3">
 
         <?php
         $content = new Content();
         $contentArray = $content->getAllPublicContent();
 
-        // For each Content, print it out.
-        // If there are no content, print out a message.
         if (count($contentArray) === 0) {
             echo '<div class="col-12"><h1 class="display-6 text-center">There is no content to show!</h1></div>';
         } else {
-
-            // For each content make an icon to visit his profile
             foreach ($contentArray as $content) {
-                echo '<div class="col-12 col-lg-4 col-xxl-3">';
-                echo '<div class="img-wrapper position-relative text-center">';
-                echo '<img src="' . $content->getUrlImage() . '" alt="image" class="img-fluid rounded-4 img-thumbnail bg-placeholder img-home" loading="lazy" onclick="window.location.href = \'/share.php?id=' . $content->getContentId() . '\'" onload="hideSpinner(this)" style="opacity: 0;" data-aos="fade-up">';
+                echo '<div class="col-12 col-lg-4 col-xxl-3 d-flex align-items-stretch px-0 px-lg-2">';
+                echo '<div class="card border-0 bg-placeholder img-home w-100" data-aos="fade-up" onclick="window.location.href = \'/share.php?id=' . $content->getContentId() . '\'">';
+                echo '<div class="card-img-top img-wrapper position-relative text-center w-100 lazy-background" data-background="' . encode_url($content->getUrlImage()) . '" style="background-size: cover; background-position: center; height: 45vh;">';
+                echo '</div>';
                 echo '</div>';
                 echo '</div>';
             }
+
         }
         ?>
+
     </div>
 
 </div>
@@ -334,6 +334,37 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                 }
             });
         });
+    });
+
+    $(function(){
+        // Get all the elements with class lazy-background
+        const lazyBackgrounds = $('.lazy-background');
+
+        // Create a new IntersectionObserver instance
+        const observer = new IntersectionObserver((entries, observer) => {
+            // Loop through each entry
+            entries.forEach(entry => {
+                // If the entry is intersecting (visible)
+                if (entry.isIntersecting) {
+                    console.log(entry);
+                    // Get the element from the entry
+                    const el = $(entry.target);
+                    // Get the data-background value from the element
+                    const background = el.data('background');
+                    console.log(background);
+                    // Set the background-image style property to load the image
+                    el.css('background-image', `url(${background})`);
+                    // Unobserve the element (no need to watch it anymore)
+                    observer.unobserve(el[0]);
+                }
+            });
+        });
+
+        // Loop through each element and observe it
+        lazyBackgrounds.each(function() {
+            observer.observe(this);
+        });
+
     });
 </script>
 </body>
