@@ -316,7 +316,7 @@ class Content implements JsonSerializable
     {
         $conn = connection();
 
-        $sql = "SELECT * FROM Content WHERE ownerId = ?";
+        $sql = "SELECT * FROM Content WHERE ownerId = ? ORDER BY uploadDate DESC, contentId DESC";
 
         if ($data = $conn->execute_query($sql, [$userId])) {
             return $this->contentDataArray($data);
@@ -335,7 +335,7 @@ class Content implements JsonSerializable
     {
         $conn = connection();
 
-        $sql = "SELECT * FROM Content WHERE ownerId = ? AND isPrivate = 0";
+        $sql = "SELECT * FROM Content WHERE ownerId = ? AND isPrivate = 0 ORDER BY uploadDate DESC, contentId DESC";
 
         if ($data = $conn->execute_query($sql, [$userId])) {
             return $this->contentDataArray($data);

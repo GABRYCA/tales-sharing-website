@@ -333,11 +333,11 @@ $owner->loadUser();
                 } else {
                 ?>
                 <!-- Follow/Unfollow -->
-                <div class="col-auto">
+                <div class="col-auto ps-0 ps-lg-5">
                     <div class="row justify-content-center d-flex align-items-center">
                         <div class="col-auto">
                             <div class="row justify-content-center">
-                                <div class="col-auto">
+                                <div class="col-auto pe-0 pe-lg-2">
                                     <?php
                                     if ($user->isFollowing($content->getOwnerId())) {
                                         echo '<button class="btn btn-outline-light fs-6" id="followButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Unfollow" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right"><i class="fas fa-user-minus"></i> Unfollow</button>';
