@@ -28,32 +28,6 @@
             color: #FF0F7BFF !important;
         }
 
-        .user-icon-top {
-            transition: 0.2s ease-out !important;
-        }
-
-        .user-icon-top:hover {
-            background-color: rgba(255, 15, 123, 0.54) !important;
-            box-shadow: 0 0 0 0.2rem rgba(255, 15, 123, 0.25) !important;
-        }
-
-        .img-home {
-            max-height: 80vh !important;
-            transition: 0.2s ease-out !important;
-        }
-
-        .row-horizon {
-            overflow-x: auto;
-            white-space: nowrap;
-        }
-
-        .img-home:hover {
-            background-color: rgba(255, 15, 123, 0.54) !important;
-            box-shadow: 0 0 0 0.2rem rgba(255, 15, 123, 0.25) !important;
-            filter: brightness(1.1);
-            cursor: pointer;
-        }
-
         #bell:hover {
             cursor: pointer;
         }
@@ -64,6 +38,30 @@
 
         #profile-stats {
             background: linear-gradient(90deg, rgb(255, 15, 123, 0.5) 0%, rgba(0, 97, 255, 0.5) 100%) !important;
+        }
+
+        .fa-user {
+            transition: 0.2s ease-out !important;
+        }
+
+        .fa-user:hover {
+            color: #FF0F7BFF !important;
+        }
+
+        .fa-heart {
+            transition: 0.2s ease-out !important;
+        }
+
+        .fa-heart:hover {
+            color: #FF0F7BFF !important;
+        }
+
+        .fa-calendar-alt {
+            transition: 0.2s ease-out !important;
+        }
+
+        .fa-calendar-alt:hover {
+            color: #FF0F7BFF !important;
         }
     </style>
 
@@ -282,16 +280,42 @@ if (!empty($_GET['username'])){
     <!-- User info (number of followers, registering date, etc.) -->
     <div class="row justify-content-evenly mt-3 mb-3 mx-1 pt-3 pb-3 bg-light bg-opacity-10 rounded-4 d-flex align-items-center" id="profile-stats">
         <!-- Number of followers -->
-        <div class="col-auto" data-bs-toggle="tooltip" data-bs-placement="top" title="Followers" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right" style="cursor: help">
+        <div class="col-auto" data-bs-toggle="tooltip" data-bs-placement="top" title="Followers - Click to see!" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right" style="cursor: pointer">
             <div class="row justify-content-center d-flex align-items-center">
                 <div class="col-auto pe-0 d-flex align-items-center">
-                    <i class="fas fa-user text-light opacity-75" style="font-size: 24px;"></i>
+                    <i class="fas fa-user text-light opacity-75" style="font-size: 24px;" data-bs-toggle="dropdown"></i>
+                    <!-- Create a dropdown menu with the list of followers -->
+                    <ul class="dropdown-menu">
+                        <!-- Loop through the array of followers and display their icons and usernames -->
+                        <?php
+                        $followers = $userProfile->getFollowers();
+                        if (count($followers) == 0) { ?>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <span>No followers yet!</span>
+                                </a>
+                            </li>
+                        <?php } else {
+                            foreach ($followers as $follower){ ?>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center" href="profile.php?username=<?= $follower->getUsername() ?>">
+                                        <!-- Display the follower's icon -->
+                                        <img src="<?= $follower->getUrlProfilePicture() ?>" alt="<?= $follower->getUsername() ?>" class="rounded-circle me-2" width="32" height="32">
+                                        <!-- Display the follower's username -->
+                                        <span><?= $follower->getUsername() ?></span>
+                                    </a>
+                                </li>
+                            <?php }
+                        }?>
+                    </ul>
                 </div>
                 <div class="col-auto pe-0">
                     <h6 class="d-inline" id="followersNumber"><?= $userProfile->getNumberOfFollowers() ?></h6>
                 </div>
             </div>
         </div>
+
+
         <!-- Total likes received by user in all of its contents -->
         <div class="col-auto" data-bs-toggle="tooltip" data-bs-placement="top" title="Total likes received" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right" style="cursor: help">
             <div class="row justify-content-center d-flex align-items-center">
@@ -541,7 +565,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                 showAll = true;
             }
         });
-    })
+    });
 </script>
 </body>
 </html>

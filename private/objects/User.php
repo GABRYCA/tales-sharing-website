@@ -773,7 +773,7 @@ class User implements JsonSerializable
 
     /**
      * Get Followers of user.
-     * @return Followers[]
+     * @return User[]
      */
     public function getFollowers() : array
     {
@@ -783,7 +783,7 @@ class User implements JsonSerializable
 
     /**
      * Get Following of user.
-     * @return Followers[]
+     * @return User[]
      */
     public function getFollowing() : array
     {
