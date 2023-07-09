@@ -11,16 +11,22 @@ class Gallery implements JsonSerializable
     private $errorStatus = null;
 
     /**
-     * Function to load gallery info from database following $galleryId and $ownerId.
+     * Function to load gallery info from database following $galleryId.
      * @return bool
      */
     public function loadGalleryInfoByGalleryId() : bool
     {
         $conn = connection();
 
-        $sql = "SELECT * FROM GalleryGroup WHERE galleryId = ? AND ownerId = ? ORDER BY galleryId DESC";
+        $sql = "SELECT * FROM GalleryGroup WHERE galleryId = ? ORDER BY galleryId DESC";
 
-        if ($data = $conn->execute_query($sql, [$this->galleryId, $this->ownerId])){
+        if ($data = $conn->execute_query($sql, [$this->galleryId])){
+
+            if ($data->num_rows == 0) {
+                $this->setErrorStatus("Gallery not found");
+                return false;
+            }
+
             $row = $data->fetch_assoc();
             $this->ownerId = $row["ownerId"];
             $this->name = $row["name"];
@@ -267,7 +273,34 @@ class Gallery implements JsonSerializable
         return false;
     }
 
+    /**
+     * Function to get all content from gallery (Please load gallery before).
+     * @return Content[]
+     */
+    public function getContent() : array
+    {
+        $conn = connection();
 
+        $sql = "SELECT distinct GA.contentId FROM GalleryAssociation AS GA INNER JOIN Content AS C on GA.contentId = C.contentId WHERE GA.galleryId = ? ORDER BY C.uploadDate DESC, C.contentId DESC";
+
+        $content = array();
+        if ($data = $conn->execute_query($sql, [$this->galleryId])){
+            foreach ($data as $row) {
+                $tempContent = new Content();
+                $tempContent->setContentId($row["contentId"]);
+                if ($tempContent->loadContent()) {
+                    $content[] = $tempContent;
+                }
+            }
+        }
+
+        // If the array is empty set error status
+        if (empty($content)) {
+            $this->setErrorStatus("There are no content to show");
+        }
+
+        return $content;
+    }
 
     // Getters and Setters
     public function getGalleryId()
@@ -301,6 +334,11 @@ class Gallery implements JsonSerializable
     }
 
     public function getHideGallery()
+    {
+        return $this->hideGallery;
+    }
+
+    public function isHiddenGallery()
     {
         return $this->hideGallery;
     }

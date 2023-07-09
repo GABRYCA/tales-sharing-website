@@ -81,13 +81,6 @@
 
 
     </style>
-
-    <script>
-        function hideSpinner(image) {
-            image.classList.remove("bg-placeholder");
-            image.style.opacity = "1";
-        }
-    </script>
 </head>
 <body class="font-monospace text-light bg-dark">
 
@@ -256,8 +249,7 @@ $owner->loadUser();
                             </li>
                             <li>
                                 <a class="dropdown-item text-center text-light border-top border-bottom pt-2 pb-2 rounded-4 bg-gradient"
-                                   id="upload-button" data-mdb-toggle="animation" data-mdb-animation-start="onHover"
-                                   data-mdb-animation="slide-out-right" href="upload-content.php">Upload</a>
+                                   id="upload-button" href="upload-content.php">Upload</a>
                             </li>
                         </ul>
                     </div>
@@ -274,8 +266,7 @@ $owner->loadUser();
                     <!-- Image -->
                     <div class="col-12 rounded-3 text-center px-0">
                         <a href="<?= $content->getUrlImage() ?>" target="_blank">
-                            <img src="<?= $content->getUrlImage() ?>" class="img-fluid rounded-3" id="image" alt="Image"
-                                 onerror="hideSpinner(this)">
+                            <img src="<?= $content->getUrlImage() ?>" class="img-fluid rounded-3" id="image" alt="Image">
                         </a>
                     </div>
                 </div>
@@ -289,8 +280,7 @@ $owner->loadUser();
                         <div class="col-3 text-end">
                             <a href="profile.php?username=<?= $content->getOwnerId(); ?>" class="m-auto">
                                 <img src="<?= $owner->getUrlProfilePicture(); ?>"
-                                     class="img-fluid rounded-circle border-gradient" alt="Profile Picture" width="100"
-                                     onerror="hideSpinner(this)">
+                                     class="img-fluid rounded-circle border-gradient" alt="Profile Picture" width="100">
                             </a>
                         </div>
                         <!-- Title and owner name of content -->
@@ -326,7 +316,7 @@ $owner->loadUser();
                     echo '<div class="col-auto">';
                     echo '<div class="row justify-content-center">';
                     echo '<div class="col-auto">';
-                    echo '<a href="edit.php?id=' . $content->getContentId() . '" class="btn btn-outline-light fs-6" id="edit-button" title="Edit" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right"><i class="fas fa-edit"></i> Edit</a>';
+                    echo '<a href="edit.php?id=' . $content->getContentId() . '" class="btn btn-outline-light fs-6" id="edit-button" title="Edit"><i class="fas fa-edit"></i> Edit</a>';
                     echo '</div>';
                     echo '</div>';
                     echo '</div>';
@@ -340,9 +330,9 @@ $owner->loadUser();
                                 <div class="col-auto pe-0 pe-lg-2">
                                     <?php
                                     if ($user->isFollowing($content->getOwnerId())) {
-                                        echo '<button class="btn btn-outline-light fs-6" id="followButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Unfollow" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right"><i class="fas fa-user-minus"></i> Unfollow</button>';
+                                        echo '<button class="btn btn-outline-light fs-6" id="followButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Unfollow"><i class="fas fa-user-minus"></i> Unfollow</button>';
                                     } else {
-                                        echo '<button class="btn btn-outline-light fs-6" id="followButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Follow" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right"><i class="fas fa-user-plus"></i> Follow</button>';
+                                        echo '<button class="btn btn-outline-light fs-6" id="followButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Follow"><i class="fas fa-user-plus"></i> Follow</button>';
                                     }
                                     ?>
                                 </div>
@@ -572,6 +562,11 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
             });
         });
     });
+
+    function hideSpinner(image) {
+        image.classList.remove("bg-placeholder");
+        image.style.opacity = "1";
+    }
 </script>
 </body>
 </html>

@@ -4,7 +4,11 @@
     <?php
     include_once(dirname(__FILE__) . '/common/common-head.php');
     ?>
-    <title>Home - Tales</title>
+    <script src="data/util/tinymce/js/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.3/purify.min.js"
+            integrity="sha512-TBmnYz6kBCpcGbD55K7f4LZ+ykn3owqujFnUiTSHEto6hMA7aV4W7VDPvlqDjQImvZMKxoR0dNY5inyhxfZbmA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <title>Share - Tales</title>
     <style>
         #upload-button {
             background: rgb(0, 97, 255) !important;
@@ -20,7 +24,7 @@
 
         #dropdownMenuLink {
             background: rgb(0, 97, 255) !important;
-            background: linear-gradient(90deg, rgba(0, 97, 255, 1) 0%, rgba(255, 15, 123, 1) 100%) !important;
+            background: linear-gradient(90deg, rgba(0, 97, 255, 1) 0%, rgb(255, 15, 123) 100%) !important;
             transition: 0.4s ease-out !important;
         }
 
@@ -28,30 +32,8 @@
             color: #FF0F7BFF !important;
         }
 
-        .user-icon-top {
-            transition: 0.2s ease-out !important;
-        }
-
-        .user-icon-top:hover {
-            background-color: rgba(255, 15, 123, 0.54) !important;
-            box-shadow: 0 0 0 0.2rem rgba(255, 15, 123, 0.25) !important;
-        }
-
-        .img-home {
-            max-height: 80vh !important;
-            transition: 0.2s ease-out !important;
-        }
-
-        .row-horizon {
-            overflow-x: auto;
-            white-space: nowrap;
-        }
-
-        .img-home:hover {
-            background-color: rgba(255, 15, 123, 0.54) !important;
-            box-shadow: 0 0 0 0.2rem rgba(255, 15, 123, 0.25) !important;
-            filter: brightness(1.1);
-            cursor: pointer;
+        #image {
+            max-height: 90vh !important;
         }
 
         #bell:hover {
@@ -61,6 +43,27 @@
         .new-notification {
             background-color: rgba(255, 15, 123, 0.54) !important;
         }
+
+        .img-home {
+            max-height: 80vh !important;
+            transition: 0.2s ease-out !important;
+        }
+
+        .img-home:hover {
+            background-color: rgba(255, 15, 123, 0.54) !important;
+            box-shadow: 0 0 0 0.2rem rgba(255, 15, 123, 0.25) !important;
+            filter: brightness(1.1);
+            cursor: pointer;
+        }
+
+        .fa-eye {
+            color: rgb(63, 135, 255) !important;
+        }
+
+        .fa-eye-slash {
+            color: #FF0F7BFF !important;
+        }
+
     </style>
 </head>
 <body class="font-monospace text-light bg-dark">
@@ -72,19 +75,37 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] === false) {
     header("Location: ../login.php");
     exit();
 }
-?>
 
-<?php
-// Load all necessary includes.
+if (empty($_GET["id"])) {
+    header("Location: ../home.php");
+    exit();
+}
+
+// Includes
 include_once(dirname(__FILE__) . '/common/utility.php');
 include_once(dirname(__FILE__) . '/../private/objects/User.php');
 include_once(dirname(__FILE__) . '/../private/objects/Content.php');
-include_once(dirname(__FILE__) . '/../private/objects/Followers.php');
+include_once(dirname(__FILE__) . '/../private/objects/Gallery.php');
+
+$id = validate_input($_GET["id"]);
+
+// Get gallery from database
+$gallery = new Gallery();
+$gallery->setGalleryId($id);
+if (!$gallery->loadGalleryInfoByGalleryId()) {
+    header("Location: ../home.php");
+    exit();
+}
 
 // Get user from session
 $user = new User();
 $user->setUsername($_SESSION["username"]);
 $user->loadUser();
+
+// Load owner of gallery
+$owner = new User();
+$owner->setUsername($gallery->getOwnerId());
+$owner->loadUser();
 
 ?>
 
@@ -206,55 +227,151 @@ $user->loadUser();
         </div>
     </div>
 
-    <div class="row row-horizon border-bottom text-center pt-1 pb-1 pt-lg-3 pb-lg-3 flex-nowrap" id="row-profiles">
-
-        <?php
-        // Get followed users and print them out.
-
-        $followers = new Followers($user->getUsername());
-        $followers->loadFollowing(); // Load following.
-        $followedUsers = $followers->getFollowing(); // Get following.
-
-        // If there are no followed users, print out a message.
-        if (count($followedUsers) === 0) {
-            echo '<div class="col-12"><h1 class="display-6">You are not following anyone!</h1></div>';
-        } else {
-
-            // For each user make an icon to visit his profile
-            foreach ($followedUsers as $followedUser) {
-                echo '<div class="col-3 col-md-2 col-xl-1">';
-                echo '<a href="profile.php?username=' . $followedUser->getUsername() . '" data-bs-toggle="tooltip" title="click to open">';
-                echo '<img src="' . $followedUser->getUrlProfilePicture() . '" alt="icon-user" class="img-fluid bg-placeholder bg-opacity-10 rounded-4 user-icon-top" width="50" height="50">';
-                echo '</a>';
-                echo '</div>';
-            }
-        }
-
-        ?>
-    </div>
-
-    <!-- New Content (New design) -->
-    <div class="row p-3 gap-0 justify-content-evenly gy-3">
-
-        <?php
-        $content = new Content();
-        $contentArray = $content->getAllPublicContent();
-
-        if (count($contentArray) === 0) {
-            echo '<div class="col-12"><h1 class="display-6 text-center">There is no content to show!</h1></div>';
-        } else {
-            foreach ($contentArray as $content) {
-                echo '<div class="col-12 col-lg-4 col-xxl-3 d-flex align-items-stretch px-0 px-lg-2">';
-                echo '<div class="card border-0 bg-placeholder img-home w-100" data-aos="fade-up" onclick="window.location.href = \'/share.php?id=' . $content->getContentId() . '\'">';
-                echo '<div class="card-img-top img-wrapper position-relative text-center w-100 lazy-background" data-background="' . encode_url($content->getUrlImage()) . '" style="background-size: cover; background-position: center; height: 45vh;">';
-                echo '</div>';
-                echo '</div>';
-                echo '</div>';
-            }
-        }
+    <?php
+    if ($gallery->isHiddenGallery() && ($user->getUsername() !== $gallery->getOwnerId())) {
+        echo '<div class="row mt-3">';
+        echo '<div class="col-12">';
+        echo '<h1 class="display-6 text-center">This gallery is hidden!</h1>';
+        echo '</div>';
+        echo '</div>';
+    } else {
         ?>
 
-    </div>
+        <!-- Title of gallery -->
+        <div class="row mt-3">
+            <div class="col-12">
+                <h1 class="display-6 text-center"><?php echo $gallery->getName(); ?></h1>
+            </div>
+        </div>
+
+        <!-- Info of (Owner and if hidden) -->
+        <div class="row">
+            <div class="col-12">
+                <p class="text-center mb-1">
+                    <?php
+                    if ($gallery->isHiddenGallery()) {
+                        echo '<i class="fas fa-eye-slash"></i> Hidden gallery';
+                    } else {
+                        echo '<i class="fas fa-eye"></i> Public gallery';
+                    }
+                    ?>
+                </p>
+            </div>
+
+            <?php
+            if ($user->getUsername() === $gallery->getOwnerId()) {
+                echo '<div class="col-12">';
+                echo '<p class="text-center">';
+                echo '<i class="fas fa-user"></i> You are the owner of this gallery';
+                echo '</p>';
+                echo '</div>';
+            } else {
+                echo '<div class="col-12">';
+                echo '<p class="text-center">';
+                echo '<i class="fas fa-user"></i> Owner: <a href="profile.php?username=' . $gallery->getOwnerId() . '">' . $gallery->getOwnerId() . '</a>';
+                echo '</p>';
+                echo '</div>';
+            }
+            ?>
+        </div>
+
+        <hr class="mt-1">
+
+        <!-- If it's the owner, add buttons to edit title of the gallery and manage it -->
+        <?php
+        if ($user->getUsername() === $gallery->getOwnerId()) { ?>
+
+            <!-- Edit title button that opens a modal on click to edit it and also a delete button that opens a modal to confirm the deletion of the gallery -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="d-flex justify-content-center">
+                        <div role="group" aria-label="Edit and delete buttons">
+                            <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#editGalleryModal">
+                                <i class="fas fa-edit"></i> Edit title
+                            </button>
+                            <button type="button" class="btn btn-outline-danger ms-2" data-bs-toggle="modal" data-bs-target="#deleteGalleryModal">
+                                <i class="fas fa-trash"></i> Delete gallery
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="mt-3">
+
+        <?php } ?>
+
+        <!-- Content of gallery -->
+        <div class="row p-3 gap-0 justify-content-evenly gy-3">
+
+            <?php
+            $contentArray = $gallery->getContent();
+            if (count($contentArray) === 0) {
+                echo '<div class="col-12"><h1 class="display-6 text-center">This gallery is empty!</h1></div>';
+            } else {
+                foreach ($contentArray as $content) {
+                    echo '<div class="col-12 col-lg-4 col-xxl-3 d-flex align-items-stretch px-0 px-lg-2">';
+                    echo '<div class="card border-0 bg-placeholder img-home w-100" data-aos="fade-up" onclick="window.location.href = \'/share.php?id=' . $content->getContentId() . '\'">';
+                    echo '<div class="card-img-top img-wrapper position-relative text-center w-100 lazy-background" data-background="' . encode_url($content->getUrlImage()) . '" style="background-size: cover; background-position: center; height: 45vh;">';
+                    echo '</div>';
+                    echo '</div>';
+                    echo '</div>';
+                }
+            }
+            ?>
+
+        </div>
+
+        <?php
+        if ($user->getUsername() === $gallery->getOwnerId()) {?>
+
+            <!-- Edit gallery modal -->
+            <div class="modal fade" id="editGalleryModal" tabindex="-1" aria-labelledby="editGalleryModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editGalleryModalLabel">Edit gallery title</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <div class="mb-3">
+                                    <label for="galleryTitleInput" class="form-label">New title</label>
+                                    <input type="text" class="form-control" id="galleryTitleInput" placeholder="Enter a new title for your gallery">
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete gallery modal -->
+            <div class="modal fade" id="deleteGalleryModal" tabindex="-1" aria-labelledby="deleteGalleryModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title text-danger" id="deleteGalleryModalLabel">Delete gallery</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Are you sure you want to delete this gallery?</p>
+                            <p>This action cannot be undone.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-danger">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        <?php } ?>
+
+    <?php } ?>
 
 </div>
 
@@ -263,15 +380,15 @@ include_once(dirname(__FILE__) . '/common/common-footer.php');
 include_once(dirname(__FILE__) . '/common/common-body.php');
 ?>
 <script>
-    $(function (){
+    $(function () {
         // Get the bell element
-        var bell = document.getElementById("bell");
+        //var bell = document.getElementById("bell");
         // Add a click event listener to the bell
-        $('#bell').on("click", function() {
+        $('#bell').on("click", function () {
             // Get the dropdown menu element
             var dropdown = document.querySelector(".notifications-dropdown");
             // Set a timeout of 1 second after the dropdown is opened
-            setTimeout(function() {
+            setTimeout(function () {
                 // Check if the dropdown is still open
                 if (dropdown.classList.contains("show")) {
                     // Get the new-notification elements
@@ -285,11 +402,11 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                         type: "POST",
                         url: "actions/notifications.php",
                         data: {read: true},
-                        success: function() {
+                        success: function () {
                             // Remove the element notification-count
                             $('#notification-count').remove();
                         },
-                        error: function() {
+                        error: function () {
                             // Show an error message
                             console.log("Error while marking notifications as read");
                         }
@@ -299,35 +416,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
         });
     });
 
-    $(function(){
-        // Handle the deletion of all notifications on click of button #delete-notifications.
-        $('#delete-notifications').on("click", function() {
-            // Send a post request to the server to delete all notifications
-            $.ajax({
-                type: "POST",
-                url: "actions/notifications.php",
-                data: {delete: true},
-                success: function() {
-                    // Remove all the elements with class .notification
-                    $('.notification').remove();
-                    // Remove the element notification-count
-                    $('#notification-count').remove();
-                    // Remove notification-divider
-                    $('.notification-divider').remove();
-                    // Remove button #delete-notifications
-                    $('#delete-notifications').remove();
-                    // And replace it with text: You have no notifications.
-                    $('.notifications-dropdown').append('<p class="text-white">You have no notifications.</p>');
-                },
-                error: function() {
-                    // Show an error message
-                    console.log("Error while deleting notifications");
-                }
-            });
-        });
-    });
-
-    $(function(){
+    $(function () {
         // Get all the elements with class lazy-background
         const lazyBackgrounds = $('.lazy-background');
 
@@ -351,7 +440,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
         });
 
         // Loop through each element and observe it
-        lazyBackgrounds.each(function() {
+        lazyBackgrounds.each(function () {
             observer.observe(this);
         });
 

@@ -24,9 +24,6 @@ $galleries = $user->getGalleries();
     <?php
     include_once (dirname(__FILE__) . "/common/common-head.php");
     ?>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.css" integrity="sha512-wJgJNTBBkLit7ymC6vvzM1EcSWeM9mmOu+1USHaRBbHkm6W9EgM0HY27+UtUaprntaYQJF75rc8gjxllKs5OIQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="data/util/tinymce/js/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js" integrity="sha512-zlWWyZq71UMApAjih4WkaRpikgY9Bz1oXIW5G0fED4vk14JjGlQ1UmkGM392jEULP8jbNMiwLWdM8Z87Hu88Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <title>Upload Content</title>
     <style>
         #drop-area {}
@@ -125,304 +122,6 @@ $galleries = $user->getGalleries();
             to { transform: rotate(360deg); }
         }
     </style>
-
-    <script>
-
-        // Declare a global variable to store the file data
-        var fileData = null;
-
-        $(function() {
-
-            // Create a variable to store the loader element
-            var $loader = $('#loader');
-
-            // Hide the loader element initially
-            $loader.hide();
-
-            $('#createGallery').on('click', function(){
-                // Get from input fron newGallery (the name of the new gallery)
-                var newGallery = $('#newGallery').val();
-                // If the input is empty, show a toast
-                if (newGallery === "") {
-                    $.toast({
-                        heading: 'Error',
-                        text: 'Please enter a name for the new gallery.',
-                        showHideTransition: 'slide',
-                        icon: 'error',
-                        position: 'top-right'
-                    });
-                } else {
-                    // If the input is not empty, create a gallery
-                    createGallery(newGallery);
-                }
-            });
-
-            // Bind dragover and dragenter events to prevent default actions
-            $('#drop-area').on('dragover dragenter', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-            });
-
-            // Bind drop event and access the dropped file with e.originalEvent.dataTransfer.files
-            $('#drop-area').on('drop', function(e) {
-                if (e.originalEvent.dataTransfer && e.originalEvent.dataTransfer.files.length) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    // Get the first dropped file
-                    var file = e.originalEvent.dataTransfer.files[0];
-                    // Create a FileReader object
-                    var reader = new FileReader();
-                    // Read the file data as a base64 encoded string
-                    reader.readAsDataURL(file);
-                    // When the file is loaded, store it in the global variable and show a preview
-                    reader.onload = function(e) {
-                        // Get the file data
-                        fileData = e.target.result;
-                        // Display a message to indicate that the file is ready to upload
-                        loadedImage();
-                    };
-                }
-            });
-
-            $('#fileElem').on('change', function(e) {
-                if (e.target.files && e.target.files.length) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    // Get the first dropped file
-                    var file = e.target.files[0];
-                    // Create a FileReader object
-                    var reader = new FileReader();
-                    // Read the file data as a base64 encoded string
-                    reader.readAsDataURL(file);
-                    // When the file is loaded, store it in the global variable and show a preview
-                    reader.onload = function(e) {
-                        // Get the file data
-                        fileData = e.target.result;
-                        // Display a message to indicate that the file is ready to upload
-                        loadedImage();
-                    };
-                }
-            });
-
-            // Bind submit event to the form element
-            $('#upload').on('click', function(e) {
-                tinymce.triggerSave();
-                // Prevent the default form submission action
-                e.preventDefault();
-                // Check if the file data is not null
-                if (fileData) {
-
-                    var name = $('#name').val();
-                    var description = tinyMCE.activeEditor.getContent();
-                    var gallery = $('#selectGallery').val();
-                    var isPrivate = $('#isPrivate').is(':checked') ? 1 : 0;
-                    var isAI = $('#isAI').is(':checked') ? 1 : 0;
-                    var tags = getTags();
-
-                    // Check if gallery is number, if not set to "";
-                    if (isNaN(gallery)) {
-                        gallery = "";
-                    }
-
-                    // Check if name is empty or null
-                    if (name === "" || name === null) {
-                        // Show a toast
-                        $.toast({
-                            heading: 'Error',
-                            text: 'Please enter a name for the image.',
-                            showHideTransition: 'slide',
-                            icon: 'error',
-                            position: 'top-right'
-                        });
-                        return;
-                    }
-
-                    // Check if description is empty or null
-                    if (description === "" || description === null) {
-                        // Show a toast
-                        $.toast({
-                            heading: 'Error',
-                            text: 'Please enter a description for the image.',
-                            showHideTransition: 'slide',
-                            icon: 'error',
-                            position: 'top-right'
-                        });
-                        return;
-                    }
-
-                    // The gallery is optional, so we don't need to check it
-                    // Same for isPrivate and isAI
-
-                    var finalFile = new FormData();
-                    finalFile.append('file', fileData);
-                    finalFile.append('name', name);
-                    finalFile.append('description', description);
-                    finalFile.append('gallery', gallery);
-                    finalFile.append('isPrivate', isPrivate.toString());
-                    finalFile.append('isAI', isAI.toString());
-                    finalFile.append("action", "upload");
-
-                    // Add tags to the FormData using a for loop to make an array
-                    for (var i = 0; i < tags.length; i++) {
-                        finalFile.append('tags[]', tags[i]);
-                    }
-
-                    // For debug, print in console finalFile and tags.
-                    //console.log(...finalFile);
-                    //console.log(tags);
-                    //return;
-
-                    // Send it to the server using jQuery AJAX along with other form data
-                    $.ajax({
-                        url: 'actions/upload.php', // The URL of your PHP script that handles the upload
-                        type: 'POST', // The HTTP method to use
-                        processData: false,
-                        contentType: false,
-                        data: finalFile, // The file data and other form data as key-value pairs
-                        beforeSend: function() {
-                            // Show the loader element before sending the request
-                            $loader.show();
-                        },
-                        complete: function() {
-                            // Hide the loader element after completing the request
-                            $loader.hide();
-                        },
-                        success: function(response) {
-                            // Toast with output from upload.php
-                            $.toast({
-                                text: response + ' \nPlease wait for the page reload before uploading again.',
-                                icon: 'info',
-                                position: 'top-right',
-                                hideAfter: 3000,
-
-                            });
-
-                            // Reset inputs and fileData
-                            $('#name').val('');
-                            tinyMCE.activeEditor.setContent('');
-                            $('#selectGallery').val('');
-                            $('#isPrivate').prop('checked', false);
-                            $('#isAI').prop('checked', false);
-                            fileData = null;
-
-                            // After 3 seconds, reload the page
-                            setTimeout(function() {
-                                location.reload();
-                            }, 3000);
-                        },
-                        error: function(error) {
-                            // Toast with error from upload.php
-                            $.toast({
-                                text: error,
-                                icon: 'error',
-                                position: 'top-right'
-                            });
-                        }
-                    });
-                } else {
-                    // Display a message to indicate that no file was dropped
-                    $('#drop-area').text('Please drop a file first');
-                    // Remove p-3 and change it to p-5
-                    $('#drop-area').removeClass('p-3');
-                    $('#drop-area').addClass('p-5');
-                }
-            });
-        });
-
-        function createGallery(galleryName) {
-            // Using ajax, I send to galleryManager with the action type of create and the gallery name
-            $.ajax({
-                url: 'actions/galleryManager.php',
-                type: 'POST',
-                data: {
-                    action: 'create',
-                    galleryName: galleryName,
-                },
-                success: function (data) {
-
-                    // Send toast with data
-                    $.toast({
-                        text: data,
-                        icon: 'success',
-                        position: 'top-center',
-                        showHideTransition: 'slide',
-                        showDuration: 500,
-                        hideDuration: 500,
-                        loader: false,
-                        allowToastClose: true,
-                        hideAfter: 3000,
-                        stack: false,
-                        textAlign: 'center',
-                        positionLeft: false,
-                        positionRight: true,
-                        bgColor: '#6600e1',
-                        textColor: '#fff',
-                    });
-
-                    reloadGalleries();
-                },
-                error: function (data) {
-                    // Send toast with data
-                    $.toast({
-                        text: data,
-                        icon: 'error',
-                        position: 'top-center',
-                        showHideTransition: 'slide',
-                        showDuration: 500,
-                        hideDuration: 500,
-                        loader: false,
-                        allowToastClose: true,
-                        hideAfter: 3000,
-                        stack: false,
-                        textAlign: 'center',
-                        positionLeft: false,
-                        positionRight: true,
-                        bgColor: '#6600e1',
-                        textColor: '#fff',
-                    });
-                }
-            })
-        }
-
-        function reloadGalleries(){
-            // Clear select with id selectGallery
-            $('#selectGallery').empty();
-            // Clear also input with id newGallery
-            $('#newGallery').val('');
-            // Get galleries from user
-            $.ajax({
-                url: 'actions/galleryManager.php',
-                type: 'POST',
-                data: {
-                    action: 'list'
-                },
-                success: function (data) {
-                    // Parse data
-                    var galleries = JSON.parse(data);
-                    // For each gallery, append an option to the select
-                    galleries.forEach(function (gallery) {
-                        $('#selectGallery').append('<option value="' + gallery.galleryId + '">' + gallery.name + '</option>');
-                    });
-                }
-            });
-        }
-
-        function loadedImage() {
-            $('#drop-area').text('File ready to upload');
-            // Remove p-5 and change it to p-3
-            $('#drop-area').removeClass('p-5');
-            $('#drop-area').addClass('p-3');
-            // Create an image element with the file data as the source
-            var image = $('<img>').attr('src', fileData);
-            // Add classes to image element
-            image.addClass('img-fluid img-thumbnail rounded-5 mt-2');
-            // Append the image element to the drop area
-            $('#drop-area').append(image);
-            // Show the input description
-            $('#inputDescription').removeClass('d-none');
-        }
-
-    </script>
 </head>
 <body class="bg-dark font-monospace text-light">
 <div class="container-fluid">
@@ -604,7 +303,301 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
         setTimeout(function (){
             $('.tox-promotion').remove();
         }, 1000);
-    })
+    });
+
+    // Declare a global variable to store the file data
+    var fileData = null;
+
+    $(function() {
+
+        // Create a variable to store the loader element
+        var $loader = $('#loader');
+
+        // Hide the loader element initially
+        $loader.hide();
+
+        $('#createGallery').on('click', function(){
+            // Get from input fron newGallery (the name of the new gallery)
+            var newGallery = $('#newGallery').val();
+            // If the input is empty, show a toast
+            if (newGallery === "") {
+                $.toast({
+                    heading: 'Error',
+                    text: 'Please enter a name for the new gallery.',
+                    showHideTransition: 'slide',
+                    icon: 'error',
+                    position: 'top-right'
+                });
+            } else {
+                // If the input is not empty, create a gallery
+                createGallery(newGallery);
+            }
+        });
+
+        // Bind dragover and dragenter events to prevent default actions
+        $('#drop-area').on('dragover dragenter', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+
+        // Bind drop event and access the dropped file with e.originalEvent.dataTransfer.files
+        $('#drop-area').on('drop', function(e) {
+            if (e.originalEvent.dataTransfer && e.originalEvent.dataTransfer.files.length) {
+                e.preventDefault();
+                e.stopPropagation();
+                // Get the first dropped file
+                var file = e.originalEvent.dataTransfer.files[0];
+                // Create a FileReader object
+                var reader = new FileReader();
+                // Read the file data as a base64 encoded string
+                reader.readAsDataURL(file);
+                // When the file is loaded, store it in the global variable and show a preview
+                reader.onload = function(e) {
+                    // Get the file data
+                    fileData = e.target.result;
+                    // Display a message to indicate that the file is ready to upload
+                    loadedImage();
+                };
+            }
+        });
+
+        $('#fileElem').on('change', function(e) {
+            if (e.target.files && e.target.files.length) {
+                e.preventDefault();
+                e.stopPropagation();
+                // Get the first dropped file
+                var file = e.target.files[0];
+                // Create a FileReader object
+                var reader = new FileReader();
+                // Read the file data as a base64 encoded string
+                reader.readAsDataURL(file);
+                // When the file is loaded, store it in the global variable and show a preview
+                reader.onload = function(e) {
+                    // Get the file data
+                    fileData = e.target.result;
+                    // Display a message to indicate that the file is ready to upload
+                    loadedImage();
+                };
+            }
+        });
+
+        // Bind submit event to the form element
+        $('#upload').on('click', function(e) {
+            tinymce.triggerSave();
+            // Prevent the default form submission action
+            e.preventDefault();
+            // Check if the file data is not null
+            if (fileData) {
+
+                var name = $('#name').val();
+                var description = tinyMCE.activeEditor.getContent();
+                var gallery = $('#selectGallery').val();
+                var isPrivate = $('#isPrivate').is(':checked') ? 1 : 0;
+                var isAI = $('#isAI').is(':checked') ? 1 : 0;
+                var tags = getTags();
+
+                // Check if gallery is number, if not set to "";
+                if (isNaN(gallery)) {
+                    gallery = "";
+                }
+
+                // Check if name is empty or null
+                if (name === "" || name === null) {
+                    // Show a toast
+                    $.toast({
+                        heading: 'Error',
+                        text: 'Please enter a name for the image.',
+                        showHideTransition: 'slide',
+                        icon: 'error',
+                        position: 'top-right'
+                    });
+                    return;
+                }
+
+                // Check if description is empty or null
+                if (description === "" || description === null) {
+                    // Show a toast
+                    $.toast({
+                        heading: 'Error',
+                        text: 'Please enter a description for the image.',
+                        showHideTransition: 'slide',
+                        icon: 'error',
+                        position: 'top-right'
+                    });
+                    return;
+                }
+
+                // The gallery is optional, so we don't need to check it
+                // Same for isPrivate and isAI
+
+                var finalFile = new FormData();
+                finalFile.append('file', fileData);
+                finalFile.append('name', name);
+                finalFile.append('description', description);
+                finalFile.append('gallery', gallery);
+                finalFile.append('isPrivate', isPrivate.toString());
+                finalFile.append('isAI', isAI.toString());
+                finalFile.append("action", "upload");
+
+                // Add tags to the FormData using a for loop to make an array
+                for (var i = 0; i < tags.length; i++) {
+                    finalFile.append('tags[]', tags[i]);
+                }
+
+                // For debug, print in console finalFile and tags.
+                //console.log(...finalFile);
+                //console.log(tags);
+                //return;
+
+                // Send it to the server using jQuery AJAX along with other form data
+                $.ajax({
+                    url: 'actions/upload.php', // The URL of your PHP script that handles the upload
+                    type: 'POST', // The HTTP method to use
+                    processData: false,
+                    contentType: false,
+                    data: finalFile, // The file data and other form data as key-value pairs
+                    beforeSend: function() {
+                        // Show the loader element before sending the request
+                        $loader.show();
+                    },
+                    complete: function() {
+                        // Hide the loader element after completing the request
+                        $loader.hide();
+                    },
+                    success: function(response) {
+                        // Toast with output from upload.php
+                        $.toast({
+                            text: response + ' \nPlease wait for the page reload before uploading again.',
+                            icon: 'info',
+                            position: 'top-right',
+                            hideAfter: 3000,
+
+                        });
+
+                        // Reset inputs and fileData
+                        $('#name').val('');
+                        tinyMCE.activeEditor.setContent('');
+                        $('#selectGallery').val('');
+                        $('#isPrivate').prop('checked', false);
+                        $('#isAI').prop('checked', false);
+                        fileData = null;
+
+                        // After 3 seconds, reload the page
+                        setTimeout(function() {
+                            location.reload();
+                        }, 3000);
+                    },
+                    error: function(error) {
+                        // Toast with error from upload.php
+                        $.toast({
+                            text: error,
+                            icon: 'error',
+                            position: 'top-right'
+                        });
+                    }
+                });
+            } else {
+                // Display a message to indicate that no file was dropped
+                $('#drop-area').text('Please drop a file first');
+                // Remove p-3 and change it to p-5
+                $('#drop-area').removeClass('p-3');
+                $('#drop-area').addClass('p-5');
+            }
+        });
+    });
+
+    function createGallery(galleryName) {
+        // Using ajax, I send to galleryManager with the action type of create and the gallery name
+        $.ajax({
+            url: 'actions/galleryManager.php',
+            type: 'POST',
+            data: {
+                action: 'create',
+                galleryName: galleryName,
+            },
+            success: function (data) {
+
+                // Send toast with data
+                $.toast({
+                    text: data,
+                    icon: 'success',
+                    position: 'top-center',
+                    showHideTransition: 'slide',
+                    showDuration: 500,
+                    hideDuration: 500,
+                    loader: false,
+                    allowToastClose: true,
+                    hideAfter: 3000,
+                    stack: false,
+                    textAlign: 'center',
+                    positionLeft: false,
+                    positionRight: true,
+                    bgColor: '#6600e1',
+                    textColor: '#fff',
+                });
+
+                reloadGalleries();
+            },
+            error: function (data) {
+                // Send toast with data
+                $.toast({
+                    text: data,
+                    icon: 'error',
+                    position: 'top-center',
+                    showHideTransition: 'slide',
+                    showDuration: 500,
+                    hideDuration: 500,
+                    loader: false,
+                    allowToastClose: true,
+                    hideAfter: 3000,
+                    stack: false,
+                    textAlign: 'center',
+                    positionLeft: false,
+                    positionRight: true,
+                    bgColor: '#6600e1',
+                    textColor: '#fff',
+                });
+            }
+        })
+    }
+
+    function reloadGalleries(){
+        // Clear select with id selectGallery
+        $('#selectGallery').empty();
+        // Clear also input with id newGallery
+        $('#newGallery').val('');
+        // Get galleries from user
+        $.ajax({
+            url: 'actions/galleryManager.php',
+            type: 'POST',
+            data: {
+                action: 'list'
+            },
+            success: function (data) {
+                // Parse data
+                var galleries = JSON.parse(data);
+                // For each gallery, append an option to the select
+                galleries.forEach(function (gallery) {
+                    $('#selectGallery').append('<option value="' + gallery.galleryId + '">' + gallery.name + '</option>');
+                });
+            }
+        });
+    }
+
+    function loadedImage() {
+        $('#drop-area').text('File ready to upload');
+        // Remove p-5 and change it to p-3
+        $('#drop-area').removeClass('p-5');
+        $('#drop-area').addClass('p-3');
+        // Create an image element with the file data as the source
+        var image = $('<img>').attr('src', fileData);
+        // Add classes to image element
+        image.addClass('img-fluid img-thumbnail rounded-5 mt-2');
+        // Append the image element to the drop area
+        $('#drop-area').append(image);
+        // Show the input description
+        $('#inputDescription').removeClass('d-none');
+    }
 
     // Get the tag input element by id
     var tagInput = $("#tag-input");
@@ -748,7 +741,6 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
         // Split the value by comma and return the array
         return value.split(",");
     }
-
 </script>
 </body>
 </html>

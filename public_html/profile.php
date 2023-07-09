@@ -63,14 +63,30 @@
         .fa-calendar-alt:hover {
             color: #FF0F7BFF !important;
         }
-    </style>
 
-    <script>
-        function hideSpinner(image) {
-            image.classList.remove("bg-placeholder");
-            image.style.opacity = "1";
+        .img-home {
+            max-height: 80vh !important;
+            transition: 0.2s ease-out !important;
         }
-    </script>
+
+        .img-home:hover {
+            background-color: rgba(255, 15, 123, 0.54) !important;
+            box-shadow: 0 0 0 0.2rem rgba(255, 15, 123, 0.25) !important;
+            filter: brightness(1.1);
+            cursor: pointer;
+        }
+
+        .gallery {
+            transition: 0.2s ease-out !important;
+        }
+
+        .gallery:hover {
+            background-color: rgba(255, 15, 123, 0.54) !important;
+            box-shadow: 0 0 0 0.2rem rgba(255, 15, 123, 0.25) !important;
+            filter: brightness(2);
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body class="font-monospace text-light bg-dark">
 
@@ -221,8 +237,7 @@ if (!empty($_GET['username'])){
                             </li>
                             <li>
                                 <a class="dropdown-item text-center text-light border-top border-bottom pt-2 pb-2 rounded-4 bg-gradient"
-                                   id="upload-button" data-mdb-toggle="animation" data-mdb-animation-start="onHover"
-                                   data-mdb-animation="slide-out-right" href="upload-content.php">Upload</a>
+                                   id="upload-button" href="upload-content.php">Upload</a>
                             </li>
                         </ul>
                     </div>
@@ -260,17 +275,17 @@ if (!empty($_GET['username'])){
             // Follow or unfollow button.
             if ($user->isFollowing($userProfile->getUsername())) {
                 echo '<div class="col-auto d-flex justify-content-center">';
-                echo '<button class="btn btn-outline-light fs-6" id="followButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Unfollow" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right"><i class="fas fa-user-minus"></i> Unfollow</button>';
+                echo '<button class="btn btn-outline-light fs-6" id="followButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Unfollow"><i class="fas fa-user-minus"></i> Unfollow</button>';
                 echo '</div>';
             } else {
                 echo '<div class="col-auto d-flex justify-content-center">';
-                echo '<button class="btn btn-outline-light fs-6" id="followButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Follow" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right"><i class="fas fa-user-plus"></i> Follow</button>';
+                echo '<button class="btn btn-outline-light fs-6" id="followButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Follow"><i class="fas fa-user-plus"></i> Follow</button>';
                 echo '</div>';
             }
         } else {
             // Edit profile
             echo '<div class="col-auto d-flex justify-content-center">';
-            echo '<button class="btn btn-outline-light fs-6" id="editButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Profile" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right"><i class="fa fa-edit"></i> Edit profile</button>';
+            echo '<button class="btn btn-outline-light fs-6" id="editButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Profile"><i class="fa fa-edit"></i> Edit profile</button>';
             echo '</div>';
         }
         ?>
@@ -280,7 +295,7 @@ if (!empty($_GET['username'])){
     <!-- User info (number of followers, registering date, etc.) -->
     <div class="row justify-content-evenly mt-3 mb-3 mx-1 pt-3 pb-3 bg-light bg-opacity-10 rounded-4 d-flex align-items-center" id="profile-stats">
         <!-- Number of followers -->
-        <div class="col-auto" data-bs-toggle="tooltip" data-bs-placement="top" title="Followers - Click to see!" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right" style="cursor: pointer">
+        <div class="col-auto" data-bs-toggle="tooltip" data-bs-placement="top" title="Followers - Click to see!" style="cursor: pointer">
             <div class="row justify-content-center d-flex align-items-center">
                 <div class="col-auto pe-0 d-flex align-items-center">
                     <i class="fas fa-user text-light opacity-75" style="font-size: 24px;" data-bs-toggle="dropdown"></i>
@@ -317,7 +332,7 @@ if (!empty($_GET['username'])){
 
 
         <!-- Total likes received by user in all of its contents -->
-        <div class="col-auto" data-bs-toggle="tooltip" data-bs-placement="top" title="Total likes received" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right" style="cursor: help">
+        <div class="col-auto" data-bs-toggle="tooltip" data-bs-placement="top" title="Total likes received" style="cursor: help">
             <div class="row justify-content-center d-flex align-items-center">
                 <div class="col-auto pe-0 d-flex align-items-center">
                     <i class="fas fa-heart text-light opacity-75" style="font-size: 24px;"></i>
@@ -328,7 +343,7 @@ if (!empty($_GET['username'])){
             </div>
         </div>
         <!-- Registering date -->
-        <div class="col-auto" data-bs-toggle="tooltip" data-bs-placement="top" title="Join date" data-mdb-toggle="animation" data-mdb-animation-start="onHover" data-mdb-animation="slide-out-right" style="cursor: help">
+        <div class="col-auto" data-bs-toggle="tooltip" data-bs-placement="top" title="Join date" style="cursor: help">
             <div class="row justify-content-center d-flex align-items-center">
                 <div class="col-auto pe-0 d-flex align-items-center">
                     <i class="fas fa-calendar-alt text-light opacity-75" style="font-size: 24px;"></i>
@@ -379,7 +394,7 @@ if (!empty($_GET['username'])){
                 foreach ($contentArray as $content) {
                     echo '<div class="col-12 col-lg-4 col-xxl-3">';
                     echo '<div class="img-wrapper position-relative text-center">';
-                    echo '<img src="' . $content->getUrlImage() . '" alt="image" class="img-fluid rounded-4 img-thumbnail bg-placeholder img-home" loading="lazy" onclick="window.location.href = \'/share.php?id=' . $content->getContentId() . '\'" onload="hideSpinner(this)" style="opacity: 0;" data-aos="fade-up">';
+                    echo '<img src="' . $content->getUrlImage() . '" alt="image" class="img-fluid rounded-4 img-thumbnail img-home" loading="lazy" onclick="window.location.href = \'/share.php?id=' . $content->getContentId() . '\'" data-aos="fade-up">';
                     echo '</div>';
                     echo '</div>';
                 }
@@ -407,9 +422,9 @@ if (!empty($_GET['username'])){
             } else {
                 // Show galleries and also their name.
                 foreach ($galleryArray as $gallery) {
-                    echo '<div class="col-12 col-lg-4 col-xxl-3">';
-                    echo '<div class="img-wrapper position-relative text-center">';
-                    echo '<img src="common/assets/cover.webp" alt="image" class="img-fluid rounded-4 img-thumbnail bg-placeholder img-home" loading="lazy" onclick="window.location.href = \'/gallery.php?id=' . $gallery->getGalleryId() . '\'" onload="hideSpinner(this)" style="opacity: 0;" data-aos="fade-up">';
+                    echo '<div class="col-12 col-lg-4 col-xxl-3" onclick="window.location.href = \'gallery.php?id=' . $gallery->getGalleryId() . '\'">';
+                    echo '<div class="img-wrapper position-relative text-center gallery">';
+                    echo '<img src="common/assets/cover.webp" alt="image" class="img-fluid rounded-4 img-thumbnail img-home" loading="lazy" data-aos="fade-up">';
                     echo '<div class="img-overlay position-absolute top-0 start-0 w-100 h-100 rounded-4" style="background-color: rgba(0, 0, 0, 0.5);"></div>';
                     echo '<div class="img-text position-absolute top-50 start-50 translate-middle text-light">';
                     echo '<h1 class="display-6">' . $gallery->getName() . '</h1>';
@@ -566,6 +581,11 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
             }
         });
     });
+
+    function hideSpinner(image) {
+        image.classList.remove("bg-placeholder");
+        image.style.opacity = "1";
+    }
 </script>
 </body>
 </html>

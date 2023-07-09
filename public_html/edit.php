@@ -47,10 +47,7 @@ $user->loadUser();
     <?php
     include_once (dirname(__FILE__) . "/common/common-head.php");
     ?>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.css" integrity="sha512-wJgJNTBBkLit7ymC6vvzM1EcSWeM9mmOu+1USHaRBbHkm6W9EgM0HY27+UtUaprntaYQJF75rc8gjxllKs5OIQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="data/util/tinymce/js/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js" integrity="sha512-zlWWyZq71UMApAjih4WkaRpikgY9Bz1oXIW5G0fED4vk14JjGlQ1UmkGM392jEULP8jbNMiwLWdM8Z87Hu88Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <title>Edit Content</title>
+    <title>Edit Content - <?= $content->getTitle() ?></title>
     <style>
         .tag-input {
             /* border: 1px solid black; */
@@ -137,163 +134,6 @@ $user->loadUser();
             to { transform: rotate(360deg); }
         }
     </style>
-
-    <script>
-
-        $(function(){
-
-            // Create a variable to store the loader element
-            var $loader = $('#loader');
-
-            // Hide the loader element initially
-            $loader.hide();
-
-            // Bind submit event to the form element
-            $('#upload').on('click', function(e) {
-                tinymce.triggerSave();
-                // Prevent the default form submission action
-                e.preventDefault();
-
-                var name = $('#name').val();
-                var description = tinyMCE.activeEditor.getContent();
-                var isPrivate = $('#isPrivate').is(':checked') ? 1 : 0;
-                var isAI = $('#isAI').is(':checked') ? 1 : 0;
-                var tags = getTags();
-
-                // Check if name is empty or null
-                if (name === "" || name === null) {
-                    // Show a toast
-                    $.toast({
-                        heading: 'Error',
-                        text: 'Please enter a name for the image.',
-                        showHideTransition: 'slide',
-                        icon: 'error',
-                        position: 'top-right'
-                    });
-                    return;
-                }
-
-                // Check if description is empty or null
-                if (description === "" || description === null) {
-                    // Show a toast
-                    $.toast({
-                        heading: 'Error',
-                        text: 'Please enter a description for the image.',
-                        showHideTransition: 'slide',
-                        icon: 'error',
-                        position: 'top-right'
-                    });
-                    return;
-                }
-
-                // The gallery is optional, so we don't need to check it
-                // Same for isPrivate and isAI
-                var finalFile = new FormData();
-                finalFile.append('name', name);
-                finalFile.append('description', description);
-                finalFile.append('isPrivate', isPrivate.toString());
-                finalFile.append('isAI', isAI.toString());
-                finalFile.append('contentId', <?= $contentId ?>); // Add the id of the image to edit (passed in the URL
-                finalFile.append("action", "edit");
-
-                // Add tags to the FormData using a for loop to make an array
-                for (var i = 0; i < tags.length; i++) {
-                    finalFile.append('tags[]', tags[i]);
-                }
-
-                // For debug, print in console finalFile and tags.
-                //console.log(...finalFile);
-                //console.log(tags);
-                //return;
-
-                // Send it to the server using jQuery AJAX along with other form data
-                $.ajax({
-                    url: 'actions/upload.php', // The URL of your PHP script that handles the upload
-                    type: 'POST', // The HTTP method to use
-                    processData: false,
-                    contentType: false,
-                    data: finalFile, // The file data and other form data as key-value pairs
-                    beforeSend: function() {
-                        // Show the loader element before sending the request
-                        $loader.show();
-                    },
-                    complete: function() {
-                        // Hide the loader element after completing the request
-                        $loader.hide();
-                    },
-                    success: function(response) {
-                        // Toast with output from upload.php
-                        $.toast({
-                            text: response + ' \n- You will be redirect to your content.',
-                            icon: 'info',
-                            position: 'top-right',
-                            hideAfter: 3000,
-                        });
-
-                        // After 3 seconds, reload the page
-                        setTimeout(function() {
-                            // Send user to share.php?id=lastID
-                            window.location.href = "share.php?id=" + <?= $contentId ?>;
-                        }, 3000);
-                    },
-                    error: function(error) {
-                        // Toast with error from upload.php
-                        $.toast({
-                            text: error,
-                            icon: 'error',
-                            position: 'top-right'
-                        });
-                    }
-                });
-            });
-
-            // If I click the cancel button, go back to the share page
-            $('#cancel').on('click', function(e) {
-                e.preventDefault();
-                window.location.href = "share.php?id=" + <?= $contentId ?>;
-            });
-
-            // If I click confirm-deletion button, delete the image and go back to home.php
-            $('#confirm-deletion').on('click', function(e) {
-                e.preventDefault();
-                $.ajax({
-                    url: 'actions/upload.php', // The URL of your PHP script that handles the upload
-                    type: 'POST', // The HTTP method to use
-                    data: {
-                        contentId: <?= $contentId ?>,
-                        action: "delete"
-                    },
-                    success: function(response) {
-                        // Toast with output from upload.php
-                        $.toast({
-                            text: response + ' \n- You are about to be redirected to the homepage.',
-                            icon: 'info',
-                            position: 'top-right',
-                            hideAfter: 3000,
-                        });
-
-                        // Close modal.
-                        $('#deleteModal').modal('hide');
-
-                        // After 3 seconds, go home.php
-                        setTimeout(function() {
-                            // Send user to home.php
-                            window.location.href = "home.php";
-                        }, 3000);
-                    },
-                    error: function(error) {
-                        // Toast with error from upload.php
-                        $.toast({
-                            text: error,
-                            icon: 'error',
-                            position: 'top-right'
-                        });
-                    }
-                });
-            });
-
-        });
-    </script>
 </head>
 <body class="bg-dark font-monospace text-light">
 <div class="container-fluid">
@@ -500,9 +340,161 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
             echo "$('#isAI').prop('checked', true);";
         }
         ?>
-    })
+    });
 
+    $(function(){
 
+        // Create a variable to store the loader element
+        var $loader = $('#loader');
+
+        // Hide the loader element initially
+        $loader.hide();
+
+        // Bind submit event to the form element
+        $('#upload').on('click', function(e) {
+            tinymce.triggerSave();
+            // Prevent the default form submission action
+            e.preventDefault();
+
+            var name = $('#name').val();
+            var description = tinyMCE.activeEditor.getContent();
+            var isPrivate = $('#isPrivate').is(':checked') ? 1 : 0;
+            var isAI = $('#isAI').is(':checked') ? 1 : 0;
+            var tags = getTags();
+
+            // Check if name is empty or null
+            if (name === "" || name === null) {
+                // Show a toast
+                $.toast({
+                    heading: 'Error',
+                    text: 'Please enter a name for the image.',
+                    showHideTransition: 'slide',
+                    icon: 'error',
+                    position: 'top-right'
+                });
+                return;
+            }
+
+            // Check if description is empty or null
+            if (description === "" || description === null) {
+                // Show a toast
+                $.toast({
+                    heading: 'Error',
+                    text: 'Please enter a description for the image.',
+                    showHideTransition: 'slide',
+                    icon: 'error',
+                    position: 'top-right'
+                });
+                return;
+            }
+
+            // The gallery is optional, so we don't need to check it
+            // Same for isPrivate and isAI
+            var finalFile = new FormData();
+            finalFile.append('name', name);
+            finalFile.append('description', description);
+            finalFile.append('isPrivate', isPrivate.toString());
+            finalFile.append('isAI', isAI.toString());
+            finalFile.append('contentId', <?= $contentId ?>); // Add the id of the image to edit (passed in the URL
+            finalFile.append("action", "edit");
+
+            // Add tags to the FormData using a for loop to make an array
+            for (var i = 0; i < tags.length; i++) {
+                finalFile.append('tags[]', tags[i]);
+            }
+
+            // For debug, print in console finalFile and tags.
+            //console.log(...finalFile);
+            //console.log(tags);
+            //return;
+
+            // Send it to the server using jQuery AJAX along with other form data
+            $.ajax({
+                url: 'actions/upload.php', // The URL of your PHP script that handles the upload
+                type: 'POST', // The HTTP method to use
+                processData: false,
+                contentType: false,
+                data: finalFile, // The file data and other form data as key-value pairs
+                beforeSend: function() {
+                    // Show the loader element before sending the request
+                    $loader.show();
+                },
+                complete: function() {
+                    // Hide the loader element after completing the request
+                    $loader.hide();
+                },
+                success: function(response) {
+                    // Toast with output from upload.php
+                    $.toast({
+                        text: response + ' \n- You will be redirect to your content.',
+                        icon: 'info',
+                        position: 'top-right',
+                        hideAfter: 3000,
+                    });
+
+                    // After 3 seconds, reload the page
+                    setTimeout(function() {
+                        // Send user to share.php?id=lastID
+                        window.location.href = "share.php?id=" + <?= $contentId ?>;
+                    }, 3000);
+                },
+                error: function(error) {
+                    // Toast with error from upload.php
+                    $.toast({
+                        text: error,
+                        icon: 'error',
+                        position: 'top-right'
+                    });
+                }
+            });
+        });
+
+        // If I click the cancel button, go back to the share page
+        $('#cancel').on('click', function(e) {
+            e.preventDefault();
+            window.location.href = "share.php?id=" + <?= $contentId ?>;
+        });
+
+        // If I click confirm-deletion button, delete the image and go back to home.php
+        $('#confirm-deletion').on('click', function(e) {
+            e.preventDefault();
+            $.ajax({
+                url: 'actions/upload.php', // The URL of your PHP script that handles the upload
+                type: 'POST', // The HTTP method to use
+                data: {
+                    contentId: <?= $contentId ?>,
+                    action: "delete"
+                },
+                success: function(response) {
+                    // Toast with output from upload.php
+                    $.toast({
+                        text: response + ' \n- You are about to be redirected to the homepage.',
+                        icon: 'info',
+                        position: 'top-right',
+                        hideAfter: 3000,
+                    });
+
+                    // Close modal.
+                    $('#deleteModal').modal('hide');
+
+                    // After 3 seconds, go home.php
+                    setTimeout(function() {
+                        // Send user to home.php
+                        window.location.href = "home.php";
+                    }, 3000);
+                },
+                error: function(error) {
+                    // Toast with error from upload.php
+                    $.toast({
+                        text: error,
+                        icon: 'error',
+                        position: 'top-right'
+                    });
+                }
+            });
+        });
+
+    });
 
     // Get the tag input element by id
     var tagInput = $("#tag-input");

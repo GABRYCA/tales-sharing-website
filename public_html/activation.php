@@ -13,7 +13,7 @@ include_once (dirname(__FILE__) . "/../private/objects/User.php");
 include_once (dirname(__FILE__) . "/common/utility.php");
 
 // Check if get method and code is set.
-if (isset($_GET["code"])){
+if (!empty($_GET["code"])){
     // Get code from get method.
     $code = validate_input($_GET["code"]);
     // DBConnection.
