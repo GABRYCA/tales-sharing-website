@@ -275,17 +275,17 @@ $owner->loadUser();
             ?>
         </div>
 
-        <hr class="mt-1">
+        <hr class="mt-1 mb-2">
 
         <!-- If it's the owner, add buttons to edit title of the gallery and manage it -->
         <?php
         if ($user->getUsername() === $gallery->getOwnerId()) { ?>
 
             <!-- Edit title button that opens a modal on click to edit it and also a delete button that opens a modal to confirm the deletion of the gallery -->
-            <div class="row mt-3">
+            <div class="row">
                 <div class="col-12">
                     <div class="d-flex justify-content-center">
-                        <div role="group" aria-label="Edit and delete buttons">
+                        <div role="group" class="bg-white bg-opacity-10 p-2 px-4 rounded-4" aria-label="Edit and delete buttons">
                             <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#editGalleryModal">
                                 <i class="fas fa-edit"></i> Edit title
                             </button>
@@ -296,7 +296,7 @@ $owner->loadUser();
                     </div>
                 </div>
             </div>
-            <hr class="mt-3">
+            <hr class="mt-2">
 
         <?php } ?>
 
