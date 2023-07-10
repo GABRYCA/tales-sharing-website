@@ -285,7 +285,7 @@ $owner->loadUser();
             <div class="row">
                 <div class="col-12">
                     <div class="d-flex justify-content-center">
-                        <div role="group" class="bg-white bg-opacity-10 p-2 px-4 rounded-4" aria-label="Edit and delete buttons">
+                        <div role="group" class="bg-light bg-opacity-10 p-2 px-4 rounded-4" aria-label="Edit and delete buttons">
                             <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#editGalleryModal">
                                 <i class="fas fa-edit"></i> Edit title
                             </button>
@@ -342,7 +342,7 @@ $owner->loadUser();
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary">Save changes</button>
+                            <button type="button" class="btn btn-primary" id="renameGallery">Save changes</button>
                         </div>
                     </div>
                 </div>
@@ -356,13 +356,14 @@ $owner->loadUser();
                             <h5 class="modal-title text-danger" id="deleteGalleryModalLabel">Delete gallery</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div class="modal-body">
+                        <div class="modal-body text-center">
                             <p>Are you sure you want to delete this gallery?</p>
-                            <p>This action cannot be undone.</p>
+                            <p>The content won't be deleted and will still be visible on your profile page. Only the gallery will.</p>
+                            <p class="mb-0">This action cannot be undone!</p>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-danger">Delete</button>
+                            <button type="button" class="btn btn-danger" id="deleteGallery">Delete</button>
                         </div>
                     </div>
                 </div>
@@ -444,6 +445,79 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
             observer.observe(this);
         });
 
+    });
+
+    $(function (){
+       // Function that handles the click of the delete gallery button.
+        // Sends ajax request to delete the gallery to galleryManager.php with action = "delete" and the galleryId
+        // On click #deleteGallery
+        $('#deleteGallery').on("click", function () {
+            const galleryId = <?php echo $gallery->getGalleryId(); ?>;
+            if (galleryId === null) return;
+            $.ajax({
+                type: "POST",
+                url: "actions/galleryManager.php",
+                data: {action: "delete", galleryId: galleryId},
+                success: function (data) {
+                    // Toast message.
+                    $.toast({
+                        heading: 'Success',
+                        text: 'Gallery deleted with success: ' + data,
+                        icon: 'success',
+                        position: 'top-right',
+                        hideAfter: 2000
+                    });
+                    // Redirect to profile page after 2 seconds.
+                    setTimeout(function () {
+                        window.location.href = "profile.php";
+                    }, 2000);
+                },
+                error: function (data) {
+                    // Send toast message with error.
+                    $.toast({
+                        heading: 'Error',
+                        text: 'Error while deleting gallery: ' + data,
+                        icon: 'error',
+                        position: 'top-right'
+                    });
+                }
+            });
+        });
+
+        $('#renameGallery').on("click", function () {
+            const galleryId = <?php echo $gallery->getGalleryId(); ?>;
+            const newGalleryName = $('#galleryTitleInput').val();
+            if (galleryId === null) return;
+            if (newGalleryName === null || newGalleryName === "") return;
+            $.ajax({
+                type: "POST",
+                url: "actions/galleryManager.php",
+                data: {action: "rename", galleryId: galleryId, newGalleryName: newGalleryName},
+                success: function (data) {
+                    // Toast message.
+                    $.toast({
+                        heading: 'Success',
+                        text: 'Gallery renamed with success: ' + data,
+                        icon: 'success',
+                        position: 'top-right',
+                        hideAfter: 1500
+                    });
+                    // Reload page.
+                    setTimeout(function () {
+                        window.location.href = "gallery.php?id=" + galleryId;
+                    }, 1500);
+                },
+                error: function (data) {
+                    // Send toast message with error.
+                    $.toast({
+                        heading: 'Error',
+                        text: 'Error while renaming gallery: ' + data,
+                        icon: 'error',
+                        position: 'top-right'
+                    });
+                }
+            });
+        });
     });
 
     function hideSpinner(image) {

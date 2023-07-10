@@ -39,6 +39,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         exit();
     }
 
+    $user = new User();
+    $user->setUsername($_SESSION["username"]);
+    if (!$user->loadUser()){
+        // Add an error message to the errors array
+        exit("Failed to load user. Please try again.");
+    }
+
     switch ($action){
 
         case "create": {
@@ -50,9 +57,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 echo json_encode($errors);
                 exit();
             }
-
-            // Get user from session
-            $user = $_SESSION["user"];
 
             $galleries = $user->getGalleries();
 
@@ -85,9 +89,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 exit("Gallery id is empty. Please select a valid gallery.");
             }
 
-            // Get user from session
-            $user = $_SESSION["user"];
-
             // Load gallery by id
             if (!$gallery = $user->getGalleryById($galleryId)){
                 // Send the error array to the client
@@ -95,7 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             }
 
             // Delete gallery
-            if (!$user->deleteGallery($gallery)){
+            if (!$user->deleteGalleryById($gallery->getGalleryId())){
                 // Send the error array to the client
                 exit("Failed to delete gallery. Please try again.");
             }
@@ -118,9 +119,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 exit("Gallery name is empty or too long. Please enter a valid gallery name.");
             }
 
-            // Get user from session
-            $user = $_SESSION["user"];
-
             // Load gallery by id
             if (!$gallery = $user->getGalleryById($galleryId)){
                 // Send the error array to the client
@@ -128,7 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             }
 
             // Rename gallery
-            if (!$user->renameGalleryById($gallery, $newGalleryName)){
+            if (!$user->renameGalleryById($gallery->getGalleryId(), $newGalleryName)){
                 // Send the error array to the client
                 exit("Failed to rename gallery. Please try again.");
             }
@@ -138,9 +136,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         }
 
         case "list": {
-
-            // Get user from session
-            $user = $_SESSION["user"];
 
             // Load gallery by id
             if (!$galleries = $user->getGalleries()){
@@ -160,9 +155,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 exit("Gallery id is empty. Please select a valid gallery.");
             }
 
-            // Get user from session
-            $user = $_SESSION["user"];
-
             // Load gallery by id
             if (!$gallery = $user->getGalleryById($galleryId)){
                 // Send the error array to the client
@@ -181,19 +173,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 exit("Gallery id is empty. Please select a valid gallery.");
             }
 
-            // Get user from session
-            $user = $_SESSION["user"];
-
             // Load gallery by id
             if (!$gallery = $user->getGalleryById($galleryId)){
                 // Send the error array to the client
                 exit("Failed to load gallery. Please try again.");
             }
 
-            $content = $user->getContentById($contentId);
-
-            // Check if $content is null
-            if (!$content){
+            if (!$content = $user->getContentById($contentId)){
                 // Send the error array to the client
                 exit("Failed to load content. Please try again.");
             }
@@ -221,12 +207,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 exit("Gallery id is empty. Please select a valid gallery.");
             }
 
-            // Get user from session
-            $user = $_SESSION["user"];
-
-            $gallery = $user->getGalleryById($galleryId);
-
-            if (!$gallery){
+            if (!$gallery = $user->getGalleryById($galleryId)){
                 exit("Failed to load gallery. Please try again.");
             }
 
@@ -239,10 +220,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 exit("Failed to load gallery. Please try again.");
             }
 
-            $content = $user->getContentById($contentId);
-
-            // Check if $content is null
-            if (!$content){
+            if (!$content = $user->getContentById($contentId)){
                 exit("Failed to load content. Please try again.");
             }
 

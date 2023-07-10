@@ -30,7 +30,7 @@ class Gallery implements JsonSerializable
             $row = $data->fetch_assoc();
             $this->ownerId = $row["ownerId"];
             $this->name = $row["name"];
-            $this->hideGallery = $row["hideGallery"];
+            $this->hideGallery = (bool) $row["hideGallery"];
         } else {
             $this->setErrorStatus("Error while loading gallery");
             return false;
@@ -303,7 +303,7 @@ class Gallery implements JsonSerializable
     }
 
     // Getters and Setters
-    public function getGalleryId()
+    public function getGalleryId() : int
     {
         return $this->galleryId;
     }
