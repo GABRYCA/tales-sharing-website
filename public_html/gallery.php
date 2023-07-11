@@ -282,18 +282,16 @@ $owner->loadUser();
         if ($user->getUsername() === $gallery->getOwnerId()) { ?>
 
             <!-- Edit title button that opens a modal on click to edit it and also a delete button that opens a modal to confirm the deletion of the gallery -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="d-flex justify-content-center">
-                        <div role="group" class="bg-light bg-opacity-10 p-2 px-4 rounded-4" aria-label="Edit and delete buttons">
-                            <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#editGalleryModal">
-                                <i class="fas fa-edit"></i> Edit title
-                            </button>
-                            <button type="button" class="btn btn-outline-danger ms-2" data-bs-toggle="modal" data-bs-target="#deleteGalleryModal">
-                                <i class="fas fa-trash"></i> Delete gallery
-                            </button>
-                        </div>
-                    </div>
+            <div class="row bg-light bg-opacity-10 p-2 px-4 mx-1 rounded-4 justify-content-center text-center">
+                <div class="col-6 col-lg-3">
+                    <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#editGalleryModal">
+                        <i class="fas fa-edit"></i> Rename
+                    </button>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <button type="button" class="btn btn-outline-danger ms-2" data-bs-toggle="modal" data-bs-target="#deleteGalleryModal">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
                 </div>
             </div>
             <hr class="mt-2">
