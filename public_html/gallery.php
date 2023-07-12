@@ -64,6 +64,19 @@
             color: #FF0F7BFF !important;
         }
 
+        .custom-btn {
+            background-color: transparent !important;
+            color: #FF0F7BFF !important;
+            border-color: #FF0F7BFF !important;
+            transition: 0.2s ease-out !important;
+        }
+
+        .custom-btn:hover {
+            color: #ffffff !important;
+            border-color: #FF0F7BFF !important;
+            background-color: rgba(255, 15, 123, 0.54) !important;
+        }
+
     </style>
 </head>
 <body class="font-monospace text-light bg-dark">
@@ -284,7 +297,7 @@ $owner->loadUser();
             <!-- Edit title button that opens a modal on click to edit it and also a delete button that opens a modal to confirm the deletion of the gallery -->
             <div class="row bg-light bg-opacity-10 p-2 px-4 mx-1 rounded-4 justify-content-center text-center">
                 <div class="col-6 col-lg-3">
-                    <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#editGalleryModal">
+                    <button type="button" class="btn btn-outline-primary me-2 custom-btn" data-bs-toggle="modal" data-bs-target="#editGalleryModal">
                         <i class="fas fa-edit"></i> Rename
                     </button>
                 </div>
@@ -340,7 +353,7 @@ $owner->loadUser();
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary" id="renameGallery">Save changes</button>
+                            <button type="button" class="btn btn-primary custom-btn" id="renameGallery">Save changes</button>
                         </div>
                     </div>
                 </div>
