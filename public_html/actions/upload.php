@@ -204,6 +204,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit("Description is empty or too long. Please enter a valid description.");
         }
 
+        // Check if gallery is empty or invalid
+        if ($galleryId != "" && !is_numeric($galleryId)) {
+            // Send the error array to the client
+            exit("Gallery id is invalid. Please select a valid gallery id.");
+        }
+
         // Check if the isPrivate is empty or invalid (0 or 1)
         if ($isPrivate == "" || !is_numeric($isPrivate) || ($isPrivate != 0 && $isPrivate != 1)) {
             // Send the error array to the client
@@ -222,6 +228,47 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $content->setIsAI($isAI);
         $content->setPrivate($isPrivate);
         $content->setTags($tags);
+
+        // Load galleries and check if anyone contains the content
+        $galleries = $user->getGalleries();
+        $found = false;
+        $foundGallery = null;
+        foreach ($galleries as $gallery) {
+            $contentArray = $gallery->getContent();
+            foreach ($contentArray as $contentInGallery) {
+                if ($contentInGallery->getContentId() == $content->getContentId()) {
+                    $found = true;
+                    $foundGallery = $gallery;
+                    break;
+                }
+            }
+        }
+
+        // If gallery is specified, add the content to the gallery in the database, if not, remove it from the gallery if it is in one.
+        if ($found){
+            if ($galleryId == "") {
+                if (!$foundGallery->removeContentFromGallery($content->getContentId())){
+                    // Send the error array to the client
+                    exit("Error removing content from gallery.");
+                }
+            } else {
+                if (!$foundGallery->removeContentFromGallery($content->getContentId())){
+                    // Send the error array to the client
+                    exit("Error removing content from gallery.");
+                }
+                if (!$user->addContentToGallery($galleryId, $content->getContentId())){
+                    // Send the error array to the client
+                    exit("Error adding content to gallery.");
+                }
+            }
+        } else {
+            if ($galleryId != "") {
+                if (!$user->addContentToGallery($galleryId, $content->getContentId())){
+                    // Send the error array to the client
+                    exit("Error adding content to gallery.");
+                }
+            }
+        }
 
         // Save the content to the database.
         if (!$content->updateContent()) {

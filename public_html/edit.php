@@ -40,6 +40,20 @@ $user = new User();
 $user->setUsername($_SESSION["username"]);
 $user->loadUser();
 
+// Get Galleries of user
+$galleries = $user->getGalleries();
+
+// Check if content is in gallery
+$inGallery = false;
+$galleryOfContent = new Gallery();
+foreach ($galleries as $galleryCheck) {
+    if ($galleryCheck->isContentInGallery($content->getContentId())) {
+        $inGallery = true;
+        $galleryOfContent = $galleryCheck;
+        break;
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
@@ -232,6 +246,57 @@ $user->loadUser();
 
             <div class="row justify-content-center">
 
+                <div class="col-12 col-lg-6">
+                    <div class="row justify-content-center">
+                        <div class="col-6">
+                            <!-- List of galleries selectable (using the session user and Gallery.php I get the list of galleries) -->
+                            <p class="fs-4 text-center">Gallery: (Optional)</p>
+
+                            <div class="input-group mb-3">
+                                <select class="form-select" aria-label="Select Galleries" id="selectGallery" name="galleryName">
+                                    <?php
+                                    if (!$inGallery){
+                                        echo "<option selected>Select gallery</option>";
+                                    } else {
+                                        echo "<option>Select gallery</option>";
+                                    }
+                                    foreach ($galleries as $gallery) {
+                                        if ($inGallery && $gallery->getGalleryId() == $galleryOfContent->getGalleryId()) {
+                                            echo "<option selected value='" . $gallery->getGalleryId() . "'>" . $gallery->getName() . "</option>";
+                                        } else {
+                                            echo "<option value='" . $gallery->getGalleryId() . "'>" . $gallery->getName() . "</option>";
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                                <button class="btn btn-outline-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteGalleryModal" title="You will need to confirm the deletion after clicking this button">Delete</button>
+                            </div>
+                        </div>
+                        <!-- Create a new gallery  -->
+                        <div class="col-6">
+                            <p class="fs-4 text-center">Create new gallery:</p>
+                            <div class="row justify-content-center">
+                                <div class="col-9 p-0">
+                                    <input type="text" class="form-control" id="newGallery" placeholder="New Gallery" name="newGallery">
+                                </div>
+                                <div class="col-3 px-1">
+                                    <button class="btn btn-primary w-100 border border-0" id="createGallery" title="Create new empty gallery">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-12 col-lg-6">
+                    <hr>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+
                 <p class="fs-4 text-center">Options:</p>
                 <!-- Checkmarks isPrivate and isAI -->
                 <div class="col-6 col-lg-3 text-center">
@@ -288,6 +353,27 @@ $user->loadUser();
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-danger" id="confirm-deletion">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete gallery modal -->
+    <div class="modal fade" id="deleteGalleryModal" tabindex="-1" aria-labelledby="deleteGalleryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger" id="deleteGalleryModalLabel">Delete gallery</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p>Are you sure you want to delete this gallery?</p>
+                    <p>The content won't be deleted and will still be visible on your profile page. Only the gallery will.</p>
+                    <p class="mb-0">This action cannot be undone!</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="deleteButton">Delete</button>
                 </div>
             </div>
         </div>
@@ -358,9 +444,15 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
 
             var name = $('#name').val();
             var description = tinyMCE.activeEditor.getContent();
+            var gallery = $('#selectGallery').val();
             var isPrivate = $('#isPrivate').is(':checked') ? 1 : 0;
             var isAI = $('#isAI').is(':checked') ? 1 : 0;
             var tags = getTags();
+
+            // Check if gallery is number, if not set to "";
+            if (isNaN(gallery)) {
+                gallery = "";
+            }
 
             // Check if name is empty or null
             if (name === "" || name === null) {
@@ -393,6 +485,7 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
             var finalFile = new FormData();
             finalFile.append('name', name);
             finalFile.append('description', description);
+            finalFile.append('gallery', gallery);
             finalFile.append('isPrivate', isPrivate.toString());
             finalFile.append('isAI', isAI.toString());
             finalFile.append('contentId', <?= $contentId ?>); // Add the id of the image to edit (passed in the URL
@@ -449,6 +542,24 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
             });
         });
 
+        $('#createGallery').on('click', function(){
+            // Get from input fron newGallery (the name of the new gallery)
+            var newGallery = $('#newGallery').val();
+            // If the input is empty, show a toast
+            if (newGallery === "") {
+                $.toast({
+                    heading: 'Error',
+                    text: 'Please enter a name for the new gallery.',
+                    showHideTransition: 'slide',
+                    icon: 'error',
+                    position: 'top-right'
+                });
+            } else {
+                // If the input is not empty, create a gallery
+                createGallery(newGallery);
+            }
+        });
+
         // If I click the cancel button, go back to the share page
         $('#cancel').on('click', function(e) {
             e.preventDefault();
@@ -495,6 +606,166 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
         });
 
     });
+
+    // Use jQuery to select the button element
+    $("#deleteButton").on("click", function() {
+        // Use jQuery to get the selected option value
+        var selectedValue = $("#selectGallery").val();
+        // Check if a valid option is selected
+        if (selectedValue) {
+            // Delete the gallery with the selected value
+            deleteGallery(selectedValue);
+        }
+    });
+
+    function deleteGallery(value) {
+        // Delete the gallery from the database or server
+        // Using ajax, I send to galleryManager with the action type of delete and the gallery id
+        $.ajax({
+            url: 'actions/galleryManager.php',
+            type: 'POST',
+            data: {
+                action: 'delete',
+                galleryId: value,
+            },
+            success: function (data) {
+                // Send toast with data
+                $.toast({
+                    text: 'Gallery ' + data + " deleted.",
+                    icon: 'success',
+                    position: 'top-center',
+                    showHideTransition: 'slide',
+                    showDuration: 500,
+                    hideDuration: 500,
+                    loader: false,
+                    allowToastClose: true,
+                    hideAfter: 3000,
+                    stack: false,
+                    textAlign: 'center',
+                    positionLeft: false,
+                    positionRight: true,
+                    bgColor: '#6600e1',
+                    textColor: '#fff'
+                });
+
+                reloadGalleries();
+            },
+            error: function (data) {
+                // Send toast with data
+                $.toast({
+                    text: data,
+                    icon: 'error',
+                    position: 'top-center',
+                    showHideTransition: 'slide',
+                    showDuration: 500,
+                    hideDuration: 500,
+                    loader: false,
+                    allowToastClose: true,
+                    hideAfter: 3000,
+                    stack: false,
+                    textAlign: 'center',
+                    positionLeft: false,
+                    positionRight: true,
+                    bgColor: '#6600e1',
+                    textColor: '#fff'
+                });
+            }
+        });
+        // Close the modal
+        $('#deleteGalleryModal').modal('hide');
+    }
+
+    function createGallery(galleryName) {
+        // Using ajax, I send to galleryManager with the action type of create and the gallery name
+        $.ajax({
+            url: 'actions/galleryManager.php',
+            type: 'POST',
+            data: {
+                action: 'create',
+                galleryName: galleryName,
+            },
+            success: function (data) {
+
+                // Send toast with data
+                $.toast({
+                    text: data,
+                    icon: 'success',
+                    position: 'top-center',
+                    showHideTransition: 'slide',
+                    showDuration: 500,
+                    hideDuration: 500,
+                    loader: false,
+                    allowToastClose: true,
+                    hideAfter: 3000,
+                    stack: false,
+                    textAlign: 'center',
+                    positionLeft: false,
+                    positionRight: true,
+                    bgColor: '#6600e1',
+                    textColor: '#fff',
+                });
+
+                reloadGalleries();
+            },
+            error: function (data) {
+                // Send toast with data
+                $.toast({
+                    text: data,
+                    icon: 'error',
+                    position: 'top-center',
+                    showHideTransition: 'slide',
+                    showDuration: 500,
+                    hideDuration: 500,
+                    loader: false,
+                    allowToastClose: true,
+                    hideAfter: 3000,
+                    stack: false,
+                    textAlign: 'center',
+                    positionLeft: false,
+                    positionRight: true,
+                    bgColor: '#6600e1',
+                    textColor: '#fff',
+                });
+            }
+        });
+    }
+
+    function reloadGalleries(){
+        // Clear select with id selectGallery
+        $('#selectGallery').empty();
+        // Clear also input with id newGallery
+        $('#newGallery').val('');
+        // Get galleries from user
+        $.ajax({
+            url: 'actions/galleryManager.php',
+            type: 'POST',
+            data: {
+                action: 'list'
+            },
+            success: function (data) {
+                // Parse data
+                var galleries = JSON.parse(data);
+                var selectedGallery = null;
+                // Add default select
+                <?php
+                if (!$inGallery){
+                    echo "$('#selectGallery').append('<option selected>Select gallery</option>');";
+                } else {
+                    echo "$('#selectGallery').append('<option>Select gallery</option>');";
+                    echo "selectedGallery = " . $galleryOfContent->getGalleryId() . ";";
+                }
+                ?>
+                // For each gallery, append an option to the select
+                galleries.forEach(function (gallery) {
+                    if (selectedGallery !== null && gallery.galleryId === selectedGallery) {
+                        $('#selectGallery').append('<option selected value="' + gallery.galleryId + '">' + gallery.name + '</option>');
+                    } else {
+                        $('#selectGallery').append('<option value="' + gallery.galleryId + '">' + gallery.name + '</option>');
+                    }
+                });
+            }
+        });
+    }
 
     // Get the tag input element by id
     var tagInput = $("#tag-input");
