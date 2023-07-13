@@ -1,6 +1,7 @@
 <?php
 include_once (dirname(__FILE__) . "/../connection.php");
 include_once (dirname(__FILE__) . "/../objects/Notification.php");
+include_once (dirname(__FILE__) . "/../objects/VariablesConfig.php");
 
 
 /**
@@ -14,11 +15,12 @@ class Followers
     private $followers;
     private $following;
     private $errorStatus;
-    private $domain = "https://tales.anonymousgca.eu/";
+    private $domain = null;
 
     // Constructor with username
     public function __construct($username)
     {
+        $this->domain = VariablesConfig::$domain;
         $this->username = $username;
         $this->loadFollowers();
         $this->loadFollowing();

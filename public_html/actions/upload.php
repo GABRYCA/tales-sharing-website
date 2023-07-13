@@ -6,6 +6,7 @@ include_once (dirname(__FILE__) . "/../../private/objects/User.php");
 include_once (dirname(__FILE__) . "/../../private/objects/Content.php");
 include_once (dirname(__FILE__) . "/../../private/objects/Gallery.php");
 include_once (dirname(__FILE__) . "/../../private/objects/Notification.php");
+include_once (dirname(__FILE__) . "/../../private/objects/VariablesConfig.php");
 
 // Check if user logged in.
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] === false) {
@@ -15,9 +16,6 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] === false) {
 
 // Check if the request method is POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
-    // Domain
-    $domain = "https://tales.anonymousgca.eu/";
 
     // Get user.
     $user = new User();
@@ -139,7 +137,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Save the content to the database.
         if (!$content->addContent()) {
             // Remove domain from path and add ../ to go back to the root folder.
-            $path = "../" . str_replace($domain, "", $path);
+            $path = "../" . str_replace(VariablesConfig::$domain, "", $path);
             unlink($path);
             // Send the error array to the client
             exit("Error saving content to the database.");
@@ -151,7 +149,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $notification = new Notification();
         $notification->setTitle("New content from " . $user->getUsername());
         $notification->setDescription("New content from " . $user->getUsername() . " was uploaded.
-    <br><a href='" . $domain . "share.php?id=" . $content->getContentId() . "'>Click here to see it.</a>");
+    <br><a href='" . VariablesConfig::$domain . "share.php?id=" . $content->getContentId() . "'>Click here to see it.</a>");
         $notification->setNotificationType("new_content"); // Types can be new_content, new_comment, new_like, new_friend, new_follow, advertisement
         $notification->setNotificationDate(date("Y-m-d H:i:s"));
         $notification->setViewed(false);
@@ -163,13 +161,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Add content to gallery
             if (!$user->addContentToGallery($galleryId, $content->getContentId())) {
                 // Remove domain from path and add ../ to go back to the root folder.
-                $path = dirname(__FILE__) . "/../" . str_replace($domain, "", $path);
+                $path = dirname(__FILE__) . "/../" . str_replace(VariablesConfig::$domain, "", $path);
                 unlink($path);
                 exit("Error adding content to gallery (but content saved with success), direct image here: <a href='" . $path . "'>link</a>");
             }
         }
 
-        exit("Content saved with success, direct image here: <a href='" . $domain . "share.php?id=" . $content->getContentId() . "'>link</a>");
+        exit("Content saved with success, direct image here: <a href='" . VariablesConfig::$domain . "share.php?id=" . $content->getContentId() . "'>link</a>");
     } else if ($action == "edit"){
 
         // Checks if the content id is empty or invalid
@@ -276,7 +274,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit("Error saving content to the database.");
         }
 
-        exit("Content saved with success, direct image here: <a href='" . $domain . "share.php?id=" . $content->getContentId() . "'>link</a>");
+        exit("Content saved with success, direct image here: <a href='" . VariablesConfig::$domain . "share.php?id=" . $content->getContentId() . "'>link</a>");
     } else if ($action == "delete") {
 
         // Checks if the content id is empty or invalid
@@ -312,9 +310,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 // Function to save the image to the server and returns the path.
 function save_image($image, $user_id, $title) {
 
-    // Domain
-    $domain = "https://tales.anonymousgca.eu/";
-
     // Make sure that title doesn't break paths.
     $title = preg_replace("/([^\w\s\d\-_~,;[\]\(\).])/", "", $title);
 
@@ -340,7 +335,7 @@ function save_image($image, $user_id, $title) {
     // Get the image path.
 
     // Return the image path
-    return $domain . "data/profile/" . $user_id . "/gallery/images/" . $title . "-" . $uniqueid . ".webp";
+    return VariablesConfig::$domain . "data/profile/" . $user_id . "/gallery/images/" . $title . "-" . $uniqueid . ".webp";
 }
 
 ?>
