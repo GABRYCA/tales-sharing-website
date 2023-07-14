@@ -285,7 +285,8 @@ if (!empty($_GET['username'])){
         } else {
             // Edit profile
             echo '<div class="col-auto d-flex justify-content-center">';
-            echo '<button class="btn btn-outline-light fs-6" id="editButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Profile"><i class="fa fa-edit"></i> Edit profile</button>';
+            // On click open the edit-profile.php page
+            echo '<button class="btn btn-outline-light fs-6" id="editButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Profile" onclick="window.location.href=\'/edit-profile.php\'"><i class="fa fa-edit"></i> Edit profile</button>';
             echo '</div>';
         }
         ?>
