@@ -384,6 +384,7 @@ foreach ($galleries as $galleryCheck) {
 include_once (dirname(__FILE__) . '/common/common-footer.php');
 include_once (dirname(__FILE__) . "/common/common-body.php");
 ?>
+<script src="data/util/tinymce/js/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
 
     var content = `<?= addslashes(html_entity_decode ($content->getDescription())) ?>`;
