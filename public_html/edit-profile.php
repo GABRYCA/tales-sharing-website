@@ -215,28 +215,66 @@ $user->loadUser();
                 </div>
             </div>
         </div>
+
     </div>
     
     <!-- Main content to edit the profile -->
     <div class="row justify-content-center">
 
         <div class="col">
-            <div class="row">
+
+            <div class="row mt-3">
                 <div class="col">
                     <h1 class="text-center">Edit profile</h1>
                 </div>
             </div>
+
             <div class="row">
                 <div class="col">
                     <hr>
                 </div>
             </div>
-            <div class="row justify-content-center">
+
+            <div class="row text-center">
                 <div class="col">
+                    <h4>Personal information</h4>
+                </div>
+            </div>
+
+            <!-- Section to edit personal information such as username, motto, description, gender, password -->
+            <div class="row justify-content-center mx-lg-5">
+                <div class="col-12 col-lg-6 mt-3">
+                    <p class="h4 text-center">Username</p>
+                    <input type="text" id="username" class="form-control" value="<?php echo $user->getUsername(); ?>">
+                </div>
+                <div class="col-12 col-lg-6 mt-3">
+                    <p class="h4 text-center">Motto</p>
+                    <input type="text" id="motto" class="form-control" value="<?php echo $user->getMotto(); ?>">
+                </div>
+                <div class="col-12 col-lg-6 mt-4">
+                    <p class="h4 text-center">Description</p>
+                    <textarea id="description" class="form-control" rows="3"><?php echo $user->getDescription(); ?></textarea>
+                </div>
+
+            </div>
+
+            <div class="row justify-content-center mt-3">
+
+                <div class="row">
+                    <div class="col">
+                        <hr>
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-6">
                     <h4>Profile icon</h4>
                 </div>
-                <!-- A hidden input to store the cropped image data -->
+
+                <!-- Hidden input to store the cropped image data -->
                 <input type="hidden" id="cropped-image" name="cropped-image">
+
+                <!-- Current profile icon -->
+                <div class="row"></div>
 
                 <!-- A file input to upload the image -->
                 <div class="col-md-4">

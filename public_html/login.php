@@ -126,7 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
                 <div class="row m-1 mb-5 p-4 border border-light rounded-5">
                     <div class="col">
-                        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" class="row g-3 needs-validation" novalidate>
+                        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" class="row g-3 needs-validation">
                             <div class="col-md-12">
                                 <label for="username" class="form-label">Email/Username*</label>
                                 <div class="input-group">

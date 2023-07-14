@@ -285,8 +285,7 @@ if (!empty($_GET['username'])){
         } else {
             // Edit profile
             echo '<div class="col-auto d-flex justify-content-center">';
-            // On click open the edit-profile.php page
-            echo '<button class="btn btn-outline-light fs-6" id="editButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Profile" onclick="window.location.href=\'/edit-profile.php\'"><i class="fa fa-edit"></i> Edit profile</button>';
+            echo '<button class="btn btn-outline-light fs-6" id="editButton" data-bs-toggle="modal" data-bs-target="#editProfileModal"><i class="fa fa-edit"></i> Edit Profile</button>';
             echo '</div>';
         }
         ?>
@@ -438,6 +437,98 @@ if (!empty($_GET['username'])){
         </div>
     </div>
 
+    <?php
+    if ($user->getUsername() === $userProfile->getUsername()) { ?>
+
+        <!-- Modal -->
+        <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Profile Form -->
+                        <div id="profileForm">
+                            <!-- Username -->
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" class="form-control" minlength="3" maxlength="18" id="username" name="username" value="<?= $userProfile->getUsername() ?>" required>
+                            </div>
+
+                            <!-- Gender -->
+                            <div class="mb-3">
+                                <label for="gender" class="form-label">Gender</label>
+                                <select class="form-select" id="gender" name="gender">
+                                    <option value="unspecified" <?php if ($userProfile->getGender() === 'unspecified') echo 'selected'; ?>>Unspecified</option>
+                                    <option value="male" <?php if ($userProfile->getGender() === 'male') echo 'selected'; ?>>Male</option>
+                                    <option value="female" <?php if ($userProfile->getGender() === 'female') echo 'selected'; ?>>Female</option>
+                                </select>
+                            </div>
+
+                            <!-- Motto -->
+                            <div class="mb-3">
+                                <label for="motto" class="form-label">Motto</label>
+                                <input type="text" class="form-control" id="motto" name="motto" value="<?= $userProfile->getMotto() ?>">
+                            </div>
+
+                            <!-- Description -->
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" name="description" maxlength="255"><?php echo $userProfile->getDescription(); ?></textarea>
+                            </div>
+
+                            <!-- Show Checkbox -->
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="showAI" name="showAI" <?php if ($user->getShowNSFW()) echo 'checked'; ?>>
+                                <label class="form-check-label" for="showAI">Show NSFW</label>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" value="<?= $user->getEmail() ?>" required>
+                            </div>
+
+                            <!-- Password Section -->
+                            <hr>
+                            <h5>Change Password</h5>
+
+                            <!-- Old Password -->
+                            <div class="mb-3">
+                                <label for="oldPassword" class="form-label">Old Password</label>
+                                <input type="password" class="form-control" id="oldPassword" name="oldPassword">
+                            </div>
+
+                            <!-- New Password -->
+                            <div class="mb-3">
+                                <label for="newPassword" class="form-label">New Password</label>
+                                <input type="password" class="form-control" id="newPassword" name="newPassword">
+                            </div>
+
+                            <!-- Repeat New Password -->
+                            <div class="mb-3">
+                                <label for="newPasswordConfirm" class="form-label">Repeat New Password</label>
+                                <input type="password" class="form-control" id="newPasswordConfirm" name="newPasswordConfirm">
+                                <div id="passwordFeedback"></div>
+                            </div>
+                        </div>
+
+                        <div id="toastContainer"></div>
+
+                        <div class="modal-footer">
+                            <!-- Submit Button -->
+                            <button type="button" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <?php } ?>
+
 
 </div>
 
@@ -446,6 +537,159 @@ include_once(dirname(__FILE__) . '/common/common-footer.php');
 include_once(dirname(__FILE__) . '/common/common-body.php');
 ?>
 <script>
+
+    $(function() {
+
+        // Function to handle form submission
+        function submitForm() {
+            // Retrieve form data
+            var formData = {
+                username: $('#username').val(),
+                gender: $('#gender').val(),
+                motto: $('#motto').val(),
+                description: $('#description').val(),
+                showAI: $('#showNSFW').prop('checked'),
+                email: $('#email').val(),
+                oldPassword: $('#oldPassword').val(),
+                newPassword: $('#newPassword').val(),
+                newPasswordConfirm: $('#newPasswordConfirm').val()
+            };
+
+            // Validate form data
+            if (formData.username.length < 3 || formData.username.length > 18) {
+                $.toast({
+                    title: 'Error',
+                    content: 'Username must be between 3 and 18 characters',
+                    type: 'error'
+                });
+                return;
+            }
+
+            // Password is optional, but if there's input, it must be at least 8 characters
+            if (formData.newPassword.length > 0 && formData.newPassword.length < 8) {
+                $.toast({
+                    title: 'Error',
+                    content: 'Password must be at least 8 characters',
+                    type: 'error'
+                });
+                return;
+            }
+
+            // If the user is changing their password, they must provide their old password
+            if (formData.newPassword.length > 0 && formData.oldPassword.length === 0) {
+                $.toast({
+                    title: 'Error',
+                    content: 'Please provide your old password',
+                    type: 'error'
+                });
+                return;
+            }
+
+            // If the user is changing their password, the new password and confirmation must match
+            if (formData.newPassword.length > 0 && formData.newPassword !== formData.newPasswordConfirm) {
+                $.toast({
+                    title: 'Error',
+                    content: 'New password and confirmation must match',
+                    type: 'error'
+                });
+                return;
+            }
+
+            // If the user is changing their password, the new password must be different from the old password
+            if (formData.newPassword.length > 0 && formData.newPassword === formData.oldPassword) {
+                $.toast({
+                    title: 'Error',
+                    content: 'New password must be different from old password',
+                    type: 'error'
+                });
+                return;
+            }
+
+            // Ajax call to submit form data
+            $.ajax({
+                url: 'actions/updateProfile.php',
+                type: 'POST',
+                data: formData,
+                success: function(data) {
+                    // Toast that tells the reply from the server
+                    $.toast({
+                        text: data,
+                        icon: 'success',
+                        position: 'top-center'
+                    });
+                },
+                error: function(data) {
+                    // Error toast
+                    $.toast({
+                        text: 'Error updating profile ' + data,
+                        icon: 'error',
+                        position: 'top-center'
+                    });
+                }
+            });
+        }
+
+        // Event handler for save changes button
+        $('#saveChangesBtn').click(function() {
+            submitForm();
+        });
+
+        // Event handler for password confirmation
+        $('#newPasswordConfirm').keyup(function() {
+            checkPasswordsMatch();
+        });
+
+        // Event handler for password length validation
+        $('#newPassword').keyup(function() {
+            checkPasswordLength();
+            checkPasswordsMatch();
+        });
+    });
+
+    $(function() {
+        // Function to check if the passwords match
+        function checkPasswordsMatch() {
+            var newPassword = $("#newPassword").val();
+            var newPasswordConfirm = $("#newPasswordConfirm").val();
+
+            if (newPassword === newPasswordConfirm) {
+                $("#passwordFeedback").text("Passwords match").removeClass().addClass("text-success");
+            } else {
+                $("#passwordFeedback").text("Passwords do not match").removeClass().addClass("text-danger");
+            }
+        }
+
+        // Function to validate password length
+        function checkPasswordLength() {
+            var newPassword = $("#newPassword").val();
+
+            if (newPassword.length >= 8) {
+                $("#passwordFeedback").text("Password meets length requirement").removeClass().addClass("text-success");
+            } else {
+                $("#passwordFeedback").text("Password should be at least 8 characters long").removeClass().addClass("text-danger");
+            }
+        }
+
+        // Event handler for password confirmation
+        $("#newPasswordConfirm").keyup(function() {
+            checkPasswordsMatch();
+        });
+
+        // Event handler for password length validation
+        $("#newPassword").keyup(function() {
+            checkPasswordLength();
+            checkPasswordsMatch();
+        });
+
+        // If I close the modal, reset password fields
+        $('#editProfileModal').on('hidden.bs.modal', function () {
+            $("#oldPassword").val("");
+            $("#newPassword").val("");
+            $("#newPasswordConfirm").val("");
+            $("#passwordFeedback").text("");
+        });
+    });
+
     $(function (){
         // Get the bell element
         var bell = document.getElementById("bell");
