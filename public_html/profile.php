@@ -548,11 +548,11 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                 gender: $('#gender').val(),
                 motto: $('#motto').val(),
                 description: $('#description').val(),
-                showAI: $('#showNSFW').prop('checked'),
+                showNSFW: $('#showNSFW').prop('checked'),
                 email: $('#email').val(),
                 oldPassword: $('#oldPassword').val(),
                 newPassword: $('#newPassword').val(),
-                newPasswordConfirm: $('#newPasswordConfirm').val()
+                newPasswordConfirm: $('#newPasswordConfirm').val(),
             };
 
             // Validate form data
@@ -605,17 +605,60 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                 return;
             }
 
-            // Ajax call to submit form data
+            // If there's a password in formdata, send a second ajax with only the password and with action 'updatePassword'
+            if (formData.newPassword.length > 0) {
+                $.ajax({
+                    url: 'actions/updateProfile.php',
+                    type: 'POST',
+                    data: {
+                        oldPassword: formData.oldPassword,
+                        newPassword: formData.newPassword,
+                        action: 'updatePassword'
+                    },
+                    success: function(data) {
+                        // Toast that tells the reply from the server
+                        $.toast({
+                            text: data,
+                            icon: 'info',
+                            position: 'top-center',
+                            afterHidden: function() {
+                                location.reload();
+                            }
+                        });
+                    },
+                    error: function(data) {
+                        // Error toast
+                        $.toast({
+                            text: 'Error updating password ' + data,
+                            icon: 'error',
+                            position: 'top-center'
+                        });
+                    }
+                });
+            }
+
+            // Ajax call to submit form data to update the profile.
             $.ajax({
                 url: 'actions/updateProfile.php',
                 type: 'POST',
-                data: formData,
+                data: {
+                    username: formData.username,
+                    gender: formData.gender,
+                    motto: formData.motto,
+                    description: formData.description,
+                    showNSFW: formData.showNSFW,
+                    email: formData.email
+                    action: 'updateProfile'
+                },
                 success: function(data) {
-                    // Toast that tells the reply from the server
+                    // Toast that tells the reply from the server, then reload the page after it has closed.
                     $.toast({
                         text: data,
-                        icon: 'success',
-                        position: 'top-center'
+                        icon: 'info',
+                        position: 'top-center',
+                        afterHidden: function() {
+                            location.reload();
+                        }
                     });
                 },
                 error: function(data) {
