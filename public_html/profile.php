@@ -647,7 +647,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     motto: formData.motto,
                     description: formData.description,
                     showNSFW: formData.showNSFW,
-                    email: formData.email
+                    email: formData.email,
                     action: 'updateProfile'
                 },
                 success: function(data) {
