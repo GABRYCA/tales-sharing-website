@@ -492,6 +492,201 @@ class User implements JsonSerializable
     }
 
     /**
+     * Function to change username, please load user by setting original username before.
+     * @param string $username
+     * @return bool
+     */
+    public function changeUsername(string $username) : bool
+    {
+        if ($username == null) {
+            $this->setErrorStatus("Username not set!");
+            return true;
+        }
+
+        if ($this->getUsername() == $username) {
+            $this->setErrorStatus("New username must be different from old username!");
+            return true;
+        }
+
+        // Check if username is valid.
+        if (strlen($username) < 3) {
+            $this->setErrorStatus("Username must be at least 3 characters long!");
+            return false;
+        }
+
+        if (!preg_match("#[a-zA-Z0-9]+#", $username)) {
+            $this->setErrorStatus("Username must include only letters and numbers!");
+            return false;
+        }
+
+        // Check if username is already taken.
+        $conn = connection();
+
+        // Check if user already exists.
+        $sql = "SELECT * FROM User WHERE username = ?";
+        $result = $conn->execute_query($sql, [$username]);
+        if ($result->num_rows > 0) {
+            $this->setErrorStatus("Username already taken!");
+            return false;
+        }
+
+        // Update username in database, using a query, with a where condition with the old username
+        $sql = "UPDATE User SET username = ? WHERE username = ?";
+        if ($conn->execute_query($sql, [$username, $this->getUsername()])) {
+            $this->setErrorStatus("Username updated successfully");
+            
+            // Reload user.
+            $this->setUsername($username);
+            $this->loadUser();
+            
+            return true;
+        } else {
+            $this->setErrorStatus("Error: something went during DB query for changeUsername() action.");
+            return false;
+        }
+    }
+
+    /**
+     * Function to change user gender, please set username before and load user.
+     * @param string $gender
+     * @return bool
+     */
+    public function changeGender(string $gender) : bool
+    {
+        if ($gender == null) {
+            $this->setErrorStatus("Username not set!");
+            return true;
+        }
+
+        if ($this->gender == $gender){
+            $this->setErrorStatus("New gender must be different than the previous one!");
+            return true;
+        }
+
+        // Connection to database and query.
+        $conn = connection();
+        
+        $sql = "UPDATE User SET gender = ? WHERE username = ?";
+        
+        if ($conn->execute_query($sql, [$gender, $this->getUsername()])){
+            $this->setErrorStatus("Gender updated with success.");
+
+            // Reload user.
+            $this->loadUser();
+
+            return true;
+        } else {
+            $this->setErrorStatus("Error: something went during DB query for changeGender() action.");
+            return false;
+        }
+    }
+
+    /**
+     * Function to change user motto, please set username and load user before.
+     * @param string $motto
+     * @return bool
+     */
+    public function changeMotto(string $motto) : bool
+    {
+        if ($motto == null) {
+            $this->setErrorStatus("Motto not set!");
+            return true;
+        }
+
+        if ($this->motto == $motto){
+            $this->setErrorStatus("New motto must be different than the previous one!");
+            return true;
+        }
+
+        // Connection to database and query.
+        $conn = connection();
+
+        $sql = "UPDATE User SET motto = ? WHERE username = ?";
+
+        if ($conn->execute_query($sql, [$motto, $this->getUsername()])){
+            $this->setErrorStatus("Motto updated with success.");
+
+            // Reload user.
+            $this->loadUser();
+
+            return true;
+        } else {
+            $this->setErrorStatus("Error: something went during DB query for changeMotto() action.");
+            return false;
+        }
+    }
+
+    /**
+     * Function to change user description, please set username before and load user.
+     * @param string $description
+     * @return bool
+     */
+    public function changeDescription(string $description) : bool
+    {
+        if ($description == null) {
+            $this->setErrorStatus("Description not set!");
+            return true;
+        }
+
+        if ($this->description == $description){
+            $this->setErrorStatus("New description must be different than the previous one!");
+            return true;
+        }
+
+        // Connection to database and query.
+        $conn = connection();
+
+        $sql = "UPDATE User SET description = ? WHERE username = ?";
+
+        if ($conn->execute_query($sql, [$description, $this->getUsername()])){
+            $this->setErrorStatus("Description updated with success.");
+
+            // Reload user.
+            $this->loadUser();
+
+            return true;
+        } else {
+            $this->setErrorStatus("Error: something went during DB query for changeDescription() action.");
+            return false;
+        }
+    }
+
+    /**
+     * Function to update showNSFW, please set username before and load user.
+     * @param bool $showNSFW
+     * @return bool
+     */
+    public function changeShowNSFW(bool $showNSFW) : bool
+    {
+        if ($showNSFW == null) {
+            $this->setErrorStatus("ShowNSFW not set!");
+            return true;
+        }
+
+        if ($this->showNSFW == $showNSFW){
+            $this->setErrorStatus("New showNSFW must be different than the previous one! " . $this->showNSFW . " " . $showNSFW);
+            return true;
+        }
+
+        // Connection to database and query.
+        $conn = connection();
+
+        $sql = "UPDATE User SET showNSFW = ? WHERE username = ?";
+
+        if ($conn->execute_query($sql, [$showNSFW, $this->getUsername()])){
+            $this->setErrorStatus("ShowNSFW updated with success.");
+
+            // Reload user.
+            $this->loadUser();
+
+            return true;
+        } else {
+            $this->setErrorStatus("Error: something went wrong during DB query for changeShowNSFW() action.");
+            return false;
+        }
+    }
+
+    /**
      * Check if user exists (Note that you should set the username first)
      * Return true if user exists, false if not.
      * @return bool
@@ -508,6 +703,25 @@ class User implements JsonSerializable
         }
 
         return true;
+    }
+
+    /**
+     * Function that check if username is already taken.
+     * Returns true if username is available, false if not.
+     * @param string $username
+     * @return bool
+     */
+    public function checkUsername(string $username)
+    {
+        $conn = connection();
+
+        $sql = "SELECT * FROM User WHERE username = ?";
+        $result = $conn->execute_query($sql, [$username]);
+        if ($result->num_rows == 0) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

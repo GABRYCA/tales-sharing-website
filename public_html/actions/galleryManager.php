@@ -23,26 +23,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
 
     // Check if the action is empty
     if (!$action) {
-        // Add an error message to the errors array
-        $errors[] = "Action is empty. Please select a valid action.";
-        // Send the error array to the client
-        echo json_encode($errors);
-        exit();
+        // Error
+        exit("Action is empty. Please select a valid action.");
     }
 
     // Check if the action is not valid
     if ($action != "create" && $action != "delete" && $action != "rename" && $action != "list" && $action != "load" && $action != "addContent" && $action != "removeContent") {
-        // Add an error message to the errors array
-        $errors[] = "Invalid action. Please select a valid action.";
-        // Send the error array to the client
-        echo json_encode($errors);
-        exit();
+        // Error
+        exit("Invalid action. Please select a valid action.");
     }
 
     $user = new User();
     $user->setUsername($_SESSION["username"]);
     if (!$user->loadUser()){
-        // Add an error message to the errors array
+        // Error
         exit("Failed to load user. Please try again.");
     }
 
@@ -52,10 +46,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
 
             // Check if the gallery name is empty or too long
             if (!$galleryName || strlen($galleryName) > 255) {
-                // Add an error message to the errors array
-                $errors[] = "Gallery name is empty or too long. Please enter a valid gallery name.";
-                echo json_encode($errors);
-                exit();
+                // Error
+                exit("Gallery name is empty or too long. Please enter a valid gallery name.");
             }
 
             $galleries = $user->getGalleries();

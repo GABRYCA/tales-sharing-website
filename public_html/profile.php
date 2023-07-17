@@ -455,6 +455,7 @@ if (!empty($_GET['username'])){
                             <div class="mb-3">
                                 <label for="username" class="form-label">Username</label>
                                 <input type="text" class="form-control" minlength="3" maxlength="18" id="username" name="username" value="<?= $userProfile->getUsername() ?>" required>
+                                <div id="usernameFeedback"></div>
                             </div>
 
                             <!-- Gender -->
@@ -481,13 +482,13 @@ if (!empty($_GET['username'])){
 
                             <!-- Show Checkbox -->
                             <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" id="showAI" name="showAI" <?php if ($user->getShowNSFW()) echo 'checked'; ?>>
-                                <label class="form-check-label" for="showAI">Show NSFW</label>
+                                <input class="form-check-input" type="checkbox" id="showNSFW" name="showAI" <?php if ($user->getShowNSFW()) echo 'checked'; ?>>
+                                <label class="form-check-label" for="showNSFW">Show NSFW</label>
                             </div>
 
                             <!-- Email -->
                             <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
+                                <label for="email" class="form-label">Email (Currently unavailable)</label>
                                 <input type="email" class="form-control" id="email" name="email" value="<?= $user->getEmail() ?>" required>
                             </div>
 
@@ -517,7 +518,7 @@ if (!empty($_GET['username'])){
 
                         <div id="toastContainer"></div>
 
-                        <div class="modal-footer">
+                        <div class="modal-footer pb-0">
                             <!-- Submit Button -->
                             <button type="button" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -539,6 +540,51 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
 <script>
 
     $(function() {
+        // Function to check if the passwords match
+        function checkPasswordsMatch() {
+            var newPassword = $("#newPassword").val();
+            var newPasswordConfirm = $("#newPasswordConfirm").val();
+
+            if (newPassword === newPasswordConfirm) {
+                $("#passwordFeedback").text("Passwords match").removeClass().addClass("text-success");
+            } else {
+                $("#passwordFeedback").text("Passwords do not match").removeClass().addClass("text-danger");
+            }
+        }
+
+        // Function to validate password length
+        function checkPasswordLength() {
+            var newPassword = $("#newPassword").val();
+
+            if (newPassword.length >= 8) {
+                $("#passwordFeedback").text("Password meets length requirement").removeClass().addClass("text-success");
+            } else {
+                $("#passwordFeedback").text("Password should be at least 8 characters long").removeClass().addClass("text-danger");
+            }
+        }
+
+        // Function to check if username is available
+        function checkUsernameAvailability() {
+            var username = $("#username").val();
+
+            $.ajax({
+                url: "actions/updateProfile.php",
+                type: "POST",
+                data: {
+                    username: username,
+                    action: "checkUsername"
+                },
+                success: function(data) {
+                    // I use a quite hacky way to set he text-class, take apart the data content between the [] and set the class accordingly, what's
+                    // after the [] is the message to be displayed, so I just set the text to that
+                    var dataArr = data.split("[");
+                    var textClass = dataArr[1].split("]")[0];
+                    var text = dataArr[1].split("]")[1];
+
+                    $("#usernameFeedback").text(text).removeClass().addClass(textClass);
+                }
+            });
+        }
 
         // Function to handle form submission
         function submitForm() {
@@ -672,6 +718,11 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
             });
         }
 
+        // Event handler for username validation
+        $('#username').keyup(function() {
+            checkUsernameAvailability();
+        });
+
         // Event handler for save changes button
         $('#saveChangesBtn').click(function() {
             submitForm();
@@ -687,31 +738,6 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
             checkPasswordLength();
             checkPasswordsMatch();
         });
-    });
-
-    $(function() {
-        // Function to check if the passwords match
-        function checkPasswordsMatch() {
-            var newPassword = $("#newPassword").val();
-            var newPasswordConfirm = $("#newPasswordConfirm").val();
-
-            if (newPassword === newPasswordConfirm) {
-                $("#passwordFeedback").text("Passwords match").removeClass().addClass("text-success");
-            } else {
-                $("#passwordFeedback").text("Passwords do not match").removeClass().addClass("text-danger");
-            }
-        }
-
-        // Function to validate password length
-        function checkPasswordLength() {
-            var newPassword = $("#newPassword").val();
-
-            if (newPassword.length >= 8) {
-                $("#passwordFeedback").text("Password meets length requirement").removeClass().addClass("text-success");
-            } else {
-                $("#passwordFeedback").text("Password should be at least 8 characters long").removeClass().addClass("text-danger");
-            }
-        }
 
         // Event handler for password confirmation
         $("#newPasswordConfirm").keyup(function() {
