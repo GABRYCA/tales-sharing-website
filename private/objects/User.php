@@ -659,8 +659,9 @@ class User implements JsonSerializable
     public function changeShowNSFW(bool $showNSFW) : bool
     {
         if ($showNSFW == null) {
-            $this->setErrorStatus("ShowNSFW not set!");
-            return true;
+            $showNSFW = 0;
+        } else {
+            $showNSFW = 1;
         }
 
         if ($this->showNSFW == $showNSFW){

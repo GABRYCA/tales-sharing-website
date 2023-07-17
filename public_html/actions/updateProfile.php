@@ -137,6 +137,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 exit($user->getErrorStatus());
             }
 
+
             // TODO: changeEmail() function that changes the email if it is different than the current one, and also checks if the email is already taken, and sends a confirmation email to the old and new email address. If confirmed, the email is changed, if not, the email is not changed.
             // THIS REQUIRES A DB CHANGE TO HANDLE THE EMAIL CONFIRMATION TOKENS AND STATUS.
 
