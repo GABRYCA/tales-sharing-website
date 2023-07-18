@@ -4,7 +4,6 @@
     <?php
     include_once(dirname(__FILE__) . '/common/common-head.php');
     ?>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.9/dist/cropper.min.css">
     <title>User Profile</title>
     <style>
         #upload-button {
@@ -537,7 +536,6 @@ if (!empty($_GET['username'])){
 include_once(dirname(__FILE__) . '/common/common-footer.php');
 include_once(dirname(__FILE__) . '/common/common-body.php');
 ?>
-<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.9/dist/cropper.min.js"></script>
 <script>
 
     $(function() {
