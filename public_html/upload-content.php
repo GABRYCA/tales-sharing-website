@@ -688,7 +688,6 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
                             icon: 'info',
                             position: 'top-right',
                             hideAfter: 3000,
-
                         });
 
                         // Reset inputs and fileData

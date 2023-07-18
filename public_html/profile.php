@@ -4,6 +4,7 @@
     <?php
     include_once(dirname(__FILE__) . '/common/common-head.php');
     ?>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.9/dist/cropper.min.css">
     <title>User Profile</title>
     <style>
         #upload-button {
@@ -255,8 +256,7 @@ if (!empty($_GET['username'])){
                 <!-- Profile icon in the center and name under id -->
                 <div class="row justify-content-center align-items-end" style="height: 100%;">
                     <div class="col-auto">
-                        <img src="<?php echo $userProfile->getUrlProfilePicture(); ?>" class="rounded-circle bg-dark shadow" width="150px"
-                             height="150px">
+                        <img src="<?php echo $userProfile->getUrlProfilePicture(); ?>" class="rounded-circle bg-dark shadow" width="150px" height="150px" data-bs-toggle="modal" data-bs-target="#profileImageModal">
                     </div>
                 </div>
             </div>
@@ -537,6 +537,7 @@ if (!empty($_GET['username'])){
 include_once(dirname(__FILE__) . '/common/common-footer.php');
 include_once(dirname(__FILE__) . '/common/common-body.php');
 ?>
+<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.9/dist/cropper.min.js"></script>
 <script>
 
     $(function() {
@@ -605,7 +606,8 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
             if (formData.username.length < 3 || formData.username.length > 18) {
                 $.toast({
                     title: 'Error',
-                    content: 'Username must be between 3 and 18 characters',
+                    icon: 'error',
+                    text: 'Username must be between 3 and 18 characters',
                     type: 'error'
                 });
                 return;
@@ -615,8 +617,10 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
             if (formData.newPassword.length > 0 && formData.newPassword.length < 8) {
                 $.toast({
                     title: 'Error',
-                    content: 'Password must be at least 8 characters',
-                    type: 'error'
+                    icon: 'error',
+                    text: 'Password must be at least 8 characters',
+                    type: 'error',
+                    position: "top-center"
                 });
                 return;
             }
@@ -625,8 +629,10 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
             if (formData.newPassword.length > 0 && formData.oldPassword.length === 0) {
                 $.toast({
                     title: 'Error',
-                    content: 'Please provide your old password',
-                    type: 'error'
+                    icon: 'error',
+                    text: 'Please provide your old password',
+                    type: 'error',
+                    position: "top-center"
                 });
                 return;
             }
@@ -635,8 +641,10 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
             if (formData.newPassword.length > 0 && formData.newPassword !== formData.newPasswordConfirm) {
                 $.toast({
                     title: 'Error',
-                    content: 'New password and confirmation must match',
-                    type: 'error'
+                    icon: 'error',
+                    text: 'New password and confirmation must match',
+                    type: 'error',
+                    position: "top-center"
                 });
                 return;
             }
@@ -645,8 +653,10 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
             if (formData.newPassword.length > 0 && formData.newPassword === formData.oldPassword) {
                 $.toast({
                     title: 'Error',
-                    content: 'New password must be different from old password',
-                    type: 'error'
+                    icon: 'error',
+                    text: 'New password must be different from old password',
+                    type: 'error',
+                    position: "top-center"
                 });
                 return;
             }
@@ -667,6 +677,9 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                             text: data,
                             icon: 'info',
                             position: 'top-center',
+                            bgColor: '#6600e1',
+                            textColor: '#fff',
+                            loaderBg: '#ff0f7b',
                             afterHidden: function() {
                                 location.reload();
                             }
@@ -702,6 +715,9 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                         text: data,
                         icon: 'info',
                         position: 'top-center',
+                        bgColor: '#6600e1',
+                        textColor: '#fff',
+                        loaderBg: '#ff0f7b',
                         afterHidden: function() {
                             location.reload();
                         }
