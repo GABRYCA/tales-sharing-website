@@ -4,12 +4,30 @@
     <?php
     include_once (dirname(__FILE__) . '/common/common-head.php');
     ?>
-    <title>Login</title>
+    <title>Tales - Login</title>
+    <style>
+        /* Custom styles for the button */
+        .btn-google {
+            background-color: #4285f4; /* Google blue */
+            border-color: #4285f4;
+            color: #fff; /* White text */
+            font-weight: bold;
+            border-radius: 0.5rem; /* Rounded corners */
+        }
+
+        /* Change the button's appearance on hover */
+        .btn-google:hover {
+            background-color: #357ae8; /* Darker blue */
+            border-color: #357ae8;
+        }
+
+    </style>
 </head>
 <body class="font-monospace text-light bg-dark">
 
 <?php
 session_start();
+include_once (dirname(__FILE__) . "/../private/configs/googleConfig.php");
 include_once (dirname(__FILE__) . "/../private/connection.php");
 include_once (dirname(__FILE__) . "/../private/objects/User.php");
 include_once (dirname(__FILE__) . "/common/utility.php");
@@ -19,6 +37,11 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
     header("Location: ../home.php");
     exit();
 }
+
+// create googleConfig object and auth URL.
+$googleConfig = new googleConfig();
+$googleClient = $googleConfig->getClient();
+$authUrl = $googleClient->createAuthUrl();
 
 // If there's POST data, then check if the user exists and if the password is correct.
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -85,7 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Check if user is activated.
             if (!$user->getIsActivated()){
-                echo "<p class='text-center mt-5'>Error: account not activated, please check your email or contact anonymousgca@tales.anonymousgca.eu</p>";
+                echo "<p class='text-center mt-5'>Error: account not activated, please check your email or contact anonymousgca@anonymousgca.eu</p>";
 
                 // Redirect user to login.php after 2 seconds.
                 header("refresh:2;url=../login.php");
@@ -112,6 +135,88 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "<p class='text-center mt-5'>Account not found, wrong username or password.</p>";
         header("refresh:2;url=../login.php");
     }
+} else if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET["code"])) {
+    $token = $googleClient->fetchAccessTokenWithAuthCode($_GET["code"]);
+    if(isset($token['error'])){
+        // Error.
+        echo "<p class='text-center mt-5'>Error: " . $token['error'] . "</p>";
+        header("refresh:2;url=../login.php");
+        exit;
+    }
+    $_SESSION["token"] = $token;
+
+    // Add user info to DB.
+    $googleClient->setAccessToken($token['access_token']);
+    $google_oauth = new Google_Service_Oauth2($googleClient);
+    $google_account_info = $google_oauth->userinfo->get();
+
+    // Check if user exists in DB.
+    $conn = connection();
+    $sql = "SELECT username FROM User WHERE email = ?";
+
+    // Run query
+    if ($data = $conn->execute_query($sql, [$email = trim($google_account_info['email'])])) {
+        if ($data->num_rows > 0) {
+            // User exists, login.
+
+            // Create User object and save it in session.
+            $user = new User();
+            $user->setUsername($data->fetch_assoc()['username']);
+            if (!$user->loadUser()) { // Load from DB the User with updated data.
+                echo "<p class='text-center mt-5'>Error: could not load user (" . $user->getErrorStatus() . ")</p>";
+                header("refresh:2;url=../login.php");
+                exit();
+            }
+
+            // Check if user is activated.
+            if (!$user->getIsActivated()) {
+                echo "<p class='text-center mt-5'>Error: account not activated, please check your email or contact anonymousgca@tales.anonymousgca.eu</p>";
+                header("refresh:2;url=../login.php");
+                exit();
+            }
+
+            // Store data in session variables.
+            $_SESSION["loggedin"] = true;
+            $_SESSION["username"] = $user->getUsername();
+            $_SESSION["user"] = $user;
+
+            // Tell the user that the login was successful.
+            echo "<p class='text-center mt-5'>Login successful, redirecting...</p>";
+
+            // Redirect user to home.php after 2 seconds.
+            header("refresh:2;url=../home.php");
+            exit();
+        } else {
+            // Create new user.
+            $user = new User();
+
+            // Set user data.
+            $user->setUsername($google_account_info['given_name'] . $google_account_info['family_name'] . rand(0, 1000));
+
+            // Check if username already exists.
+            while ($user->loadUser()) {
+                $user->setUsername($google_account_info['given_name'] . $google_account_info['family_name'] . rand(0, 1000));
+            }
+
+            $user->setEmail($google_account_info['email']);
+            $user->setPassword(password_hash($google_account_info['sub'], PASSWORD_DEFAULT));
+            $user->setOfAge(true);
+
+            if ($user->registerUser()){
+                // Tell account created with success, please verify email
+                echo "<p class='text-center'>Account created with success, please activate it using the activation link sent to your email</p>";
+
+                // If user is created, send to login page after 2 seconds
+                header("Refresh: 2; url=login.php");
+                exit();
+            } else {
+                exit("<p class='text-center'>Error: user could not be created (" . $user->getErrorStatus() . ")</p>");
+            }
+        }
+    }
+
+    echo "<p class='text-center mt-5'>Login successful, redirecting...</p>";
+    header("refresh:2;url=../home.php");
 } else {
 ?>
 
@@ -154,6 +259,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <button type="submit" class="btn btn-primary w-100">Login</button>
                             </div>
                         </form>
+                    </div>
+                    <div class="col-md-12 mt-2 text-center">
+                        <!-- Link with dark theme and Google icon -->
+                        <a href="<?= $authUrl ?>" class="btn btn-google w-100" data-bs-theme="dark"><i class="fab fa-google me-3"></i>Login with Google</a>
                     </div>
                 </div>
                 <div class="row">

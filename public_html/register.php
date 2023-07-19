@@ -4,13 +4,31 @@
     <?php
     include_once (dirname(__FILE__) . '/common/common-head.php');
     ?>
-    <title>Registration</title>
+    <title>Tales - Register</title>
+    <style>
+        /* Custom styles for the link */
+        .btn-google {
+            background-color: #4285f4; /* Google blue */
+            border-color: #4285f4;
+            color: #fff; /* White text */
+            font-weight: bold;
+            border-radius: 0.5rem; /* Rounded corners */
+        }
+
+        /* Change the link's appearance on hover */
+        .btn-google:hover {
+            background-color: #357ae8; /* Darker blue */
+            border-color: #357ae8;
+        }
+
+    </style>
 </head>
 <body class="font-monospace text-light bg-dark">
 
 <?php
 session_start();
 include_once (dirname(__FILE__) . "/../private/connection.php");
+include_once (dirname(__FILE__) . "/../private/configs/googleConfig.php");
 include_once (dirname(__FILE__) . "/../private/objects/User.php");
 include_once (dirname(__FILE__) . "/common/utility.php");
 
@@ -19,6 +37,11 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
     header("Location: ../home.php");
     exit();
 }
+
+// create googleConfig object and auth URL.
+$googleConfig = new googleConfig();
+$googleClient = $googleConfig->getClient();
+$authUrl = $googleClient->createAuthUrl();
 
 // If there's POST data, then check if the user exists and if the password is correct.
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -138,6 +161,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <button class="btn btn-primary w-100" type="submit">Register</button>
                             </div>
                         </form>
+                    </div>
+                    <div class="col-12 mt-2 text-center">
+                        <!-- Link with dark theme and Google icon -->
+                        <a href="<?= $authUrl ?>" class="btn btn-google w-100" data-bs-theme="dark"><i class="fab fa-google me-3"></i>Register with Google</a>
                     </div>
                 </div>
                 <div class="row">
