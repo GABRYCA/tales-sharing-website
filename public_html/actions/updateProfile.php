@@ -1,6 +1,8 @@
 <?php
 include_once (dirname(__FILE__) . "/../../private/objects/User.php");
 include_once (dirname(__FILE__) . "/../common/utility.php");
+include_once (dirname(__FILE__) . "/../../private/objects/VariablesConfig.php");
+
 session_start();
 
 // Check if logged in
@@ -137,7 +139,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 exit($user->getErrorStatus());
             }
 
-
             // TODO: changeEmail() function that changes the email if it is different than the current one, and also checks if the email is already taken, and sends a confirmation email to the old and new email address. If confirmed, the email is changed, if not, the email is not changed.
             // THIS REQUIRES A DB CHANGE TO HANDLE THE EMAIL CONFIRMATION TOKENS AND STATUS.
 
@@ -224,9 +225,54 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         case "updateProfileImage": {
 
-            //TODO: Implement this.
+            // Check if user canUpload
+            if (!$user->canUpload()) {
+                // Send the error array to the client
+                exit("You can't upload anything. Please call for an administrator.");
+            }
 
-            exit("Not implemented yet.");
+            // Check if the file is empty
+            $file = $_POST["profileImage"] ?? "";
+
+            if ($file == "" || !$file) {
+                // Error message
+                exit("File is empty. Please select a file.");
+            }
+
+            // remove the prefix if exists
+            $data = explode(",", $file);
+            if (count($data) > 1) {
+                $file = $data[1];
+            }
+
+            // Decode the file data
+            $file = base64_decode($file);
+
+            // Check if the file is an image from the base64 data
+            if (getimagesizefromstring($file) === false) {
+                // Send the error array to the client
+                exit("File is not an image. Please select a valid image.");
+            }
+
+            // Check if size is too big (15MB)
+            if (strlen($file) > 15000000) {
+                // Send the error array to the client
+                exit("File is too big. Please select a valid image.");
+            }
+
+            // Save image (convert it also to webp)
+            $path = save_image($file, $user->getUsername(), VariablesConfig::$profileImage);
+
+            // Load image from path (an URL now and also check if it fails)
+            $image = imagecreatefromstring(file_get_contents($path));
+
+            // Save new URL profile picture
+            if (!$user->changeProfilePicture($path)) {
+                // Error message
+                exit($user->getErrorStatus());
+            }
+
+            exit("Profile image updated successfully.");
         }
 
         default: {
@@ -240,3 +286,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     header("Location: ../home.php");
     exit();
 }
+
+// Function to save the image to the server and returns the path.
+function save_image($image, $user_id, $title) {
+
+    // Make sure that title doesn't break paths.
+    $title = preg_replace("/([^\w\s\d\-_~,;[\]\(\).])/", "", $title);
+
+    // Create a new image from the decoded image data.
+    $image = imagecreatefromstring($image);
+    // Get the image width.
+    $image_width = imagesx($image);
+    // Get the image height.
+    $image_height = imagesy($image);
+    // Create a new image with the same width and height.
+    $new_image = imagecreatetruecolor($image_width, $image_height);
+    // Copy the image to the new image.
+    imagecopy($new_image, $image, 0, 0, 0, 0, $image_width, $image_height);
+    // The uniqueid
+    $uniqueid = uniqid();
+
+    // Create directories if there aren't already
+    if (!file_exists(dirname(__FILE__) . "/../data/profile/" . $user_id . "/gallery/images/")) {
+        mkdir(dirname(__FILE__) . "/../data/profile/" . $user_id . "/gallery/images/", 0777, true);
+    }
+    // Save the image to the server as a .webp
+    imagewebp($new_image, dirname(__FILE__) . "/../data/profile/" . $user_id . "/gallery/images/" . $title . "-" . $uniqueid . ".webp", 80);
+    // Get the image path.
+
+    // Return the image path
+    return VariablesConfig::$domain . "data/profile/" . $user_id . "/gallery/images/" . $title . "-" . $uniqueid . ".webp";
+}
+?>

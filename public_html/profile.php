@@ -519,8 +519,8 @@ if (!empty($_GET['username'])){
 
                         <div class="modal-footer pb-0">
                             <!-- Submit Button -->
-                            <button type="button" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
                         </div>
                     </div>
                 </div>
@@ -537,8 +537,8 @@ if (!empty($_GET['username'])){
                     </div>
                     <div class="modal-body">
                         <input type="file" class="form-control" id="profileImageInput" accept="image/*">
-                        <p class="fs-6 ms-1">Recommended 1:1 ratio and resolution 400x400px</p>
-                        <p class="fs-6">Preview:</p>
+                        <p class="fs-6 ms-1">Recommended 1:1 ratio and resolution 150x150px</p>
+                        <p class="fs-7">Selected Image:</p>
                         <div id="profileImagePreview"></div>
                     </div>
                     <div class="modal-footer">
@@ -567,6 +567,8 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
             // Get the selected file
             const file = $('#profileImageInput')[0].files[0];
 
+
+
             // If there isn't an image selected, show error and return.
             if (!file) {
                 $.toast({
@@ -580,51 +582,61 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                 return;
             }
 
-            // Create a FormData object to send the file via AJAX
-            const formData = new FormData();
-            formData.append('profileImage', file);
-            formData.append('action', 'updateProfileImage')
+            // Using fileReader I make the file
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
 
-            // Send the AJAX request
-            $.ajax({
-                url: 'actions/updateProfile.php',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(data) {
+            // When the file is loaded, store it
+            reader.onload = function(e) {
+                // Get the file data
+                const fileData = e.target.result;
 
-                    // Close Modal.
-                    $('#profileImageModal').modal('hide');
+                // Create a FormData object to send the file via AJAX
+                const formData = new FormData();
+                formData.append('profileImage', fileData);
+                formData.append('action', 'updateProfileImage')
 
-                    // Send jquery toast to user telling success and data, then when it closes reload the page.
-                    $.toast({
-                        title: 'Success',
-                        icon: 'success',
-                        text: data,
-                        type: 'success',
-                        position: "top-center",
-                        hideAfter: 3000,
-                        bgColor: '#6600e1',
-                        textColor: '#fff',
-                        loaderBg: '#ff0f7b',
-                        afterHidden: function () {
-                            location.reload();
-                        }
-                    });
-                },
-                error: function(xhr, status, error) {
-                    // Send jquery toast to user telling error and data.
-                    $.toast({
-                        title: 'Error',
-                        icon: 'error',
-                        text: xhr.responseText + ", " + error + ", " + status,
-                        type: 'error',
-                        loaderBg: '#ff0f7b',
-                        position: "top-center"
-                    });
-                }
-            });
+                // Send the AJAX request
+                $.ajax({
+                    url: 'actions/updateProfile.php',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(data) {
+
+                        // Close Modal.
+                        $('#profileImageModal').modal('hide');
+
+                        // Send jquery toast to user telling success and data, then when it closes reload the page.
+                        $.toast({
+                            title: 'Success',
+                            icon: 'success',
+                            text: data,
+                            type: 'success',
+                            position: "top-center",
+                            hideAfter: 3000,
+                            bgColor: '#6600e1',
+                            textColor: '#fff',
+                            loaderBg: '#ff0f7b',
+                            afterHidden: function () {
+                                location.reload();
+                            }
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        // Send jquery toast to user telling error and data.
+                        $.toast({
+                            title: 'Error',
+                            icon: 'error',
+                            text: xhr.responseText + ", " + error + ", " + status,
+                            type: 'error',
+                            loaderBg: '#ff0f7b',
+                            position: "top-center"
+                        });
+                    }
+                });
+            };
         });
 
         // Preview the selected image

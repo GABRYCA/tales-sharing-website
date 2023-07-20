@@ -20,7 +20,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Get user.
     $user = new User();
     $user->setUsername($_SESSION["username"]);
-    $user->loadUser();
+    if (!$user->loadUser()){
+        // Send the error array to the client
+        exit("Failed to load user. Please try again.");
+    }
 
     // Check if user canUpload
     if (!$user->canUpload()) {
