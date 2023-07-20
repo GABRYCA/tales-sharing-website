@@ -217,6 +217,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     echo "<p class='text-center mt-5'>Login successful, redirecting...</p>";
     header("refresh:2;url=../home.php");
+    exit();
 } else {
 ?>
 

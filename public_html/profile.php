@@ -255,7 +255,7 @@ if (!empty($_GET['username'])){
                 <!-- Profile icon in the center and name under id -->
                 <div class="row justify-content-center align-items-end" style="height: 100%;">
                     <div class="col-auto">
-                        <img src="<?php echo $userProfile->getUrlProfilePicture(); ?>" class="rounded-circle bg-dark shadow" width="150px" height="150px" data-bs-toggle="modal" data-bs-target="#profileImageModal">
+                        <img src="<?php echo $userProfile->getUrlProfilePicture(); ?>" class="rounded-circle bg-dark shadow" width="150px" height="150px" <?php if ($user->getUsername() == $userProfile->getUsername()){ ?> data-bs-toggle="modal" data-bs-target="#profileImageModal" style="cursor: pointer" <?php }?>>
                     </div>
                 </div>
             </div>
@@ -527,6 +527,28 @@ if (!empty($_GET['username'])){
             </div>
         </div>
 
+        <!-- Modal Edit Profile Image -->
+        <div class="modal fade" id="profileImageModal" tabindex="-1" aria-labelledby="profileImageModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="profileImageModalLabel">Select Profile Image</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="file" class="form-control" id="profileImageInput" accept="image/*">
+                        <p class="fs-6 ms-1">Recommended 1:1 ratio and resolution 400x400px</p>
+                        <p class="fs-6">Preview:</p>
+                        <div id="profileImagePreview"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="saveProfileImage">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     <?php } ?>
 
 
@@ -537,6 +559,85 @@ include_once(dirname(__FILE__) . '/common/common-footer.php');
 include_once(dirname(__FILE__) . '/common/common-body.php');
 ?>
 <script>
+
+    <?php if ($user->getUsername() == $userProfile->getUsername()) { ?>
+
+    $(function() {
+        $('#saveProfileImage').click(function() {
+            // Get the selected file
+            const file = $('#profileImageInput')[0].files[0];
+
+            // If there isn't an image selected, show error and return.
+            if (!file) {
+                $.toast({
+                    title: 'Error',
+                    icon: 'error',
+                    text: 'You haven\'t selected an image',
+                    type: 'error',
+                    loaderBg: '#ff0f7b',
+                    position: "top-center"
+                });
+                return;
+            }
+
+            // Create a FormData object to send the file via AJAX
+            const formData = new FormData();
+            formData.append('profileImage', file);
+            formData.append('action', 'updateProfileImage')
+
+            // Send the AJAX request
+            $.ajax({
+                url: 'actions/updateProfile.php',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(data) {
+
+                    // Close Modal.
+                    $('#profileImageModal').modal('hide');
+
+                    // Send jquery toast to user telling success and data, then when it closes reload the page.
+                    $.toast({
+                        title: 'Success',
+                        icon: 'success',
+                        text: data,
+                        type: 'success',
+                        position: "top-center",
+                        hideAfter: 3000,
+                        bgColor: '#6600e1',
+                        textColor: '#fff',
+                        loaderBg: '#ff0f7b',
+                        afterHidden: function () {
+                            location.reload();
+                        }
+                    });
+                },
+                error: function(xhr, status, error) {
+                    // Send jquery toast to user telling error and data.
+                    $.toast({
+                        title: 'Error',
+                        icon: 'error',
+                        text: xhr.responseText + ", " + error + ", " + status,
+                        type: 'error',
+                        loaderBg: '#ff0f7b',
+                        position: "top-center"
+                    });
+                }
+            });
+        });
+
+        // Preview the selected image
+        $('#profileImageInput').change(function() {
+            const file = this.files[0];
+            const reader = new FileReader();
+            reader.onload = function() {
+                const dataURL = reader.result;
+                $('#profileImagePreview').html('<img src="' + dataURL + '" class="img-fluid">');
+            };
+            reader.readAsDataURL(file);
+        });
+    });
 
     $(function() {
         // Function to check if the passwords match
@@ -772,6 +873,8 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
             $("#passwordFeedback").text("");
         });
     });
+
+    <?php } ?>
 
     $(function (){
         // Get the bell element

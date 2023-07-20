@@ -222,6 +222,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit("[text-success]Username is available.");
         }
 
+        case "updateProfileImage": {
+
+            //TODO: Implement this.
+
+            exit("Not implemented yet.");
+        }
+
         default: {
             // Error message
             exit("Invalid action. Please select a valid action.");
