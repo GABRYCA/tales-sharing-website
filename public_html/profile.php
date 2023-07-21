@@ -251,11 +251,11 @@ if (!empty($_GET['username'])){
         <!-- Profile icon and name -->
         <div class="col">
             <!-- Cover image as background -->
-            <div class="bg-image rounded-bottom-5" style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0)), url('<?php echo $user->getUrlCoverPicture(); ?>'), linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0)); height: 300px; background-repeat: no-repeat; background-position: center; background-size: cover;">
+            <div class="bg-image rounded-bottom-5" style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0)), url('<?php echo $user->getUrlCoverPicture(); ?>'), linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0)); height: 300px; background-repeat: no-repeat; background-position: center; background-size: cover; <?php if ($user->getUsername() == $userProfile->getUsername()){ ?> cursor: pointer <?php } ?>" <?php if ($user->getUsername() == $userProfile->getUsername()){ ?> data-bs-toggle="modal" data-bs-target="#profileCoverModal" <?php } ?>>
                 <!-- Profile icon in the center and name under id -->
                 <div class="row justify-content-center align-items-end" style="height: 100%;">
                     <div class="col-auto">
-                        <img src="<?php echo $userProfile->getUrlProfilePicture(); ?>" class="rounded-circle bg-dark shadow" width="150px" height="150px" <?php if ($user->getUsername() == $userProfile->getUsername()){ ?> data-bs-toggle="modal" data-bs-target="#profileImageModal" style="cursor: pointer" <?php }?>>
+                        <img src="<?php echo $userProfile->getUrlProfilePicture(); ?>" class="rounded-circle bg-dark shadow" width="150px" height="150px" id="profileIcon" <?php if ($user->getUsername() == $userProfile->getUsername()){ ?> data-bs-toggle="modal" data-bs-target="#profileImageModal" style="cursor: pointer" <?php }?>>
                     </div>
                 </div>
             </div>
@@ -549,6 +549,28 @@ if (!empty($_GET['username'])){
             </div>
         </div>
 
+        <!-- Modal Edit Profile Cover -->
+        <div class="modal fade" id="profileCoverModal" tabindex="-1" aria-labelledby="profileCoverModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="profileCoverModalLabel">Select Cover Image</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="file" class="form-control" id="profileCoverInput" accept="image/*">
+                        <p class="fs-6 ms-1">Recommended resolution of 2160x1440</p>
+                        <p class="fs-7">Selected Cover:</p>
+                        <div id="profileCoverPreview"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="saveProfileCover">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     <?php } ?>
 
 
@@ -652,6 +674,96 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
     });
 
     $(function() {
+        $('#saveProfileCover').click(function() {
+            // Get the selected file
+            const file = $('#profileCoverInput')[0].files[0];
+
+
+
+            // If there isn't an image selected, show error and return.
+            if (!file) {
+                $.toast({
+                    title: 'Error',
+                    icon: 'error',
+                    text: 'You haven\'t selected an image cover',
+                    type: 'error',
+                    loaderBg: '#ff0f7b',
+                    position: "top-center"
+                });
+                return;
+            }
+
+            // Using fileReader I make the file
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+
+            // When the file is loaded, store it
+            reader.onload = function(e) {
+                // Get the file data
+                const fileData = e.target.result;
+
+                // Create a FormData object to send the file via AJAX
+                const formData = new FormData();
+                formData.append('profileCover', fileData);
+                formData.append('action', 'updateProfileCover')
+
+                // Send the AJAX request
+                $.ajax({
+                    url: 'actions/updateProfile.php',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(data) {
+
+                        // Close Modal.
+                        $('#profileCoverModal').modal('hide');
+
+                        // Send jquery toast to user telling success and data, then when it closes reload the page.
+                        $.toast({
+                            title: 'Success',
+                            icon: 'success',
+                            text: data,
+                            type: 'success',
+                            position: "top-center",
+                            hideAfter: 3000,
+                            bgColor: '#6600e1',
+                            textColor: '#fff',
+                            loaderBg: '#ff0f7b',
+                            afterHidden: function () {
+                                location.reload();
+                            }
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        // Send jquery toast to user telling error and data.
+                        $.toast({
+                            title: 'Error',
+                            icon: 'error',
+                            text: xhr.responseText + ", " + error + ", " + status,
+                            type: 'error',
+                            loaderBg: '#ff0f7b',
+                            position: "top-center"
+                        });
+                    }
+                });
+            };
+        });
+
+        // Preview the selected image
+        $('#profileCoverInput').change(function() {
+            const file = this.files[0];
+            const reader = new FileReader();
+            reader.onload = function() {
+                const dataURL = reader.result;
+                $('#profileCoverPreview').html('<img src="' + dataURL + '" class="img-fluid">');
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+
+    $(function() {
+
         // Function to check if the passwords match
         function checkPasswordsMatch() {
             var newPassword = $("#newPassword").val();

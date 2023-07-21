@@ -723,6 +723,41 @@ class User implements JsonSerializable
     }
 
     /**
+     * Function to change user profile cover given URL of cover image.
+     * @param string $urlProfileCover
+     * @return bool
+     */
+    public function changeProfileCover(string $urlProfileCover) : bool
+    {
+        if ($urlProfileCover == null) {
+            $this->setErrorStatus("URL of profile cover not set!");
+            return true;
+        }
+
+        if ($this->urlCoverPicture == $urlProfileCover){
+            $this->setErrorStatus("New URL of profile cover must be different than the previous one!");
+            return true;
+        }
+
+        // Connection to database and query.
+        $conn = connection();
+
+        $sql = "UPDATE User SET urlCoverPicture = ? WHERE username = ?";
+
+        if ($conn->execute_query($sql, [$urlProfileCover, $this->getUsername()])){
+            $this->setErrorStatus("URL of profile cover updated with success.");
+
+            // Reload user.
+            $this->loadUser();
+
+            return true;
+        } else {
+            $this->setErrorStatus("Error: something went wrong during DB query for changeProfileCover() action.");
+            return false;
+        }
+    }
+
+    /**
      * Check if user exists (Note that you should set the username first)
      * Return true if user exists, false if not.
      * @return bool

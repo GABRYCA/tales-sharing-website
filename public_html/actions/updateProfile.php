@@ -275,6 +275,59 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit("Profile image updated successfully.");
         }
 
+        case "updateProfileCover": {
+
+            // Check if user canUpload
+            if (!$user->canUpload()) {
+                // Send the error array to the client
+                exit("You can't upload anything. Please call for an administrator.");
+            }
+
+            // Check if the file is empty
+            $file = $_POST["profileCover"] ?? "";
+
+            if ($file == "" || !$file) {
+                // Error message
+                exit("File is empty. Please select a file.");
+            }
+
+            // remove the prefix if exists
+            $data = explode(",", $file);
+            if (count($data) > 1) {
+                $file = $data[1];
+            }
+
+            // Decode the file data
+            $file = base64_decode($file);
+
+            // Check if the file is an image from the base64 data
+            if (getimagesizefromstring($file) === false) {
+                // Send the error array to the client
+                exit("File is not an image. Please select a valid image.");
+            }
+
+            // Check if size is too big (15MB)
+            if (strlen($file) > 15000000) {
+                // Send the error array to the client
+                exit("File is too big. Please select a valid image.");
+            }
+
+            // Save image (convert it also to webp)
+            $path = save_image($file, $user->getUsername(), VariablesConfig::$profileCover);
+
+            // Load image from path (an URL now and also check if it fails)
+            $image = imagecreatefromstring(file_get_contents($path));
+
+            // Save new URL profile picture
+            if (!$user->changeProfileCover($path)) {
+                // Error message
+                exit($user->getErrorStatus());
+            }
+
+            exit("Profile cover updated successfully.");
+
+        }
+
         default: {
             // Error message
             exit("Invalid action. Please select a valid action.");

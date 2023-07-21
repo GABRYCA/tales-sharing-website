@@ -4,10 +4,12 @@
 
 class VariablesConfig implements JsonSerializable
 {
-    static public $domain = "https://tales.anonymousgca.eu/";
-    static public $profileImage = "profile.webp";
+    public static $domain = "https://tales.anonymousgca.eu/";
+    public static $profileImage = "profile.webp";
 
     // Function to get the domain
+    public static $profileCover = "cover.webp";
+
     static public function getDomain(): string
     {
         return self::$domain;
@@ -17,6 +19,12 @@ class VariablesConfig implements JsonSerializable
     static public function getProfileImage(): string
     {
         return self::$profileImage;
+    }
+
+    // Function to get the profile cover
+    static public function getProfileCover(): string
+    {
+        return self::$profileCover;
     }
 
     public function jsonSerialize(): mixed
