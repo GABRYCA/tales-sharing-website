@@ -86,6 +86,22 @@
             filter: brightness(2);
             cursor: pointer;
         }
+
+        .bg-image {
+            transition: 0.2s ease-out !important;
+        }
+
+        #profileIcon {
+            transition: 0.2s ease-out !important;
+        }
+
+        .bg-image:hover {
+            filter: brightness(0.9);
+        }
+
+        #profileIcon:hover {
+            filter: brightness(1.5);
+        }
     </style>
 </head>
 <body class="font-monospace text-light bg-dark">
@@ -251,11 +267,11 @@ if (!empty($_GET['username'])){
         <!-- Profile icon and name -->
         <div class="col">
             <!-- Cover image as background -->
-            <div class="bg-image rounded-bottom-5" style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0)), url('<?php echo $user->getUrlCoverPicture(); ?>'), linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0)); height: 300px; background-repeat: no-repeat; background-position: center; background-size: cover; <?php if ($user->getUsername() == $userProfile->getUsername()){ ?> cursor: pointer <?php } ?>" <?php if ($user->getUsername() == $userProfile->getUsername()){ ?> data-bs-toggle="modal" data-bs-target="#profileCoverModal" <?php } ?>>
+            <div class="bg-image rounded-bottom-5" style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0)), url('<?php echo $user->getUrlCoverPicture(); ?>'), linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0)); height: 300px; background-repeat: no-repeat; background-position: center; background-size: cover; <?php if ($user->getUsername() == $userProfile->getUsername()){ ?> cursor: pointer <?php } ?>" <?php if ($user->getUsername() == $userProfile->getUsername()){ ?> data-bs-toggle="modal" data-bs-target="#profileCoverModal" title="click to edit" <?php } ?>>
                 <!-- Profile icon in the center and name under id -->
                 <div class="row justify-content-center align-items-end" style="height: 100%;">
                     <div class="col-auto">
-                        <img src="<?php echo $userProfile->getUrlProfilePicture(); ?>" class="rounded-circle bg-dark shadow" width="150px" height="150px" id="profileIcon" <?php if ($user->getUsername() == $userProfile->getUsername()){ ?> data-bs-toggle="modal" data-bs-target="#profileImageModal" style="cursor: pointer" <?php }?>>
+                        <img src="<?php echo $userProfile->getUrlProfilePicture(); ?>" class="rounded-circle bg-dark shadow" width="150px" height="150px" id="profileIcon" <?php if ($user->getUsername() == $userProfile->getUsername()){ ?> data-bs-toggle="modal" data-bs-target="#profileImageModal" style="cursor: pointer" title="click to edit" <?php }?>>
                     </div>
                 </div>
             </div>
