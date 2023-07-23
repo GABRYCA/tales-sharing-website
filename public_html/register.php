@@ -6,21 +6,18 @@
     ?>
     <title>Tales - Register</title>
     <style>
-        /* Custom styles for the link */
         .btn-google {
-            background-color: #4285f4; /* Google blue */
+            background-color: #4285f4;
             border-color: #4285f4;
-            color: #fff; /* White text */
+            color: #fff;
             font-weight: bold;
-            border-radius: 0.5rem; /* Rounded corners */
+            border-radius: 0.5rem;
         }
 
-        /* Change the link's appearance on hover */
         .btn-google:hover {
-            background-color: #357ae8; /* Darker blue */
+            background-color: #357ae8;
             border-color: #357ae8;
         }
-
     </style>
 </head>
 <body class="font-monospace text-light bg-dark">
@@ -49,7 +46,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Check if all data in post is set
     if (!isset($_POST["username"]) || !isset($_POST["password"]) || !isset($_POST["confirm_password"]) || !isset($_POST["email"]) || !isset($_POST["ofAge"])) {
-        echo "<p class='text-center'>Error: missing data</p>";
+        echo "<p class='text-center mt-5'><i class='fas fa-exclamation-triangle fa-3x'></i></p>";
+        echo "<p class='text-center mt-2'>Error: missing data</p>";
         exit();
     }
 
@@ -62,12 +60,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Check if password and confirm password match
     if ($password != $confirm_password) {
-        exit("<p class='text-center'>Passwords do not match</p>");
+        echo "<p class='text-center mt-5'><i class='fas fa-exclamation-triangle fa-3x'></i></p>";
+        exit("<p class='text-center mt-2'>Passwords do not match</p>");
     }
 
     // Check if user is of age
     if ($ofAge != "on") {
-        exit("<p class='text-center'>You must be of age to register</p>");
+        echo "<p class='text-center mt-5'><i class='fas fa-exclamation-triangle fa-3x'></i></p>";
+        exit("<p class='text-center mt-2'>You must be of age to register</p>");
     }
 
     $ofAge = true;
@@ -83,13 +83,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($user->registerUser()){
 
         // Tell account created with success, please verify email
-        echo "<p class='text-center'>Account created with success, please activate it using the activation link sent to your email</p>";
+        echo "<p class='text-center mt-5'><i class='fas fa-envelope fa-3x'></i></p>";
+        echo "<p class='text-center mt-2'>Account created with success, please activate it using the activation link sent to your email</p>";
 
         // If user is created, send to login page after 2 seconds
         header("Refresh: 2; url=login.php");
         exit();
     } else {
-        exit("<p class='text-center'>Error: user could not be created (" . $user->getErrorStatus() . ")</p>");
+        echo "<p class='text-center mt-5'><i class='fas fa-exclamation-triangle fa-3x'></i></p>";
+        exit("<p class='text-center mt-2'>Error: user could not be created (" . $user->getErrorStatus() . ")</p>");
     }
 } else {
     ?>

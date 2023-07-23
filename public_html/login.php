@@ -6,18 +6,16 @@
     ?>
     <title>Tales - Login</title>
     <style>
-        /* Custom styles for the button */
         .btn-google {
-            background-color: #4285f4; /* Google blue */
+            background-color: #4285f4;
             border-color: #4285f4;
-            color: #fff; /* White text */
+            color: #fff;
             font-weight: bold;
-            border-radius: 0.5rem; /* Rounded corners */
+            border-radius: 0.5rem;
         }
 
-        /* Change the button's appearance on hover */
         .btn-google:hover {
-            background-color: #357ae8; /* Darker blue */
+            background-color: #357ae8;
             border-color: #357ae8;
         }
 
@@ -108,7 +106,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Check if user is activated.
             if (!$user->getIsActivated()){
-                echo "<p class='text-center mt-5'>Error: account not activated, please check your email or contact anonymousgca@anonymousgca.eu</p>";
+                echo "<p class='text-center mt-5'><i class='fas fa-exclamation-triangle fa-3x'></i></p>";
+                echo "<p class='text-center mt-2'>Error: account not activated, please check your email or contact anonymousgca@anonymousgca.eu</p>";
+                echo "<p class='text-center mt-5'>Redirecting...</p>";
 
                 // Redirect user to login.php after 2 seconds.
                 header("refresh:2;url=../login.php");
@@ -121,13 +121,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION["user"] = $user;
 
             // Tell the user that the login was successful.
-            echo "<p class='text-center mt-5'>Login successful, redirecting...</p>";
+            echo "<p class='text-center mt-5'><i class='fas fa-check-circle fa-3x'></i></p>";
+            echo "<p class='text-center mt-2'>Login successful, redirecting...</p>";
 
             // Redirect user to home.php after 2 seconds.
             header("refresh:2;url=../home.php");
         } else {
             // Display an error message if password is not valid.
-             echo "<p class='text-center mt-5'>Wrong password, please try again.</p>";
+            echo "<p class='text-center mt-5'><i class='fas fa-exclamation-triangle fa-3x'></i></p>";
+             echo "<p class='text-center mt-2'>Wrong password, please try again.</p>";
              header("refresh:2;url=../login.php");
         }
     } else {
@@ -170,7 +172,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Check if user is activated.
             if (!$user->getIsActivated()) {
-                echo "<p class='text-center mt-5'>Error: account not activated, please check your email or contact anonymousgca@tales.anonymousgca.eu</p>";
+                echo "<p class='text-center mt-5'><i class='fas fa-exclamation-triangle fa-3x'></i></p>";
+                echo "<p class='text-center mt-2'>Error: account not activated, please check your email or contact anonymousgca@tales.anonymousgca.eu</p>";
                 header("refresh:2;url=../login.php");
                 exit();
             }
@@ -181,7 +184,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION["user"] = $user;
 
             // Tell the user that the login was successful.
-            echo "<p class='text-center mt-5'>Login successful, redirecting...</p>";
+            echo "<p class='text-center mt-5'><i class='fas fa-check-circle fa-3x'></i></p>";
+            echo "<p class='text-center mt-2'>Login successful, redirecting...</p>";
 
             // Redirect user to home.php after 2 seconds.
             header("refresh:2;url=../home.php");
@@ -213,11 +217,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 exit("<p class='text-center'>Error: user could not be created (" . $user->getErrorStatus() . ")</p>");
             }
         }
+    } else {
+        exit("<p class='text-center'>Error: could not connect to DB</p>");
     }
-
-    echo "<p class='text-center mt-5'>Login successful, redirecting...</p>";
-    header("refresh:2;url=../home.php");
-    exit();
 } else {
 ?>
 
