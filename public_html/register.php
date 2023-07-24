@@ -97,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     ?>
 
     <!-- Register form -->
-    <div class="container mb-5">
+    <div class="container mb-3">
         <div class="row justify-content-center">
             <div class="col-12 col-lg-9 col-xxl-6">
                 <div class="row mt-4 mb-4">
@@ -172,6 +172,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="row">
                     <div class="col">
                         <p class="text-center">Already have an account? <a href="login.php">Login here</a>.</p>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col">
+                        <p class="text-center text-muted">By logging in, you agree to our <a href="faq/tos.php" class="link-primary">Terms of Service</a> and <a href="faq/privacy-policy.php" class="link-primary">Privacy Policy</a>.</p>
                     </div>
                 </div>
             </div>

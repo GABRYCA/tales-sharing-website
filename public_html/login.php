@@ -46,6 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Check if all data in post is set.
     if (!isset($_POST["username"]) || !isset($_POST["password"])) {
+        echo "<p class='text-center mt-5'><i class='fas fa-exclamation-triangle fa-3x'></i></p>";
         echo "<p class='text-center mt-5'>Error: missing data</p>";
         header("refresh:2;url=../login.php");
         exit();
@@ -76,8 +77,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Check if email/username exists in DB by running query.
         if ($data->num_rows == 0) {
             if ($isEmail) {
+                echo "<p class='text-center mt-5'><i class='fas fa-exclamation-triangle fa-3x'></i></p>";
                 echo "<p class='text-center mt-5'>Email not found, please check your email and try again.</p>";
             } else {
+                echo "<p class='text-center mt-5'><i class='fas fa-exclamation-triangle fa-3x'></i></p>";
                 echo "<p class='text-center mt-5'>User not found, please check your username and try again.</p>";
             }
             header("refresh:2;url=../login.php");
@@ -207,24 +210,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $user->setOfAge(true);
 
             if ($user->registerUser()){
-                // Tell account created with success, please verify email
+                // Account created with success. Need to verify email.
+                echo "<p class='text-center mt-5'><i class='fas fa-check-circle fa-3x'></i></p>";
                 echo "<p class='text-center'>Account created with success, please activate it using the activation link sent to your email</p>";
 
                 // If user is created, send to login page after 2 seconds
                 header("Refresh: 2; url=login.php");
                 exit();
             } else {
+                echo "<p class='text-center mt-5'><i class='fas fa-exclamation-triangle fa-3x'></i></p>";
                 exit("<p class='text-center'>Error: user could not be created (" . $user->getErrorStatus() . ")</p>");
             }
         }
     } else {
+        echo "<p class='text-center mt-5'><i class='fas fa-exclamation-triangle fa-3x'></i></p>";
         exit("<p class='text-center'>Error: could not connect to DB</p>");
     }
 } else {
 ?>
 
     <!-- Login form -->
-    <div class="container mb-5">
+    <div class="container mb-3">
         <div class="row justify-content-center">
             <div class="col-12 col-lg-9 col-xxl-6">
                 <div class="row mt-4 mb-4">
@@ -271,6 +277,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="row">
                     <div class="col">
                         <p class="text-center">Don't have an account? <a href="register.php">Register here</a>.</p>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col">
+                        <p class="text-center text-muted">By logging in, you agree to our <a href="faq/tos.php" class="link-primary">Terms of Service</a> and <a href="faq/privacy-policy.php" class="link-primary">Privacy Policy</a>.</p>
                     </div>
                 </div>
             </div>
