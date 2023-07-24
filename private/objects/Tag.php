@@ -27,9 +27,6 @@ class Tag implements JsonSerializable
             return false;
         }
 
-        // Free the result set
-        $data->free();
-
         return true;
     }
 
@@ -50,9 +47,6 @@ class Tag implements JsonSerializable
             $this->setErrorStatus("Error while loading tag");
             return false;
         }
-
-        // Free the result set
-        $data->free();
 
         return true;
     }
@@ -78,9 +72,6 @@ class Tag implements JsonSerializable
             }
         }
 
-        // Free the result set
-        $data->free();
-
         return $tagList;
     }
 
@@ -104,9 +95,6 @@ class Tag implements JsonSerializable
                 $tagList[] = $tag;
             }
         }
-
-        // Free the result set
-        $data->free();
 
         return $tagList;
     }
@@ -132,9 +120,6 @@ class Tag implements JsonSerializable
             }
         }
 
-        // Free the result set
-        $data->free();
-
         return $contentList;
     }
 
@@ -158,9 +143,6 @@ class Tag implements JsonSerializable
                 $contentList[] = $content;
             }
         }
-
-        // Free the result set
-        $data->free();
 
         return $contentList;
     }

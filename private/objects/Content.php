@@ -46,6 +46,7 @@ class Content implements JsonSerializable
             $this->uploadDate = $row["uploadDate"];
             $this->isPrivate = $row["isPrivate"];
             $this->isAI = $row["isAI"];
+
             return true;
         } else {
             $this->setErrorStatus("Error while loading content");
