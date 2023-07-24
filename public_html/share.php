@@ -79,7 +79,15 @@
             }
         }
 
+        .btn-outline-custom {
+            border-color: rgba(255, 15, 123, 1) !important;
+            color: rgba(255, 15, 123, 1) !important;
+        }
 
+        .btn-outline-custom:hover {
+            background-color: rgba(255, 15, 123, 0.54) !important;
+            color: white !important;
+        }
     </style>
 </head>
 <body class="font-monospace text-light bg-dark">
@@ -142,14 +150,24 @@ $owner->loadUser();
 
 <div class="container-fluid">
     <!-- Navbar -->
+    <!-- Navbar -->
     <div class="row justify-content-between border-bottom pt-2 pb-2">
-        <div class="col">
+        <div class="col-2">
             <!-- Logo (common/favicon.webp) -->
             <a href="home.php">
                 <img src="common/favicon.webp" alt="GCA's Baseline" width="40" height="40">
             </a>
         </div>
-        <div class="col">
+        <!-- Search box here -->
+        <div class="col-6 col-md-7 col pe-0 d-flex align-items-center">
+            <form class="w-100" action="search.php" method="GET">
+                <div class="input-group">
+                    <input class="form-control form-control-sm border-0 rounded-3" type="search" placeholder="Search" aria-label="Search" name="search">
+                    <button class="btn btn-sm btn-outline-custom" type="submit"><i class="fas fa-search"></i></button>
+                </div>
+            </form>
+        </div>
+        <div class="col-4 col-md-3 ps-0">
             <div class="row justify-content-end text-end">
                 <div class="col-auto mt-2 pe-0">
                     <!-- Notification -->

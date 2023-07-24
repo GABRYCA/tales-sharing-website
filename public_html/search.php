@@ -4,7 +4,7 @@
     <?php
     include_once(dirname(__FILE__) . '/common/common-head.php');
     ?>
-    <title>Home - Tales</title>
+    <title>Search - Tales</title>
     <style>
         #upload-button {
             background: rgb(0, 97, 255) !important;
@@ -90,11 +90,28 @@ include_once(dirname(__FILE__) . '/common/utility.php');
 include_once(dirname(__FILE__) . '/../private/objects/User.php');
 include_once(dirname(__FILE__) . '/../private/objects/Content.php');
 include_once(dirname(__FILE__) . '/../private/objects/Followers.php');
+include_once(dirname(__FILE__) . '/../private/objects/Tag.php');
 
 // Get user from session
 $user = new User();
 $user->setUsername($_SESSION["username"]);
 $user->loadUser();
+
+// Empty array of search tags
+$searchTags = array();
+$originalSearchPrompt = "";
+
+// Check if get request and search is set, if it's get values.
+if (isset($_GET["search"])) {
+    $search = validate_input($_GET["search"]);
+    $originalSearchPrompt = $search;
+    // Split the search into an array of tags
+    $searchTags = explode(" ", $search);
+    // Remove empty elements from the array
+    $searchTags = array_filter($searchTags);
+    // Remove duplicates from the array
+    $searchTags = array_unique($searchTags);
+}
 
 ?>
 
@@ -111,7 +128,7 @@ $user->loadUser();
         <div class="col-6 col-md-7 col pe-0 d-flex align-items-center">
             <form class="w-100" action="search.php" method="GET">
                 <div class="input-group">
-                    <input class="form-control form-control-sm border-0 rounded-3" type="search" placeholder="Search" aria-label="Search" name="search">
+                    <input class="form-control form-control-sm border-0 rounded-3" type="search" placeholder="Search" aria-label="Search" name="search" <?php if ($originalSearchPrompt != "") echo "value='" . $originalSearchPrompt . "'"; ?>>
                     <button class="btn btn-sm btn-outline-custom" type="submit"><i class="fas fa-search"></i></button>
                 </div>
             </form>
@@ -254,6 +271,15 @@ $user->loadUser();
 
     <!-- New Content (New design) -->
     <div class="row p-3 gap-0 justify-content-evenly gy-3">
+
+        <!-- Message that says "search results for..." -->
+        <div class="col-12 mt-4">
+            <h1 class="display-6 text-center">Search results for: "<?php if ($originalSearchPrompt == "") {
+                    echo "🤔";
+                } else {
+                    echo $originalSearchPrompt;
+                }?>"</h1>
+        </div>
 
         <?php
         $content = new Content();

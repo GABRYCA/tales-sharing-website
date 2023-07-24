@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
 <head>
+    <script src="https://www.google.com/recaptcha/enterprise.js?render=6Lc_i00nAAAAALRKSTwznwDAIGJvKaTyZX9qO9GP"></script>
     <?php
     include_once (dirname(__FILE__) . '/common/common-head.php');
     ?>
