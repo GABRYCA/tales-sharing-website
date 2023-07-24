@@ -86,6 +86,7 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] === false) {
 
 <?php
 // Load all necessary includes.
+include_once (dirname(__FILE__) . "/../private/connection.php");
 include_once(dirname(__FILE__) . '/common/utility.php');
 include_once(dirname(__FILE__) . '/../private/objects/User.php');
 include_once(dirname(__FILE__) . '/../private/objects/Content.php');
@@ -282,21 +283,89 @@ if (isset($_GET["search"])) {
         </div>
 
         <?php
-        $content = new Content();
-        $contentArray = $content->getAllPublicContent();
 
-        if (count($contentArray) === 0) {
-            echo '<div class="col-12"><h1 class="display-6 text-center">There is no content to show!</h1></div>';
+        // If searchTags is more than 0, then search for tags.
+        if (count($searchTags) > 0) {
+
+            // Get all the tags from the database.
+            $tag = new Tag();
+            $tagArray = $tag->getTagList();
+
+            // If there are no tags, print out a message.
+            if (count($tagArray) === 0) {
+                echo '<div class="col-12"><h1 class="display-6 text-center">There are no tags to show!</h1></div>';
+            } else {
+
+                $conn = connection();
+
+                // Prepare the SQL query with placeholders for the array parameter
+                $query = "SELECT c.contentId, COUNT(ta.tagId) AS matches
+                          FROM Content c
+                          JOIN TagAssociation ta ON c.contentId = ta.contentId
+                          JOIN Tag t ON ta.tagId = t.tagId
+                          WHERE t.name IN (?" . str_repeat(", ?", count($searchTags) - 1) . ")
+                          GROUP BY c.contentId
+                          ORDER BY matches DESC, c.contentId DESC";
+
+                // Create a prepared statement from the query
+                $stmt = $conn->prepare($query);
+
+                // Bind the array parameter values to the statement
+                // The "s" means that each value is bound as a string
+                $stmt->bind_param(str_repeat("s", count($searchTags)), ...$searchTags);
+
+                // Execute the statement
+                $stmt->execute();
+
+                // Get the result set from the statement
+                $result = $stmt->get_result();
+
+                // Fetch all the rows from the result set as an associative array
+                $rows = $result->fetch_all(MYSQLI_ASSOC);
+
+                // Close the statement and free the result set
+                $stmt->close();
+                $result->free();
+
+                // If there are no rows, print out a message.
+                if (count($rows) === 0) {
+                    echo '<div class="col-12"><h1 class="display-6 text-center">Woops, nothing found! 🤔</h1></div>';
+                } else {
+
+                    // For each row, get the content and print it out.
+                    foreach ($rows as $row) {
+                        $content = new Content();
+                        $content->setContentId($row["contentId"]);
+                        $content->loadContent();
+                        echo '<div class="col-12 col-lg-4 col-xxl-3 d-flex align-items-stretch px-0 px-lg-2">';
+                        echo '<div class="card border-0 bg-placeholder img-home w-100" data-aos="fade-up" onclick="window.location.href = \'/share.php?id=' . $content->getContentId() . '\'">';
+                        echo '<div class="card-img-top img-wrapper position-relative text-center w-100 lazy-background" data-background="' . encode_url($content->getUrlImage()) . '" style="background-size: cover; background-position: center; height: 45vh;">';
+                        echo '</div>';
+                        echo '</div>';
+                        echo '</div>';
+                    }
+                }
+            }
         } else {
-            foreach ($contentArray as $content) {
-                echo '<div class="col-12 col-lg-4 col-xxl-3 d-flex align-items-stretch px-0 px-lg-2">';
-                echo '<div class="card border-0 bg-placeholder img-home w-100" data-aos="fade-up" onclick="window.location.href = \'/share.php?id=' . $content->getContentId() . '\'">';
-                echo '<div class="card-img-top img-wrapper position-relative text-center w-100 lazy-background" data-background="' . encode_url($content->getUrlImage()) . '" style="background-size: cover; background-position: center; height: 45vh;">';
-                echo '</div>';
-                echo '</div>';
-                echo '</div>';
+            // Empty search, show all public content.
+            $content = new Content();
+            $contentArray = $content->getAllPublicContent();
+
+            if (count($contentArray) === 0) {
+                echo '<div class="col-12"><h1 class="display-6 text-center">There is no content to show!</h1></div>';
+            } else {
+                foreach ($contentArray as $content) {
+                    echo '<div class="col-12 col-lg-4 col-xxl-3 d-flex align-items-stretch px-0 px-lg-2">';
+                    echo '<div class="card border-0 bg-placeholder img-home w-100" data-aos="fade-up" onclick="window.location.href = \'/share.php?id=' . $content->getContentId() . '\'">';
+                    echo '<div class="card-img-top img-wrapper position-relative text-center w-100 lazy-background" data-background="' . encode_url($content->getUrlImage()) . '" style="background-size: cover; background-position: center; height: 45vh;">';
+                    echo '</div>';
+                    echo '</div>';
+                    echo '</div>';
+                }
             }
         }
+
+
         ?>
 
     </div>
