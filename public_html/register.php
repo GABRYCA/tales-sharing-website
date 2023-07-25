@@ -4,6 +4,7 @@
     <?php
     include_once (dirname(__FILE__) . '/common/common-head.php');
     ?>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <title>Tales - Register</title>
     <style>
         .btn-google {
@@ -24,6 +25,7 @@
 
 <?php
 session_start();
+include_once (dirname(__FILE__) . "/../private/configs/cloudflareConfig.php");
 include_once (dirname(__FILE__) . "/../private/connection.php");
 include_once (dirname(__FILE__) . "/../private/configs/googleConfig.php");
 include_once (dirname(__FILE__) . "/../private/objects/User.php");
@@ -40,9 +42,18 @@ $googleConfig = new googleConfig();
 $googleClient = $googleConfig->getClient();
 $authUrl = $googleClient->createAuthUrl();
 
+$cloudflareConfig = new cloudflareConfig();
+
 // If there's POST data, then check if the user exists and if the password is correct.
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conn = connection();
+
+    if (!isset($_POST['cf-turnstile-response'])){
+        echo "<p class='text-center mt-5'><i class='fas fa-exclamation-triangle fa-3x'></i></p>";
+        echo "<p class='text-center mt-5'>Error: missing captcha</p>";
+        header("refresh:2;url=../login.php");
+        exit();
+    }
 
     // Check if all data in post is set
     if (!isset($_POST["username"]) || !isset($_POST["password"]) || !isset($_POST["confirm_password"]) || !isset($_POST["email"]) || !isset($_POST["ofAge"])) {
@@ -57,6 +68,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $confirm_password = validate_input($_POST["confirm_password"]);
     $email = validate_input($_POST["email"]);
     $ofAge = validate_input($_POST["ofAge"]);
+
+    // Check if captcha is valid.
+    $captcha = validate_input($_POST['cf-turnstile-response']);
+    $ip = $_SERVER['REMOTE_ADDR'];
+    $data = $data = array('secret' => $cloudflareConfig->getSecretKey(), 'response' => $captcha, 'remoteip' => $ip);
+    $options = array(
+        'http' => array(
+            'method' => 'POST',
+            'content' => http_build_query($data))
+    );
+    $stream = stream_context_create($options);
+    $result = file_get_contents(
+        $cloudflareConfig->getUrlPath(), false, $stream);
+    $response =  $result;
+    $responseKeys = json_decode($response,true);
+    if(intval($responseKeys["success"]) !== 1) {
+        echo "<p class='text-center mt-5'><i class='fas fa-exclamation-triangle fa-3x'></i></p>";
+        echo "<p class='text-center mt-5'>Error: captcha not valid</p>";
+        header("refresh:2;url=../login.php");
+        exit();
+    }
 
     // Check if password and confirm password match
     if ($password != $confirm_password) {
@@ -148,7 +180,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-12 mt-1 pt-2 mb-0 cf-turnstile" data-sitekey="<?= $cloudflareConfig->getClientKey() ?>"></div>
+                            <div class="col-md-6 mt-2">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" value="on" name="ofAge" id="ofAge" required>
                                     <label class="form-check-label" for="ofAge">

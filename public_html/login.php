@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
 <head>
-    <script src="https://www.google.com/recaptcha/enterprise.js?render=6Lc_i00nAAAAALRKSTwznwDAIGJvKaTyZX9qO9GP"></script>
     <?php
     include_once (dirname(__FILE__) . '/common/common-head.php');
     ?>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <title>Tales - Login</title>
     <style>
         .btn-google {
@@ -27,6 +27,7 @@
 <?php
 session_start();
 include_once (dirname(__FILE__) . "/../private/configs/googleConfig.php");
+include_once (dirname(__FILE__) . "/../private/configs/cloudflareConfig.php");
 include_once (dirname(__FILE__) . "/../private/connection.php");
 include_once (dirname(__FILE__) . "/../private/objects/User.php");
 include_once (dirname(__FILE__) . "/common/utility.php");
@@ -42,8 +43,17 @@ $googleConfig = new googleConfig();
 $googleClient = $googleConfig->getClient();
 $authUrl = $googleClient->createAuthUrl();
 
+$cloudflareConfig = new cloudflareConfig();
+
 // If there's POST data, then check if the user exists and if the password is correct.
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    if (!isset($_POST['cf-turnstile-response'])){
+        echo "<p class='text-center mt-5'><i class='fas fa-exclamation-triangle fa-3x'></i></p>";
+        echo "<p class='text-center mt-5'>Error: missing captcha</p>";
+        header("refresh:2;url=../login.php");
+        exit();
+    }
 
     // Check if all data in post is set.
     if (!isset($_POST["username"]) || !isset($_POST["password"])) {
@@ -59,6 +69,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Get username from POST and save it temporarily.
     $usernameOrMail = validate_input($_POST["username"]);
     $password = validate_input($_POST["password"]);
+
+    // Check if captcha is valid.
+    $captcha = validate_input($_POST['cf-turnstile-response']);
+    $ip = $_SERVER['REMOTE_ADDR'];
+    $data = $data = array('secret' => $cloudflareConfig->getSecretKey(), 'response' => $captcha, 'remoteip' => $ip);
+    $options = array(
+        'http' => array(
+            'method' => 'POST',
+            'content' => http_build_query($data))
+    );
+    $stream = stream_context_create($options);
+    $result = file_get_contents(
+        $cloudflareConfig->getUrlPath(), false, $stream);
+    $response =  $result;
+    $responseKeys = json_decode($response,true);
+    if(intval($responseKeys["success"]) !== 1) {
+        echo "<p class='text-center mt-5'><i class='fas fa-exclamation-triangle fa-3x'></i></p>";
+        echo "<p class='text-center mt-5'>Error: captcha not valid</p>";
+        header("refresh:2;url=../login.php");
+        exit();
+    }
 
     $isEmail = false;
 
@@ -262,6 +293,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-md-12 mt-3 pt-2 mb-0 cf-turnstile" data-sitekey="<?= $cloudflareConfig->getClientKey() ?>"></div>
                             <div class="col-md-12">
                                 <a href="forgot-password.php" class="link-danger">Forgot password?</a>
                             </div>
