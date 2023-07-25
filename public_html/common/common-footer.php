@@ -21,7 +21,7 @@
     <!-- Links to TOS and Privacy Policy -->
     <div class="row">
         <div class="col">
-            <p class="fs-6 text-center">For Terms of Service and Privacy Policy, please visit: <a href="faq/tos.php" class="text-decoration-none text-light">TOS</a> and <a href="faq/privacy.php" class="text-decoration-none text-light">Privacy Policy</a>.</p>
+            <p class="fs-6 text-center">For Terms of Service and Privacy Policy, please visit: <a href="faq/tos.php" target="_blank" class="text-decoration-none text-light">TOS</a> and <a href="faq/privacy-policy.php" target="_blank" class="text-decoration-none text-light">Privacy Policy</a>.</p>
         </div>
     </div>
     <!-- Copyright -->

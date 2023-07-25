@@ -4,11 +4,10 @@
     <?php
     include_once(dirname(__FILE__) . '/common/common-head.php');
     ?>
-    <script src="data/util/tinymce/js/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.3/purify.min.js"
             integrity="sha512-TBmnYz6kBCpcGbD55K7f4LZ+ykn3owqujFnUiTSHEto6hMA7aV4W7VDPvlqDjQImvZMKxoR0dNY5inyhxfZbmA=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <title>Share - Tales</title>
+    <title>Gallery - Tales</title>
     <style>
         #upload-button {
             background: rgb(0, 97, 255) !important;

@@ -448,7 +448,9 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
         content_css: 'dark',
         block_unsupported_drop: true,
         branding: false,
-        images_upload_handler: function () {}
+        images_upload_handler: function () {},
+        plugins: 'link',
+        default_link_target: '_blank'
     });
 
     $(function (){

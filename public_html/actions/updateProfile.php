@@ -342,7 +342,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 // Function to save the image to the server and returns the path.
 function save_image($image, $user_id, $title) {
-
     // Make sure that title doesn't break paths.
     $title = preg_replace("/([^\w\s\d\-_~,;[\]\(\).])/", "", $title);
 
@@ -352,8 +351,10 @@ function save_image($image, $user_id, $title) {
     $image_width = imagesx($image);
     // Get the image height.
     $image_height = imagesy($image);
-    // Create a new image with the same width and height.
+    // Create a new image with the same width and height, keeping transparent background if there's.
     $new_image = imagecreatetruecolor($image_width, $image_height);
+    // Set the flag to save full alpha channel information.
+    imagesavealpha($new_image, true);
     // Copy the image to the new image.
     imagecopy($new_image, $image, 0, 0, 0, 0, $image_width, $image_height);
     // The uniqueid

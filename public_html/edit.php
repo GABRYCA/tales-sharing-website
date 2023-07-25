@@ -401,7 +401,9 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
                 editor.setContent(content);
             });
         },
-        images_upload_handler: function () {}
+        images_upload_handler: function () {},
+        plugins: 'link',
+        default_link_target: '_blank'
     });
 
     $(function (){

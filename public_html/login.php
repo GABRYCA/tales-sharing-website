@@ -282,7 +282,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
                 <div class="row mt-4">
                     <div class="col">
-                        <p class="text-center text-muted">By logging in, you agree to our <a href="faq/tos.php" class="link-primary">Terms of Service</a> and <a href="faq/privacy-policy.php" class="link-primary">Privacy Policy</a>.</p>
+                        <p class="text-center text-muted">By logging in, you agree to our <a href="faq/tos.php" target="_blank" class="link-primary">Terms of Service</a> and <a href="faq/privacy-policy.php" target="_blank" class="link-primary">Privacy Policy</a>.</p>
                     </div>
                 </div>
             </div>

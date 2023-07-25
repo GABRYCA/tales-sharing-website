@@ -86,7 +86,7 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] === false) {
 
 <?php
 // Load all necessary includes.
-include_once (dirname(__FILE__) . "/../private/connection.php");
+include_once(dirname(__FILE__) . "/../private/connection.php");
 include_once(dirname(__FILE__) . '/common/utility.php');
 include_once(dirname(__FILE__) . '/../private/objects/User.php');
 include_once(dirname(__FILE__) . '/../private/objects/Content.php');
@@ -129,7 +129,9 @@ if (isset($_GET["search"])) {
         <div class="col-6 col-md-7 col pe-0 d-flex align-items-center">
             <form class="w-100" action="search.php" method="GET">
                 <div class="input-group">
-                    <input class="form-control form-control-sm border-0 rounded-3" type="search" placeholder="Search" aria-label="Search" name="search" <?php if ($originalSearchPrompt != "") echo "value='" . $originalSearchPrompt . "'"; ?>>
+                    <input class="form-control form-control-sm border-0 rounded-3" type="search" placeholder="Search"
+                           aria-label="Search"
+                           name="search" <?php if ($originalSearchPrompt != "") echo "value='" . $originalSearchPrompt . "'"; ?>>
                     <button class="btn btn-sm btn-outline-custom" type="submit"><i class="fas fa-search"></i></button>
                 </div>
             </form>
@@ -279,7 +281,7 @@ if (isset($_GET["search"])) {
                     echo "🤔";
                 } else {
                     echo $originalSearchPrompt;
-                }?>"</h1>
+                } ?>"</h1>
         </div>
 
         <?php
@@ -292,9 +294,7 @@ if (isset($_GET["search"])) {
             $tagArray = $tag->getTagList();
 
             // If there are no tags, print out a message.
-            if (count($tagArray) === 0) {
-                echo '<div class="col-12"><h1 class="display-6 text-center">There are no tags to show!</h1></div>';
-            } else {
+            if (!(count($tagArray) === 0)) {
 
                 $conn = connection();
 
@@ -377,15 +377,15 @@ include_once(dirname(__FILE__) . '/common/common-footer.php');
 include_once(dirname(__FILE__) . '/common/common-body.php');
 ?>
 <script>
-    $(function (){
+    $(function () {
         // Get the bell element
         var bell = document.getElementById("bell");
         // Add a click event listener to the bell
-        $('#bell').on("click", function() {
+        $('#bell').on("click", function () {
             // Get the dropdown menu element
             var dropdown = document.querySelector(".notifications-dropdown");
             // Set a timeout of 1 second after the dropdown is opened
-            setTimeout(function() {
+            setTimeout(function () {
                 // Check if the dropdown is still open
                 if (dropdown.classList.contains("show")) {
                     // Get the new-notification elements
@@ -399,11 +399,11 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                         type: "POST",
                         url: "actions/notifications.php",
                         data: {read: true},
-                        success: function() {
+                        success: function () {
                             // Remove the element notification-count
                             $('#notification-count').remove();
                         },
-                        error: function() {
+                        error: function () {
                             // Show an error message
                             console.log("Error while marking notifications as read");
                         }
@@ -413,15 +413,15 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
         });
     });
 
-    $(function(){
+    $(function () {
         // Handle the deletion of all notifications on click of button #delete-notifications.
-        $('#delete-notifications').on("click", function() {
+        $('#delete-notifications').on("click", function () {
             // Send a post request to the server to delete all notifications
             $.ajax({
                 type: "POST",
                 url: "actions/notifications.php",
                 data: {delete: true},
-                success: function() {
+                success: function () {
                     // Remove all the elements with class .notification
                     $('.notification').remove();
                     // Remove the element notification-count
@@ -433,7 +433,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     // And replace it with text: You have no notifications.
                     $('.notifications-dropdown').append('<p class="text-white">You have no notifications.</p>');
                 },
-                error: function() {
+                error: function () {
                     // Show an error message
                     console.log("Error while deleting notifications");
                 }
@@ -441,7 +441,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
         });
     });
 
-    $(function(){
+    $(function () {
         // Get all the elements with class lazy-background
         const lazyBackgrounds = $('.lazy-background');
 
@@ -465,7 +465,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
         });
 
         // Loop through each element and observe it
-        lazyBackgrounds.each(function() {
+        lazyBackgrounds.each(function () {
             observer.observe(this);
         });
 
