@@ -289,14 +289,41 @@ if (isset($_GET["search"])) {
         // If searchTags is more than 0, then search for tags.
         if (count($searchTags) > 0) {
 
+            $conn = connection();
+            $isUserFound = false;
+
+            // Search if there's an activated User matching the search or similar.
+            $query = "SELECT username, urlProfilePicture FROM User WHERE isActivated = 1 AND (";
+            $params = [];
+            foreach ($searchTags as $tag) {
+                $query .= "username LIKE ? OR ";
+                $params[] = "%$tag%";
+            }
+            $query = rtrim($query, "OR ") . ")";
+            $result = $conn->execute_query($query, $params);
+
+            // User Results
+            if ($result && $result->num_rows > 0) {
+                // For each row, print the user.
+                echo '<hr class="mb-0">';
+                echo '<div class="row row-horizon justify-content-center border-bottom text-center pt-3 pb-3 flex-nowrap">';
+                while ($row = $result->fetch_assoc()) {
+                    echo '<div class="col-3 col-md-2 col-xl-1">';
+                    echo '<a href="profile.php?username=' . $row["username"] . '" data-bs-toggle="tooltip" title="' . $row["username"] . '">';
+                    echo '<img src="' . $row["urlProfilePicture"] . '" alt="icon-user" class="img-fluid bg-placeholder bg-opacity-10 rounded-4 user-icon-top" width="64" height="64">';
+                    echo '</a>';
+                    echo '</div>';
+                }
+                echo '</div>';
+                $isUserFound = true;
+            }
+
             // Get all the tags from the database.
             $tag = new Tag();
             $tagArray = $tag->getTagList();
 
-            // If there are no tags, print out a message.
+            // Tags search for content
             if (!(count($tagArray) === 0)) {
-
-                $conn = connection();
 
                 // Prepare the SQL query with placeholders for the array parameter
                 $query = "SELECT c.contentId, COUNT(ta.tagId) AS matches
@@ -328,10 +355,9 @@ if (isset($_GET["search"])) {
                 $result->free();
 
                 // If there are no rows, print out a message.
-                if (count($rows) === 0) {
+                if (count($rows) === 0 && !$isUserFound) {
                     echo '<div class="col-12"><h1 class="display-6 text-center">Woops, nothing found! 🤔</h1></div>';
                 } else {
-
                     // For each row, get the content and print it out.
                     foreach ($rows as $row) {
                         $content = new Content();
