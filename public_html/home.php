@@ -130,7 +130,7 @@ $user->loadUser();
                     </span>
                     <!-- Dropdown menu -->
                     <div class="dropdown-menu dropdown-menu-end p-3 bg-dark-subtle notifications-dropdown"
-                         style="width: 300px;" data-aos="zoom-in">
+                         style="width: 300px; max-height: 80vh; overflow-y: auto;" data-aos="zoom-in">
                         <h5 class="text-white">Notifications</h5>
                         <hr class="text-white">
                         <?php
