@@ -277,7 +277,7 @@ if (!empty($_GET['username'])){
         <!-- Profile icon and name -->
         <div class="col">
             <!-- Cover image as background -->
-            <div class="bg-image rounded-bottom-5" style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0)), url('<?php echo $user->getUrlCoverPicture(); ?>'), linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0)); height: 300px; background-repeat: no-repeat; background-position: center; background-size: cover; <?php if ($user->getUsername() == $userProfile->getUsername()){ ?> cursor: pointer <?php } ?>" <?php if ($user->getUsername() == $userProfile->getUsername()){ ?> data-bs-toggle="modal" data-bs-target="#profileCoverModal" title="click to edit" <?php } ?>>
+            <div class="bg-image rounded-bottom-5" style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0)), url('<?php echo $userProfile->getUrlCoverPicture(); ?>'), linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0)); height: 300px; background-repeat: no-repeat; background-position: center; background-size: cover; <?php if ($user->getUsername() == $userProfile->getUsername()){ ?> cursor: pointer <?php } ?>" <?php if ($user->getUsername() == $userProfile->getUsername()){ ?> data-bs-toggle="modal" data-bs-target="#profileCoverModal" title="click to edit" <?php } ?>>
                 <!-- Profile icon in the center and name under id -->
                 <div class="row justify-content-center align-items-end" style="height: 100%;">
                     <div class="col-auto">
