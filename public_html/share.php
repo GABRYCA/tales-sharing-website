@@ -305,7 +305,7 @@ $owner->loadUser();
                         <div class="col-9 text-center text-lg-start">
                             <h2><?= $content->getTitle() ?></h2>
                             <h6>by
-                                <a href="profile.php?username=<?= $content->getOwnerId(); ?>"><?= $content->getOwnerId(); ?></a>
+                                <a href="profile.php?username=<?= $content->getOwnerId(); ?>"><?= $content->getOwnerId(); ?></a> - <span class="text-white opacity-75 d-inline"><?= $content->getFormattedDate() ?></span>
                             </h6>
                         </div>
                     </div>

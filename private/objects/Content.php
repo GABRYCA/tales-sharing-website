@@ -706,6 +706,16 @@ class Content implements JsonSerializable
     }
 
     /**
+     * Get formatted date with only day, month and year.
+     * @return string
+     */
+    public function getFormattedDate() : string
+    {
+        $date = new DateTime($this->uploadDate);
+        return $date->format('d-m-Y');
+    }
+
+    /**
      * @param mixed $uploadDate
      */
     public function setUploadDate($uploadDate): void
