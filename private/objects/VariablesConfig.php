@@ -5,14 +5,20 @@
 class VariablesConfig implements JsonSerializable
 {
     public static $domain = "https://tales.anonymousgca.eu/";
+    public static $emailNoreply = "noreply@anonymousgca.eu";
     public static $profileImage = "profile.webp";
-
-    // Function to get the domain
     public static $profileCover = "cover.webp";
 
+    // Function to get the domain
     static public function getDomain(): string
     {
         return self::$domain;
+    }
+
+    // Function to get the noreply email
+    static public function getEmailNoreply(): string
+    {
+        return self::$emailNoreply;
     }
 
     // Function to get the profile image

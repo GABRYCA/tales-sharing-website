@@ -6,6 +6,7 @@ include_once (dirname(__FILE__) . "/../objects/Followers.php");
 include_once (dirname(__FILE__) . "/../objects/Friends.php");
 include_once (dirname(__FILE__) . "/../objects/Likes.php");
 include_once (dirname(__FILE__) . "/../objects/Notification.php");
+include_once (dirname(__FILE__) . "/../objects/VariablesConfig.php");
 
 class User implements JsonSerializable
 {
@@ -198,11 +199,11 @@ class User implements JsonSerializable
         if ($this->addUserToDatabase()) {
 
             $to = $this->getEmail();
-            $subject = "Account Activation";
-            $message = "Hi " . $this->getUsername() . ",
-            Thank you for registering! Please Click on the link below to activate your account.
-            https://tales.anonymousgca.eu/activation.php?code=" . $this->getActivationCode();
-            $headers = "From: noreply@tales.anonymousgca.eu";
+            $subject = "Account Activation - Tales";
+            $headers = "From: " . VariablesConfig::$emailNoreply;
+            $message = "Hi " . $this->getUsername() . ",\\n";
+            $message .= "Thank you for registering! Please click on the link below to activate your account.\\n";
+            $message .= "https://tales.anonymousgca.eu/activation.php?code=" . $this->getActivationCode();
 
             if (@mail($to, $subject, $message, $headers)) {
                 $this->setErrorStatus("Email sent successfully!");
@@ -470,7 +471,7 @@ class User implements JsonSerializable
 
         // Send email.
         $to = $email;
-        $subject = "Password reset";
+        $subject = "Password reset - Tales";
         $message = "Hi " . $this->getUsername() . "!";
         $message .= "<br>Your temporary password is: " . $tempPassword;
         $message .= "<br>Please change your password as soon as possible.";
@@ -480,7 +481,7 @@ class User implements JsonSerializable
         $message .= "<br>We care about your security!";
         $headers = "MIME-Version: 1.0\r\n";
         $headers .= "Content-type:text/html;charset=UTF-8\r\n";
-        $headers .= "From: noreply@tales.anonymousgca.eu\r\n";
+        $headers .= "From: " . VariablesConfig::$emailNoreply . "\r\n";
         if (@mail($to, $subject, $message, $headers)){
             $this->setErrorStatus("<br>Email sent successfully");
         } else {
