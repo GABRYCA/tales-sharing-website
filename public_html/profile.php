@@ -1164,7 +1164,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
     });
 
     // Change title of the document to the name of the user
-    document.title = "User Profile - <?= $userProfile->getUsername() ?>";
+    document.title = "User - <?= $userProfile->getUsername() ?>";
 
     function hideSpinner(image) {
         image.classList.remove("bg-placeholder");
