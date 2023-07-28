@@ -387,12 +387,14 @@ if (!empty($_GET['username'])){
         <!-- Toggle to show content or galleries -->
         <div class="row justify-content-center">
             <div class="col-auto bg-light bg-opacity-10 pt-2 pb-2 rounded-3">
-                <div class="form-check form-switch">
-                    <input id="toggle-btn" class="form-check-input" type="checkbox" checked>
-                    <label id="toggle-label" class="form-check-label" for="toggle-btn">Show Content</label>
+                <div class="d-flex align-items-center">
+                    <span class="me-2">Show:</span>
+                    <div id="all-btn" class="btn btn-outline-light active rounded-end-0 opacity-75">All</div>
+                    <div id="gallery-btn" class="btn btn-outline-light rounded-start-0 opacity-75">Galleries</div>
                 </div>
             </div>
         </div>
+
 
         <hr>
 
@@ -1142,26 +1144,28 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
 
     // Show all content or galleries handler.
     $(function(){
-        // Get the toggle button, the toggle label and the container elements
-        var toggleBtn = $("#toggle-btn");
-        var toggleLabel = $("#toggle-label");
+        // Get the toggle buttons and the container elements
+        var allBtn = $("#all-btn");
+        var galleryBtn = $("#gallery-btn");
         var container = $("#container");
-        // Add a change event listener to the toggle button
-        toggleBtn.on('change', function () {
-            // Hide or show content and galleries based on the current mode
-            if (showAll) {
-                $('#content').addClass('d-none');
-                $('#galleries').removeClass('d-none');
-                toggleLabel.text("Show Gallery");
-                showAll = false;
-            } else {
-                $('#content').removeClass('d-none');
-                $('#galleries').addClass('d-none');
-                toggleLabel.text("Show Content");
-                showAll = true;
-            }
+        // Add a click event listener to the all button
+        allBtn.on('click', function () {
+            // Show all content and galleries and add active class to the button
+            $('#content').removeClass('d-none');
+            $('#galleries').removeClass('d-none');
+            allBtn.addClass('active');
+            galleryBtn.removeClass('active');
+        });
+        // Add a click event listener to the gallery button
+        galleryBtn.on('click', function () {
+            // Hide content and show galleries and add active class to the button
+            $('#content').addClass('d-none');
+            $('#galleries').removeClass('d-none');
+            allBtn.removeClass('active');
+            galleryBtn.addClass('active');
         });
     });
+
 
     // Change title of the document to the name of the user
     document.title = "User - <?= $userProfile->getUsername() ?>";
