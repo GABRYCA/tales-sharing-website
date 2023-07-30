@@ -419,9 +419,95 @@ $owner->loadUser();
                 </div>
             </div>
 
+            <hr>
+
+            <!-- Comments area (Add comment, show comments) -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <h4>Comments</h4>
+                </div>
+
+                <!-- Add comment -->
+                <div class="col-12 mt-4">
+                    <div class="row">
+                        <div class="col-12">
+                            <form id="commentForm">
+                                <div class="form-floating">
+                                    <textarea class="form-control" placeholder="Leave a comment here" id="comment" style="height: 100px"></textarea>
+                                    <label for="comment">Write your comment here</label>
+                                </div>
+                                <div class="row justify-content-end mt-2">
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-outline-custom w-100">Submit comment</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Show comments -->
+                    <div class="row mt-4" id="comments">
+                        <?php
+                        $comments = $content->getCommentsOfContent();
+                        foreach ($comments as $comment) {
+                            $commenter = new User();
+                            $commenter->setUsername($comment->getUserId());
+                            $commenter->loadUser();
+                            ?>
+                            <!-- Comment, with also a button to delete it if the session user is the owner of the comment (the button appears as an X only on over and is subtle) -->
+                            <div class="col-12">
+                                <div class="row">
+                                    <div class="col-auto">
+                                        <div class="row justify-content-center">
+                                            <div class="col-auto">
+                                                <img src="<?= $commenter->getUrlProfilePicture() ?>" class="rounded-circle" style="width: 50px; height: 50px;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <h6 class="d-inline"><?= $commenter->getUsername() ?></h6>
+                                                        <p class="d-inline opacity-50"><?= $comment->getCommentDate() ?></p>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <p><?= $comment->getCommentText() ?></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php
+                                    if ($comment->getUserId() == $user->getUsername()) {
+                                        ?>
+                                        <!-- Button to delete comment, it also contains the comment ID -->
+                                        <div class="col-auto">
+                                            <div class="row justify-content-center">
+                                                <div class="col-auto">
+                                                    <button class="btn btn-outline-danger" id="deleteCommentButton" data-comment-id="<?= $comment->getCommentId() ?>">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <?php
+                                    }
+                                    ?>
+                                </div>
+                            <?php
+                        }
+                        ?>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
 </div>
 
 <?php
@@ -430,6 +516,56 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
 ?>
 <script src="data/util/tinymce/js/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
+
+    $(function (){
+        // Handle comment submit
+        $('#commentForm').on("submit", function (e) {
+            e.preventDefault();
+            // Get the comment text
+            var commentText = $('#comment').val();
+            // Get the content id
+            var contentId = <?= $content->getContentId() ?>;
+            // Send a post request to the server to add the comment
+            $.ajax({
+                type: "POST",
+                url: "actions/comments.php",
+                data: {
+                    commentText: commentText,
+                    contentId: contentId,
+                    action: "addComment"
+                },
+                success: function (response) {
+                    // If the comment was added successfully
+                    console.log("Comment added successfully");
+                    // Reload whole page (In the future I should reload only comments).
+                    location.reload();
+                }
+            });
+        });
+
+        // Handle comment delete
+        $('#comments').on("click", "#deleteCommentButton", function () {
+            // Get the comment id
+            var commentId = $(this).data("comment-id");
+            // Send a post request to the server to delete the comment
+            $.ajax({
+                type: "POST",
+                url: "actions/comments.php",
+                data: {
+                    contentId: <?= $content->getContentId() ?>,
+                    commentId: commentId,
+                    action: "deleteComment"
+                },
+                success: function (response) {
+                    // If the comment was deleted successfully
+                    console.log("Comment deleted successfully");
+                    // Reload whole page (In the future I should reload only comments).
+                    location.reload();
+                }
+            });
+        });
+    });
+
     $(function () {
         // Get the bell element
         //var bell = document.getElementById("bell");

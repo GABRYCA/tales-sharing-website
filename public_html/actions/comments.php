@@ -1,0 +1,169 @@
+<?php
+// Check if logged in
+session_start();
+include_once (dirname(__FILE__) . "/../../private/objects/User.php");
+include_once (dirname(__FILE__) . "/../common/utility.php");
+
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
+    header("Location: ../login.php");
+    exit();
+}
+
+// If POST, handle the post with data, if GET, handle the get with data
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    // Get action from the client
+    if (empty($_POST["action"])) {
+        exit("Action is empty");
+    }
+
+    $action = validate_input($_POST["action"]);
+
+    switch ($action) {
+        case "addComment":
+
+            // Gets contentId and commentText from the client, check if they're empty
+            if (empty($_POST["contentId"])) {
+                exit("ContentId is empty");
+            }
+
+            if (empty($_POST["commentText"])) {
+                exit("CommentText is empty");
+            }
+
+            $contentId = validate_input($_POST["contentId"]);
+            $commentText = validate_input($_POST["commentText"]);
+
+            // Load session user.
+            $user = new User();
+            $user->setUsername($_SESSION["username"]);
+            $user->loadUser();
+
+            // Check if content is private, if it's, only the owner can post comments.
+            $content = new Content();
+            $content->setContentId($contentId);
+            $content->loadContent();
+
+            if ($content->getIsPrivate()) {
+                if ($content->getOwnerId() != $user->getUsername()) {
+                    exit("Content is private");
+                }
+            }
+
+            // Use Content functions to add comment
+            if (!$content->addCommentToContent($user->getUsername(), $commentText)) {
+                exit("Error while adding comment: " . $content->getErrorStatus());
+            }
+
+            // Return success
+            exit("success");
+
+            break;
+        case "deleteComment":
+
+            // Gets contentId and commentId from the client, check if they're empty
+
+            if (empty($_POST["contentId"])) {
+                exit("ContentId is empty");
+            }
+
+            if (empty($_POST["commentId"])) {
+                exit("CommentId is empty");
+            }
+
+            $contentId = validate_input($_POST["contentId"]);
+            $commentId = validate_input($_POST["commentId"]);
+
+            // Load session user.
+            $user = new User();
+            $user->setUsername($_SESSION["username"]);
+            $user->loadUser();
+
+            // Check if content is private, if it's, only the owner can delete comments.
+            $content = new Content();
+            $content->setContentId($contentId);
+            $content->loadContent();
+
+            if ($content->getIsPrivate()) {
+                if ($content->getOwnerId() != $user->getUsername()) {
+                    exit("Content is private");
+                }
+            }
+
+            // Check if the user is owner of the comment.
+            $comment = new Comment();
+            $comment->setCommentId($commentId);
+            $comment->loadComment();
+
+            if ($comment->getUserId() != $user->getUsername()) {
+                exit("You can't delete this comment");
+            }
+
+            // Use Content functions to delete comment
+            if (!$content->deleteCommentFromContent($commentId)) {
+                exit("Error while deleting comment: " . $content->getErrorStatus());
+            }
+
+            // Return success
+            exit("success");
+        default:
+            exit("Invalid action");
+    }
+
+
+} else if ($_SERVER["REQUEST_METHOD"] == "GET") {
+
+    // Check contentId is not empty
+    if (empty($_GET["contentId"])) {
+        exit("ContentId is empty");
+    }
+
+    // Load session user.
+    $user = new User();
+    $user->setUsername($_SESSION["username"]);
+    $user->loadUser();
+
+    // I receive the contentId from the client
+    $contentId = validate_input($_GET["contentId"]);
+
+    // Create a new User object.
+    $content = new Content();
+    // Set the contentId
+    $content->setContentId($contentId);
+    // Get the content from the database
+    $content->loadContent();
+
+    // Check if content is private
+    if ($content->getIsPrivate()) {
+        // Check if user is owner
+        if ($content->getOwnerId() != $user->getUsername()) {
+            exit("Content is private");
+        }
+    }
+
+    // Get the comments, with also User data of each comment (like Url, Username, etc)
+    $comments = $content->getCommentsOfContent();
+
+    // Custom array to store comment text, date, and load user data (profile url icon and name)
+    $commentsArray = array();
+    foreach ($comments as $comment) {
+        $commentArray = array();
+        $commentArray["commentText"] = $comment->getCommentText();
+        $commentArray["commentDate"] = $comment->getCommentDate();
+        $commentArray["commentUser"] = $comment->getUserId();
+        // Load User.
+        $userComment = new User();
+        $userComment->setUsername($comment->getUserId());
+        $userComment->loadUser();
+        // Add data to array
+        $commentArray["commentUserIcon"] = $userComment->getUrlProfilePicture();
+        $commentArray["commentUserName"] = $userComment->getUsername();
+        $commentsArray[] = $commentArray;
+    }
+
+    // Return the comments array as json
+    exit(json_encode($commentsArray));
+} else {
+    exit("Invalid request method.");
+}
+
