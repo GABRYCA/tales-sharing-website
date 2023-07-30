@@ -140,7 +140,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit("Content is private");
         }
     }
+    $commentsArray = getCommentsArray($content);
 
+    // Return the comments array as json
+    exit(json_encode($commentsArray));
+} else {
+    exit("Invalid request method.");
+}
+
+/**
+ * @param Content $content
+ * @return array
+ */
+function getCommentsArray(Content $content): array
+{
     // Get the comments, with also User data of each comment (like Url, Username, etc)
     $comments = $content->getCommentsOfContent();
 
@@ -150,20 +163,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $commentArray = array();
         $commentArray["commentText"] = $comment->getCommentText();
         $commentArray["commentDate"] = $comment->getCommentDate();
-        $commentArray["commentUser"] = $comment->getUserId();
+        $commentArray["commentUsername"] = $comment->getUserId();
+        $commentArray["commentId"] = $comment->getCommentId();
+        // If the current session user is the owner of the comment, add a flag to the array
+        if ($comment->getUserId() == $_SESSION["username"]) {
+            $commentArray["isOwner"] = true;
+        } else {
+            $commentArray["isOwner"] = false;
+        }
         // Load User.
         $userComment = new User();
         $userComment->setUsername($comment->getUserId());
         $userComment->loadUser();
         // Add data to array
-        $commentArray["commentUserIcon"] = $userComment->getUrlProfilePicture();
-        $commentArray["commentUserName"] = $userComment->getUsername();
+        $commentArray["commentUserIconUrl"] = $userComment->getUrlProfilePicture();
         $commentsArray[] = $commentArray;
     }
-
-    // Return the comments array as json
-    exit(json_encode($commentsArray));
-} else {
-    exit("Invalid request method.");
+    return $commentsArray;
 }
-

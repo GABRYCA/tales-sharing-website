@@ -162,7 +162,8 @@ $owner->loadUser();
         <div class="col-6 col-md-7 col pe-0 d-flex align-items-center">
             <form class="w-100" action="search.php" method="GET">
                 <div class="input-group">
-                    <input class="form-control form-control-sm border-0 rounded-3" type="search" placeholder="Search" aria-label="Search" name="search">
+                    <input class="form-control form-control-sm border-0 rounded-3" type="search" placeholder="Search"
+                           aria-label="Search" name="search">
                     <button class="btn btn-sm btn-outline-custom" type="submit"><i class="fas fa-search"></i></button>
                 </div>
             </form>
@@ -284,7 +285,8 @@ $owner->loadUser();
                     <!-- Image -->
                     <div class="col-12 rounded-3 text-center px-0">
                         <a href="<?= $content->getUrlImage() ?>" target="_blank">
-                            <img src="<?= $content->getUrlImage() ?>" class="img-fluid rounded-3" id="image" alt="Image">
+                            <img src="<?= $content->getUrlImage() ?>" class="img-fluid rounded-3" id="image"
+                                 alt="Image">
                         </a>
                     </div>
                 </div>
@@ -305,7 +307,9 @@ $owner->loadUser();
                         <div class="col-9 text-center text-lg-start">
                             <h2><?= $content->getTitle() ?></h2>
                             <h6>by
-                                <a href="profile.php?username=<?= $content->getOwnerId(); ?>"><?= $content->getOwnerId(); ?></a> - <span class="text-white opacity-75 d-inline"><?= $content->getFormattedDate() ?></span>
+                                <a href="profile.php?username=<?= $content->getOwnerId(); ?>"><?= $content->getOwnerId(); ?></a>
+                                -
+                                <span class="text-white opacity-75 d-inline"><?= $content->getFormattedDate() ?></span>
                             </h6>
                         </div>
                     </div>
@@ -328,7 +332,8 @@ $owner->loadUser();
 
             <hr>
 
-            <div class="row justify-content-between px-lg-5 pt-2 pb-2 bg-light bg-opacity-10 rounded-3 d-flex align-items-center" id="content-stats">
+            <div class="row justify-content-between px-lg-5 pt-2 pb-2 bg-light bg-opacity-10 rounded-3 d-flex align-items-center"
+                 id="content-stats">
                 <?php
                 if ($user->getUsername() == $content->getOwnerId()) {
                     echo '<div class="col-auto">';
@@ -339,26 +344,26 @@ $owner->loadUser();
                     echo '</div>';
                     echo '</div>';
                 } else {
-                ?>
-                <!-- Follow/Unfollow -->
-                <div class="col-auto ps-0 ps-lg-5">
-                    <div class="row justify-content-center d-flex align-items-center">
-                        <div class="col-auto">
-                            <div class="row justify-content-center">
-                                <div class="col-auto pe-0 pe-lg-2">
-                                    <?php
-                                    if ($user->isFollowing($content->getOwnerId())) {
-                                        echo '<button class="btn btn-outline-light fs-6" id="followButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Unfollow"><i class="fas fa-user-minus"></i> Unfollow</button>';
-                                    } else {
-                                        echo '<button class="btn btn-outline-light fs-6" id="followButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Follow"><i class="fas fa-user-plus"></i> Follow</button>';
-                                    }
-                                    ?>
+                    ?>
+                    <!-- Follow/Unfollow -->
+                    <div class="col-auto ps-0 ps-lg-5">
+                        <div class="row justify-content-center d-flex align-items-center">
+                            <div class="col-auto">
+                                <div class="row justify-content-center">
+                                    <div class="col-auto pe-0 pe-lg-2">
+                                        <?php
+                                        if ($user->isFollowing($content->getOwnerId())) {
+                                            echo '<button class="btn btn-outline-light fs-6" id="followButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Unfollow"><i class="fas fa-user-minus"></i> Unfollow</button>';
+                                        } else {
+                                            echo '<button class="btn btn-outline-light fs-6" id="followButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Follow"><i class="fas fa-user-plus"></i> Follow</button>';
+                                        }
+                                        ?>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <?php }?>
+                <?php } ?>
                 <!-- Likes -->
                 <div class="col-auto">
                     <div class="row justify-content-center">
@@ -433,12 +438,14 @@ $owner->loadUser();
                         <div class="col-12">
                             <form id="commentForm">
                                 <div class="form-floating">
-                                    <textarea class="form-control" placeholder="Leave a comment here" id="comment" style="height: 100px"></textarea>
+                                    <textarea class="form-control" placeholder="Leave a comment here" id="comment"
+                                              style="height: 100px"></textarea>
                                     <label for="comment">Write your comment here</label>
                                 </div>
                                 <div class="row justify-content-end mt-2">
                                     <div class="col-12">
-                                        <button type="submit" class="btn btn-outline-custom w-100">Submit comment</button>
+                                        <button type="submit" class="btn btn-outline-custom w-100">Submit comment
+                                        </button>
                                     </div>
                                 </div>
                             </form>
@@ -451,58 +458,66 @@ $owner->loadUser();
                     <div class="row mt-4" id="comments">
                         <?php
                         $comments = $content->getCommentsOfContent();
-                        foreach ($comments as $comment) {
-                            $commenter = new User();
-                            $commenter->setUsername($comment->getUserId());
-                            $commenter->loadUser();
-                            ?>
-                            <!-- Comment, with also a button to delete it if the session user is the owner of the comment (the button appears as an X only on over and is subtle) -->
-                            <div class="col-12">
-                                <div class="row">
-                                    <div class="col-auto">
-                                        <div class="row justify-content-center">
-                                            <div class="col-auto">
-                                                <img src="<?= $commenter->getUrlProfilePicture() ?>" class="rounded-circle" style="width: 50px; height: 50px;">
+                        foreach ($comments
+
+                        as $comment) {
+                        $commenter = new User();
+                        $commenter->setUsername($comment->getUserId());
+                        $commenter->loadUser();
+                        ?>
+                        <!-- Comment -->
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="col-auto">
+                                    <div class="row justify-content-center">
+                                        <div class="col-auto">
+                                            <a href="profile.php?username=<?= $commenter->getUsername() ?>"
+                                               class="text-decoration-none">
+                                                <img src="<?= $commenter->getUrlProfilePicture() ?>"
+                                                     class="rounded-circle" style="width: 50px; height: 50px;">
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <h6 class="d-inline"><?= $commenter->getUsername() ?></h6>
+                                                    <p class="d-inline opacity-50"><?= $comment->getCommentDate() ?></p>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <p><?= $comment->getCommentText() ?></p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col">
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <div class="row">
-                                                    <div class="col-12">
-                                                        <h6 class="d-inline"><?= $commenter->getUsername() ?></h6>
-                                                        <p class="d-inline opacity-50"><?= $comment->getCommentDate() ?></p>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-12">
-                                                        <p><?= $comment->getCommentText() ?></p>
-                                                    </div>
-                                                </div>
+                                </div>
+                                <?php
+                                if ($comment->getUserId() == $user->getUsername()) {
+                                    ?>
+                                    <!-- Button to delete comment, it also contains the comment ID -->
+                                    <div class="col-auto">
+                                        <div class="row justify-content-center">
+                                            <div class="col-auto">
+                                                <button class="btn btn-outline-danger" id="deleteCommentButton"
+                                                        data-comment-id="<?= $comment->getCommentId() ?>">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
                                     <?php
-                                    if ($comment->getUserId() == $user->getUsername()) {
-                                        ?>
-                                        <!-- Button to delete comment, it also contains the comment ID -->
-                                        <div class="col-auto">
-                                            <div class="row justify-content-center">
-                                                <div class="col-auto">
-                                                    <button class="btn btn-outline-danger" id="deleteCommentButton" data-comment-id="<?= $comment->getCommentId() ?>">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <?php
-                                    }
-                                    ?>
-                                </div>
+                                }
+                                ?>
+                            </div>
                             <?php
-                        }
-                        ?>
+                            }
+                            ?>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -517,7 +532,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
 <script src="data/util/tinymce/js/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
 
-    $(function (){
+    $(function () {
         // Handle comment submit
         $('#commentForm').on("submit", function (e) {
             e.preventDefault();
@@ -537,8 +552,10 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                 success: function (response) {
                     // If the comment was added successfully
                     console.log("Comment added successfully");
+                    // Delete input text
+                    $('#comment').val("");
                     // Reload whole page (In the future I should reload only comments).
-                    location.reload();
+                    reloadComments();
                 }
             });
         });
@@ -560,11 +577,115 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     // If the comment was deleted successfully
                     console.log("Comment deleted successfully");
                     // Reload whole page (In the future I should reload only comments).
-                    location.reload();
+                    reloadComments();
                 }
             });
         });
     });
+
+    // Method to reload comments of page.
+    function reloadComments() {
+        // Send a post request to the server to get the comments
+        $.ajax({
+            type: "GET",
+            url: "actions/comments.php",
+            data: {
+                contentId: <?= $content->getContentId() ?>,
+            },
+            success: function (response) {
+                // If the comments were retrieved successfully
+                console.log("Comments retrieved successfully");
+                // Get the comments array
+                var commentsArray = JSON.parse(response);
+                // Get the comments div
+                var commentsDiv = $('#comments');
+                // Empty the comments div
+                commentsDiv.empty();
+                // For each comment in the array
+                for (var i = 0; i < commentsArray.length; i++) {
+                    // Get the comment
+                    var comment = commentsArray[i];
+                    // InnerHTML each comment, also check isOwner, if true, add button to delete comment.
+                    if (comment.isOwner){
+                        commentsDiv.append(
+                            '<div class="col-12">' +
+                            '<div class="row">' +
+                            '<div class="col-auto">' +
+                            '<div class="row justify-content-center">' +
+                            '<div class="col-auto">' +
+                            '<a href="profile.php?username=' + comment.commentUsername + '" class="text-decoration-none">' +
+                            '<img src="' + comment.commentUserIconUrl + '" class="rounded-circle" style="width: 50px; height: 50px;">' +
+                            '</a>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '<div class="col">' +
+                            '<div class="row">' +
+                            '<div class="col-12">' +
+                            '<div class="row">' +
+                            '<div class="col-12">' +
+                            '<h6 class="d-inline">' + comment.commentUsername + '</h6>' +
+                            '<p class="d-inline opacity-50">' + comment.commentDate + '</p>' +
+                            '</div>' +
+                            '</div>' +
+                            '<div class="row">' +
+                            '<div class="col-12">' +
+                            '<p>' + comment.commentText + '</p>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '<div class="col-auto">' +
+                            '<div class="row justify-content-center">' +
+                            '<div class="col-auto">' +
+                            '<button class="btn btn-outline-danger" id="deleteCommentButton" data-comment-id="' + comment.commentId + '">' +
+                            '<i class="fas fa-times"></i>' +
+                            '</button>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>'
+                        );
+                    } else {
+                        commentsDiv.append(
+                            '<div class="col-12">' +
+                            '<div class="row">' +
+                            '<div class="col-auto">' +
+                            '<div class="row justify-content-center">' +
+                            '<div class="col-auto">' +
+                            '<a href="profile.php?username=' + comment.commentUsername + '" class="text-decoration-none">' +
+                            '<img src="' + comment.commentUserIconUrl + '" class="rounded-circle" style="width: 50px; height: 50px;">' +
+                            '</a>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '<div class="col">' +
+                            '<div class="row">' +
+                            '<div class="col-12">' +
+                            '<div class="row">' +
+                            '<div class="col-12">' +
+                            '<h6 class="d-inline">' + comment.commentUsername + '</h6>' +
+                            '<p class="d-inline opacity-50">' + comment.commentDate + '</p>' +
+                            '</div>' +
+                            '</div>' +
+                            '<div class="row">' +
+                            '<div class="col-12">' +
+                            '<p>' + comment.commentText + '</p>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>'
+                        );
+                    }
+                }
+            }
+        });
+    }
 
     $(function () {
         // Get the bell element
@@ -602,7 +723,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
         });
     })
 
-    $(function (){
+    $(function () {
         // Like dislike button on click of #likeButton
         $('#likeButton').on("click", function () {
 
@@ -625,7 +746,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
 
                         // Animation
                         $('#likeButton').addClass("animate__animated animate__heartBeat");
-                        setTimeout(function(){
+                        setTimeout(function () {
                             $('#likeButton').removeClass("animate__animated animate__heartBeat");
                         }, 1000);
                     } else {
@@ -635,7 +756,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
 
                         // Animation
                         $('#likeButton').addClass("animate__animated animate__heartBeat");
-                        setTimeout(function(){
+                        setTimeout(function () {
                             $('#likeButton').removeClass("animate__animated animate__heartBeat");
                         }, 1000);
                     }
@@ -648,7 +769,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
         });
     });
 
-    $(function(){
+    $(function () {
         // Handle follow and unfollow
         // If it has child <i> with class fa-user-minus, it means it is already following, so handle unfollow onClick, else
         // if it has fa-user-plus, it means it is not following, so handle follow onClick
@@ -690,15 +811,15 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
         });
     });
 
-    $(function(){
+    $(function () {
         // Handle the deletion of all notifications on click of button #delete-notifications.
-        $('#delete-notifications').on("click", function() {
+        $('#delete-notifications').on("click", function () {
             // Send a post request to the server to delete all notifications
             $.ajax({
                 type: "POST",
                 url: "actions/notifications.php",
                 data: {delete: true},
-                success: function() {
+                success: function () {
                     // Remove all the elements with class .notification
                     $('.notification').remove();
                     // Remove the element notification-count
@@ -710,7 +831,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     // And replace it with text: You have no notifications.
                     $('.notifications-dropdown').append('<p class="text-white">You have no notifications.</p>');
                 },
-                error: function() {
+                error: function () {
                     // Show an error message
                     console.log("Error while deleting notifications");
                 }
