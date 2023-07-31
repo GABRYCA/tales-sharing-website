@@ -565,8 +565,55 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     console.log("Comment added successfully");
                     // Delete input text
                     $('#comment').val("");
-                    // Reload whole page (In the future I should reload only comments).
-                    reloadComments();
+                    // Add to the comments section, with an animation effect, as innerHTML the new comment
+                    // Read JSON from response
+                    var comment = JSON.parse(response);
+                    // Create the comment html, with also the delete comment button.
+                    var commentHtml = '<div class="col-12">' +
+                        '<div class="row">' +
+                        '<div class="col-auto">' +
+                        '<div class="row justify-content-center">' +
+                        '<div class="col-auto">' +
+                        '<a href="profile.php?username=' + comment.commentUsername + '" class="text-decoration-none">' +
+                        '<img src="' + comment.commentUserIconUrl + '" class="rounded-circle" style="width: 50px; height: 50px;">' +
+                        '</a>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div class="col">' +
+                        '<div class="row">' +
+                        '<div class="col-12">' +
+                        '<div class="row">' +
+                        '<div class="col-12">' +
+                        '<h6 class="d-inline">' + comment.commentUsername + '</h6>' +
+                        '<p class="d-inline opacity-50"> ' + comment.commentDate + '</p>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div class="row">' +
+                        '<div class="col-12">' +
+                        '<p>' + comment.commentText + '</p>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div class="col-auto">' +
+                        '<div class="row justify-content-center">' +
+                        '<div class="col-auto">' +
+                        '<button class="btn btn-outline-danger" id="deleteCommentButton" data-comment-id="' + comment.commentId + '">' +
+                        '<i class="fas fa-times"></i>' +
+                        '</button>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>';
+
+                    // Create a new comment element and prepend it to the comments section, with also an animation (slideDown)
+                    $(commentHtml).prependTo('#comments').hide().slideDown(300);
+
+                    // For debug only.
+                    //reloadComments();
                 }
             });
         });
@@ -587,8 +634,14 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                 success: function (response) {
                     // If the comment was deleted successfully
                     console.log("Comment deleted successfully");
-                    // Reload whole page (In the future I should reload only comments).
-                    reloadComments();
+
+                    // If comment deleted with success, remove it from the comments section, with an animation effect (the opposite of addComment)
+                    $('#comments').find("[data-comment-id='" + commentId + "']").parent().parent().parent().parent().parent().slideUp(300, function () {
+                        $(this).remove();
+                    });
+
+                    // Reload comments
+                    //reloadComments();
                 }
             });
         });

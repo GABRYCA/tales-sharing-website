@@ -1,8 +1,8 @@
 <?php
 // Check if logged in
 session_start();
-include_once (dirname(__FILE__) . "/../../private/objects/User.php");
-include_once (dirname(__FILE__) . "/../common/utility.php");
+include_once(dirname(__FILE__) . "/../../private/objects/User.php");
+include_once(dirname(__FILE__) . "/../common/utility.php");
 
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     header("Location: ../login.php");
@@ -60,10 +60,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 exit("Error while adding comment: " . $content->getErrorStatus());
             }
 
-            // Return success
-            exit("success");
-
-            break;
+            // Get comment just added and return it to the client
+            $commentsArray = getCommentsArray($content);
+            // Get the first element
+            $comment = $commentsArray[0];
+            exit(json_encode($comment));
         case "deleteComment":
 
             // Gets contentId and commentId from the client, check if they're empty

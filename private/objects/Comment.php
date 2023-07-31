@@ -99,7 +99,7 @@ class Comment implements JsonSerializable
     {
         $conn = connection();
 
-        $sql = "SELECT * FROM Comment WHERE contentId = ?";
+        $sql = "SELECT * FROM Comment WHERE contentId = ? ORDER BY commentDate DESC";
 
         if ($data = $conn->execute_query($sql, [$this->contentId])){
             $comments = [];
