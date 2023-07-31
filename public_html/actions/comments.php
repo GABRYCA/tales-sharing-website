@@ -50,6 +50,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             }
 
+            // Check content length, if more than 255 characters or if 0, exit
+            if (strlen($commentText) > 255 || strlen($commentText) == 0) {
+                exit("Comment length is invalid");
+            }
+
             // Use Content functions to add comment
             if (!$content->addCommentToContent($user->getUsername(), $commentText)) {
                 exit("Error while adding comment: " . $content->getErrorStatus());

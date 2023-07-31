@@ -439,7 +439,7 @@ $owner->loadUser();
                             <form id="commentForm">
                                 <div class="form-floating">
                                     <textarea class="form-control" placeholder="Leave a comment here" id="comment"
-                                              style="height: 100px"></textarea>
+                                              style="height: 100px" maxlength="255"></textarea>
                                     <label for="comment">Write your comment here</label>
                                 </div>
                                 <div class="row justify-content-end mt-2">
@@ -538,6 +538,17 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
             e.preventDefault();
             // Get the comment text
             var commentText = $('#comment').val();
+            // Check length, if more than 255 or minor = 0, send jquery toast and stop
+            if (commentText.length > 255 || commentText.length === 0) {
+                $.toast({
+                    heading: 'Error',
+                    text: 'Comment must be between 1 and 255 characters',
+                    showHideTransition: 'slide',
+                    icon: 'error',
+                    position: 'top-right'
+                });
+                return;
+            }
             // Get the content id
             var contentId = <?= $content->getContentId() ?>;
             // Send a post request to the server to add the comment
@@ -625,7 +636,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                             '<div class="row">' +
                             '<div class="col-12">' +
                             '<h6 class="d-inline">' + comment.commentUsername + '</h6>' +
-                            '<p class="d-inline opacity-50">' + comment.commentDate + '</p>' +
+                            '<p class="d-inline opacity-50"> ' + comment.commentDate + '</p>' +
                             '</div>' +
                             '</div>' +
                             '<div class="row">' +
@@ -667,7 +678,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                             '<div class="row">' +
                             '<div class="col-12">' +
                             '<h6 class="d-inline">' + comment.commentUsername + '</h6>' +
-                            '<p class="d-inline opacity-50">' + comment.commentDate + '</p>' +
+                            '<p class="d-inline opacity-50"> ' + comment.commentDate + '</p>' +
                             '</div>' +
                             '</div>' +
                             '<div class="row">' +
