@@ -262,7 +262,7 @@ if (isset($_GET["search"])) {
             // For each user make an icon to visit his profile
             foreach ($followedUsers as $followedUser) {
                 echo '<div class="col-3 col-md-2 col-xl-1">';
-                echo '<a href="profile.php?username=' . $followedUser->getUsername() . '" data-bs-toggle="tooltip" title="click to open">';
+                echo '<a href="profile.php?username=' . $followedUser->getUsername() . '" data-bs-toggle="tooltip" title="' . $followedUser->getUsername() . '">';
                 echo '<img src="' . $followedUser->getUrlProfilePicture() . '" alt="icon-user" class="img-fluid bg-placeholder bg-opacity-10 rounded-4 user-icon-top" width="50" height="50">';
                 echo '</a>';
                 echo '</div>';

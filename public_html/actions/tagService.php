@@ -13,6 +13,11 @@ if ($_SERVER["REQUEST_METHOD"] != "GET") {
     exit("Invalid request method.");
 }
 
+// Check if q is empty
+if (empty($_GET["q"])) {
+    exit("Query is empty");
+}
+
 // PHP Service, returns tags in JSON format
 $query = validate_input($_GET["q"]);
 // Create a new Tag object
