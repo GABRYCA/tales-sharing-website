@@ -458,9 +458,7 @@ $owner->loadUser();
                     <div class="row mt-4" id="comments">
                         <?php
                         $comments = $content->getCommentsOfContent();
-                        foreach ($comments
-
-                        as $comment) {
+                        foreach ($comments as $comment) {
                         $commenter = new User();
                         $commenter->setUsername($comment->getUserId());
                         $commenter->loadUser();
@@ -514,10 +512,10 @@ $owner->loadUser();
                                 }
                                 ?>
                             </div>
+                        </div>
                             <?php
                             }
                             ?>
-                        </div>
                     </div>
                 </div>
             </div>
