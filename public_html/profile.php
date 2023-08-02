@@ -617,8 +617,6 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
             // Get the selected file
             const file = $('#profileImageInput')[0].files[0];
 
-
-
             // If there isn't an image selected, show error and return.
             if (!file) {
                 $.toast({
@@ -705,8 +703,6 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
         $('#saveProfileCover').click(function() {
             // Get the selected file
             const file = $('#profileCoverInput')[0].files[0];
-
-
 
             // If there isn't an image selected, show error and return.
             if (!file) {
@@ -1139,9 +1135,6 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
         });
     });
 
-    // Set a flag to indicate the current mode
-    var showAll = true;
-
     // Show all content or galleries handler.
     $(function(){
         // Get the toggle buttons and the container elements
@@ -1152,7 +1145,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
         allBtn.on('click', function () {
             // Show all content and galleries and add active class to the button
             $('#content').removeClass('d-none');
-            $('#galleries').removeClass('d-none');
+            $('#galleries').addClass('d-none');
             allBtn.addClass('active');
             galleryBtn.removeClass('active');
         });
