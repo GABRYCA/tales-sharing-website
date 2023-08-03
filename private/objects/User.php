@@ -892,25 +892,6 @@ class User implements JsonSerializable
     }
 
     /**
-     * Rename a gallery by gallery id.
-     * @param int $galleryId
-     * @param string $newGalleryName
-     * @return bool
-     */
-    public function renameGalleryById(int $galleryId, string $newGalleryName): bool
-    {
-        $galleryClass = new Gallery();
-        $galleryClass->setOwnerId($this->getUsername());
-        $galleryClass->setGalleryId($galleryId);
-        if (!$galleryClass->loadGalleryInfoByGalleryId()){
-            $this->setErrorStatus("Gallery not found!");
-            return false;
-        }
-
-        return $galleryClass->renameGallery($newGalleryName);
-    }
-
-    /**
      * Rename a gallery by gallery name.
      * @param string $galleryName
      * @param string $newGalleryName

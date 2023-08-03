@@ -18,7 +18,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $action = validate_input($_POST["action"] ?? "");
     $galleryId = validate_input($_POST["galleryId"] ?? "");
     $galleryName = validate_input($_POST["galleryName"] ?? "");
-    $newGalleryName = validate_input($_POST["newGalleryName"] ?? "");
     $contentId = validate_input($_POST["contentId"] ?? "");
 
     // Check if the action is empty
@@ -108,6 +107,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 exit("Gallery id is empty. Please select a valid gallery.");
             }
 
+            $newGalleryName = validate_input($_POST["newGalleryName"] ?? "");
+
             // Check if the gallery name is empty or too long
             if (!$newGalleryName || strlen($newGalleryName) > 255) {
                 // Send error message to the client
@@ -120,8 +121,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 exit("Failed to load gallery. Please try again.");
             }
 
+            // Check if user in session is owner.
+            if ($gallery->getOwnerId() != $user->getUsername()) {
+                // Send the error array to the client
+                exit("You do not own this gallery!");
+            }
+
             // Rename gallery
-            if (!$user->renameGalleryById($gallery->getGalleryId(), $newGalleryName)) {
+            if (!$gallery->renameGallery($newGalleryName)) {
                 // Send the error array to the client
                 exit("Failed to rename gallery. Please try again.");
             }

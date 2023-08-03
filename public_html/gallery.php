@@ -271,7 +271,7 @@ $owner->loadUser();
         <!-- Title of gallery -->
         <div class="row mt-3">
             <div class="col-12">
-                <h1 class="display-6 text-center"><?php echo $gallery->getName(); ?></h1>
+                <h1 class="display-6 text-center" id="galleryTitle"><?php echo $gallery->getName(); ?></h1>
             </div>
         </div>
 
@@ -314,17 +314,17 @@ $owner->loadUser();
 
             <!-- Edit title button that opens a modal on click to edit it and also a delete button that opens a modal to confirm the deletion of the gallery -->
             <div class="row bg-light bg-opacity-10 p-2 px-0 px-lg-4 mx-0 mx-lg-1 rounded-4 justify-content-center text-center align-items-center">
-                <div class="col-3 col-lg-4">
+                <div class="col-4">
                     <button type="button" class="btn btn-outline-primary custom-btn" data-bs-toggle="modal" data-bs-target="#editGalleryModal">
                         <i class="fas fa-edit"></i> Rename
                     </button>
                 </div>
-                <div class="col-3 col-lg-4">
+                <div class="col-4">
                     <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteGalleryModal">
                         <i class="fas fa-trash"></i> Delete
                     </button>
                 </div>
-                <div class="col-6 col-lg-4">
+                <div class="col-4">
                     <!-- Use a dropdown button with an icon and a label -->
                     <div class="dropdown">
                         <button class="btn btn-outline-custom dropdown-toggle" type="button" id="galleryDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -341,7 +341,7 @@ $owner->loadUser();
                             </li>
                             <!-- The item for showing the gallery -->
                             <li>
-                                <button type="button" class="dropdown-item btn btn-outline-custom" id="showGalleryButton" <?php if (!$gallery->isHiddenGallery()) echo "disabled"; ?>>
+                                <button type="button" class="dropdown-item btn btn-outline-light" id="showGalleryButton" <?php if (!$gallery->isHiddenGallery()) echo "disabled"; ?>>
                                     <i class="fas fa-eye"></i> Show
                                 </button>
                             </li>
@@ -543,14 +543,15 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
         });
 
         $('#renameGallery').on("click", function () {
-            const galleryId = <?php echo $gallery->getGalleryId(); ?>;
             const newGalleryName = $('#galleryTitleInput').val();
-            if (galleryId === null) return;
             if (newGalleryName === null || newGalleryName === "") return;
             $.ajax({
                 type: "POST",
                 url: "actions/galleryManager.php",
-                data: {action: "rename", galleryId: galleryId, newGalleryName: newGalleryName},
+                data: {
+                    action: "rename",
+                    galleryId: <?php echo $gallery->getGalleryId(); ?>,
+                    newGalleryName: newGalleryName},
                 success: function (data) {
                     // Toast message.
                     $.toast({
@@ -560,10 +561,10 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                         position: 'top-right',
                         hideAfter: 1500
                     });
-                    // Reload page.
-                    setTimeout(function () {
-                        window.location.href = "gallery.php?id=" + galleryId;
-                    }, 1500);
+                    // Close modal
+                    $('#editGalleryModal').modal('hide');
+                    // Update galleryTitle
+                    $('#galleryTitle').text(newGalleryName);
                 },
                 error: function (data) {
                     // Send toast message with error.

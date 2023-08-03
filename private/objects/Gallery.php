@@ -135,7 +135,7 @@ class Gallery implements JsonSerializable
     {
         $conn = connection();
 
-        $sql = "INSERT INTO GalleryGroup (ownerId, name, hideGallery) VALUES (?, ?, ?)";
+        $sql = "INSERT INTO GalleryGroup (ownerId, name, hideGallery, urlCoverGallery) VALUES (?, ?, ?, ?)";
 
         if ($this->hideGallery == null) {
             $this->hideGallery = false;
@@ -214,14 +214,23 @@ class Gallery implements JsonSerializable
     }
 
     /**
-     * Function to rename a gallery
+     * Function to rename a gallery, please set galleryId before.
      * @param string $galleryName
      * @return bool
      */
     public function renameGallery(string $galleryName) : bool
     {
-        $this->setName($galleryName);
-        return $this->updateGallery();
+        // Rename gallery
+        $conn = connection();
+
+        $sql = "UPDATE GalleryGroup SET name = ? WHERE galleryId = ?";
+
+        if ($conn->execute_query($sql, [$galleryName, $this->galleryId])){
+            return true;
+        } else {
+            $this->setErrorStatus("Error while renaming gallery");
+            return false;
+        }
     }
 
     /**
