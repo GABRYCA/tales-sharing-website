@@ -435,10 +435,10 @@ if (!empty($_GET['username'])){
             $gallery = new Gallery();
             $gallery->setOwnerId($userProfile->getUsername());
             if ($user->getUsername() === $userProfile->getUsername()) {
-                // If the user is visiting his own profile, show all his content (public and private)
+                // If the user is visiting his own profile, show all his galleries (hidden or not)
                 $galleryArray = $gallery->getGalleriesByOwnerId();
             } else {
-                // If the user is visiting another profile, show only his public content (not private
+                // If the user is visiting another profile, show only his public galleries (not hidden)
                 $galleryArray = $gallery->getGalleriesByOwnerIdNotHidden();
             }
 
@@ -451,7 +451,7 @@ if (!empty($_GET['username'])){
                 foreach ($galleryArray as $gallery) {
                     echo '<div class="col-12 col-lg-4 col-xxl-3" onclick="window.location.href = \'gallery.php?id=' . $gallery->getGalleryId() . '\'">';
                     echo '<div class="img-wrapper position-relative text-center gallery">';
-                    echo '<img src="common/assets/cover.webp" alt="image" class="img-fluid rounded-4 img-thumbnail img-home" loading="lazy" data-aos="fade-up">';
+                    echo '<img src="' . $gallery->getUrlCoverGallery() . '" alt="image-cover" class="img-fluid rounded-4 img-thumbnail img-home" loading="lazy" data-aos="fade-up">';
                     echo '<div class="img-overlay position-absolute top-0 start-0 w-100 h-100 rounded-4" style="background-color: rgba(0, 0, 0, 0.5);"></div>';
                     echo '<div class="img-text position-absolute top-50 start-50 translate-middle text-light">';
                     echo '<h1 class="display-6">' . $gallery->getName() . '</h1>';

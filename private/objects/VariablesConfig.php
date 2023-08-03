@@ -8,6 +8,7 @@ class VariablesConfig implements JsonSerializable
     public static $emailNoreply = "noreply@anonymousgca.eu";
     public static $profileImage = "profile.webp";
     public static $profileCover = "cover.webp";
+    public static $urlCoverGallery = "common/assets/cover.webp";
 
     // Function to get the domain
     static public function getDomain(): string
@@ -31,6 +32,12 @@ class VariablesConfig implements JsonSerializable
     static public function getProfileCover(): string
     {
         return self::$profileCover;
+    }
+
+    // Function to get the url cover gallery
+    static public function getUrlCoverGallery(): string
+    {
+        return self::$urlCoverGallery;
     }
 
     public function jsonSerialize(): mixed

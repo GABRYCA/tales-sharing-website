@@ -278,7 +278,7 @@ $owner->loadUser();
         <!-- Info of (Owner and if hidden) -->
         <div class="row">
             <div class="col-12">
-                <p class="text-center mb-1">
+                <p class="text-center mb-1" id="hideOrShow">
                     <?php
                     if ($gallery->isHiddenGallery()) {
                         echo '<i class="fas fa-eye-slash"></i> Hidden gallery';
@@ -313,18 +313,45 @@ $owner->loadUser();
         if ($user->getUsername() === $gallery->getOwnerId()) { ?>
 
             <!-- Edit title button that opens a modal on click to edit it and also a delete button that opens a modal to confirm the deletion of the gallery -->
-            <div class="row bg-light bg-opacity-10 p-2 px-4 mx-1 rounded-4 justify-content-center text-center">
-                <div class="col-6 col-lg-3">
-                    <button type="button" class="btn btn-outline-primary me-2 custom-btn" data-bs-toggle="modal" data-bs-target="#editGalleryModal">
+            <div class="row bg-light bg-opacity-10 p-2 px-0 px-lg-4 mx-0 mx-lg-1 rounded-4 justify-content-center text-center align-items-center">
+                <div class="col-3 col-lg-4">
+                    <button type="button" class="btn btn-outline-primary custom-btn" data-bs-toggle="modal" data-bs-target="#editGalleryModal">
                         <i class="fas fa-edit"></i> Rename
                     </button>
                 </div>
-                <div class="col-6 col-lg-3">
-                    <button type="button" class="btn btn-outline-danger ms-2" data-bs-toggle="modal" data-bs-target="#deleteGalleryModal">
+                <div class="col-3 col-lg-4">
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteGalleryModal">
                         <i class="fas fa-trash"></i> Delete
                     </button>
                 </div>
+                <div class="col-6 col-lg-4">
+                    <!-- Use a dropdown button with an icon and a label -->
+                    <div class="dropdown">
+                        <button class="btn btn-outline-custom dropdown-toggle" type="button" id="galleryDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-cog"></i>
+                            Options
+                        </button>
+                        <!-- Use a dropdown menu with the buttons as items -->
+                        <ul class="dropdown-menu" aria-labelledby="galleryDropdown">
+                            <!-- The item for hiding the gallery -->
+                            <li>
+                                <button type="button" class="dropdown-item btn btn-outline-danger" id="hideGalleryButton" <?php if ($gallery->isHiddenGallery()) echo "disabled"; ?>>
+                                    <i class="fas fa-eye-slash"></i> Hide
+                                </button>
+                            </li>
+                            <!-- The item for showing the gallery -->
+                            <li>
+                                <button type="button" class="dropdown-item btn btn-outline-custom" id="showGalleryButton" <?php if (!$gallery->isHiddenGallery()) echo "disabled"; ?>>
+                                    <i class="fas fa-eye"></i> Show
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
+
+
+
             <hr class="mt-2">
 
         <?php } ?>
@@ -476,6 +503,8 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
 
     });
 
+    <?php if ($user->getUsername() == $gallery->getOwnerId()) { ?>
+
     $(function (){
        // Function that handles the click of the delete gallery button.
         // Sends ajax request to delete the gallery to galleryManager.php with action = "delete" and the galleryId
@@ -548,6 +577,74 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
             });
         });
     });
+
+    // Get the buttons
+    var hideButton = $("#hideGalleryButton");
+    var showButton = $("#showGalleryButton");
+    // Add an event listener to the hide button
+    hideButton.on("click", function() {
+        // Send an ajax request to the server with the value true
+        $.ajax({
+            url: "actions/galleryManager.php",
+            type: "POST",
+            data: {
+                action: "hide",
+                galleryId: <?php echo $gallery->getGalleryId(); ?>
+            },
+            success: function(response) {
+                // Disable the hide button and enable the show button
+                hideButton.prop("disabled", true);
+                showButton.prop("disabled", false);
+                // Edit content.
+                $("#hideOrShow").html("<i class='fas fa-eye-slash'></i> Hidden gallery");
+                // Toast
+                $.toast({
+                    heading: 'Success',
+                    text: 'Gallery is now hidden.',
+                    icon: 'success',
+                    position: 'top-right',
+                    hideAfter: 2000
+                });
+                console.log(response);
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    });
+    // Add an event listener to the show button
+    showButton.on("click", function() {
+        // Send an ajax request to the server with the value false
+        $.ajax({
+            url: "actions/galleryManager.php",
+            type: "POST",
+            data: {
+                action: "show",
+                galleryId: <?php echo $gallery->getGalleryId(); ?>
+            },
+            success: function(response) {
+                // Disable the show button and enable the hide button
+                showButton.prop("disabled", true);
+                hideButton.prop("disabled", false);
+                // Edit content.
+                $("#hideOrShow").html("<i class='fas fa-eye'></i> Public gallery");
+                // Toast
+                $.toast({
+                    heading: 'Success',
+                    text: 'Gallery is now visible to everyone.',
+                    icon: 'success',
+                    position: 'top-right',
+                    hideAfter: 2000
+                });
+                console.log(response);
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    });
+
+    <?php } ?>
 
     // Change title of the document to the name of the gallery.
     document.title = "Gallery - <?= $gallery->getName() ?> - Tales";

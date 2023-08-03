@@ -8,6 +8,7 @@ class Gallery implements JsonSerializable
     private $ownerId = null;
     private $name = null;
     private $hideGallery = false;
+    private $urlCoverGallery = null;
     private $errorStatus = null;
 
     /**
@@ -31,6 +32,7 @@ class Gallery implements JsonSerializable
             $this->ownerId = $row["ownerId"];
             $this->name = $row["name"];
             $this->hideGallery = (bool) $row["hideGallery"];
+            $this->urlCoverGallery = $row["urlCoverGallery"];
         } else {
             $this->setErrorStatus("Error while loading gallery");
             return false;
@@ -54,6 +56,7 @@ class Gallery implements JsonSerializable
             $this->galleryId = $row["galleryId"];
             $this->name = $row["name"];
             $this->hideGallery = $row["hideGallery"];
+            $this->urlCoverGallery = $row["urlCoverGallery"];
         } else {
             $this->setErrorStatus("Error while loading gallery");
             return false;
@@ -80,6 +83,7 @@ class Gallery implements JsonSerializable
                 $gallery->setOwnerId($row["ownerId"]);
                 $gallery->setName($row["name"]);
                 $gallery->setHideGallery($row["hideGallery"]);
+                $gallery->setUrlCoverGallery($row["urlCoverGallery"]);
                 $galleries[] = $gallery;
             }
         }
@@ -110,6 +114,7 @@ class Gallery implements JsonSerializable
                 $gallery->setOwnerId($row["ownerId"]);
                 $gallery->setName($row["name"]);
                 $gallery->setHideGallery($row["hideGallery"]);
+                $gallery->setUrlCoverGallery($row["urlCoverGallery"]);
                 $galleries[] = $gallery;
             }
         }
@@ -136,7 +141,11 @@ class Gallery implements JsonSerializable
             $this->hideGallery = false;
         }
 
-        if ($conn->execute_query($sql, [$this->ownerId, $this->name, $this->hideGallery])){
+        if ($this->urlCoverGallery == null){
+            $this->urlCoverGallery = VariablesConfig::$urlCoverGallery;
+        }
+
+        if ($conn->execute_query($sql, [$this->ownerId, $this->name, $this->hideGallery, $this->urlCoverGallery])){
             return true;
         } else {
             $this->setErrorStatus("Error while creating gallery");
@@ -152,9 +161,9 @@ class Gallery implements JsonSerializable
     {
         $conn = connection();
 
-        $sql = "UPDATE GalleryGroup SET name = ?, hideGallery = ? WHERE galleryId = ?";
+        $sql = "UPDATE GalleryGroup SET name = ?, hideGallery = ?, urlCoverGallery = ? WHERE galleryId = ?";
 
-        if ($conn->execute_query($sql, [$this->name, $this->hideGallery, $this->galleryId])){
+        if ($conn->execute_query($sql, [$this->name, $this->hideGallery, $this->galleryId, $this->urlCoverGallery])){
             return true;
         } else {
             $this->setErrorStatus("Error while updating gallery");
@@ -212,6 +221,55 @@ class Gallery implements JsonSerializable
     public function renameGallery(string $galleryName) : bool
     {
         $this->setName($galleryName);
+        return $this->updateGallery();
+    }
+
+    /**
+     * Function to hide a gallery
+     * @return bool
+     */
+    public function hideGallery() : bool
+    {
+        // Run query to hide gallery
+        $conn = connection();
+
+        $sql = "UPDATE GalleryGroup SET hideGallery = 1 WHERE galleryId = ?";
+
+        if ($conn->execute_query($sql, [$this->galleryId])){
+            return true;
+        } else {
+            $this->setErrorStatus("Error while hiding gallery");
+            return false;
+        }
+    }
+
+    /**
+     * Function to show a gallery
+     * @return bool
+     */
+    public function showGallery() : bool
+    {
+        // Run query to show gallery
+        $conn = connection();
+
+        $sql = "UPDATE GalleryGroup SET hideGallery = 0 WHERE galleryId = ?";
+
+        if ($conn->execute_query($sql, [$this->galleryId])){
+            return true;
+        } else {
+            $this->setErrorStatus("Error while showing gallery");
+            return false;
+        }
+    }
+
+    /**
+     * Function to change the cover of a gallery
+     * @param string $urlCoverGallery
+     * @return bool
+     */
+    public function changeCoverGallery(string $urlCoverGallery) : bool
+    {
+        $this->setUrlCoverGallery($urlCoverGallery);
         return $this->updateGallery();
     }
 
@@ -328,6 +386,11 @@ class Gallery implements JsonSerializable
         return $this->name;
     }
 
+    public function getUrlCoverGallery()
+    {
+        return $this->urlCoverGallery;
+    }
+
     public function setName($name)
     {
         $this->name = $name;
@@ -356,6 +419,11 @@ class Gallery implements JsonSerializable
     public function setErrorStatus($errorStatus)
     {
         $this->errorStatus = $errorStatus;
+    }
+
+    public function setUrlCoverGallery($urlCoverGallery)
+    {
+        $this->urlCoverGallery = $urlCoverGallery;
     }
 
     // Implements JsonSerializable

@@ -112,7 +112,8 @@ CREATE TABLE GalleryGroup (
   galleryId int AUTO_INCREMENT PRIMARY KEY,  
   ownerId varchar(255) REFERENCES User(username) ON DELETE CASCADE ON UPDATE CASCADE,
   name varchar(255) NOT NULL,
-  hideGallery bit NOT NULL DEFAULT 0
+  hideGallery bit NOT NULL DEFAULT 0,
+  urlCoverGallery varchar(255) DEFAULT 'common/assets/cover.webp'
 );
 
 CREATE TABLE Tag (
