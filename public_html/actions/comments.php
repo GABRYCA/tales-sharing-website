@@ -21,6 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     switch ($action) {
         case "addComment":
+        {
 
             // Gets contentId and commentText from the client, check if they're empty
             if (empty($_POST["contentId"])) {
@@ -65,10 +66,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Get the first element
             $comment = $commentsArray[0];
             exit(json_encode($comment));
+        }
         case "deleteComment":
+        {
 
             // Gets contentId and commentId from the client, check if they're empty
-
             if (empty($_POST["contentId"])) {
                 exit("ContentId is empty");
             }
@@ -112,8 +114,77 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Return success
             exit("success");
+        }
+
+        case "editComment":
+        {
+            if (empty($_POST["contentId"])) {
+                exit("ContentId is empty");
+            }
+
+            if (empty($_POST["commentId"])) {
+                exit("CommentId is empty");
+            }
+
+            if (empty($_POST["commentText"])) {
+                exit("CommentText is empty");
+            }
+
+            $contentId = validate_input($_POST["contentId"]);
+            $commentId = validate_input($_POST["commentId"]);
+            $commentText = validate_input($_POST["commentText"]);
+
+            // Load session user.
+            $user = new User();
+            $user->setUsername($_SESSION["username"]);
+            $user->loadUser();
+
+            // Check if content is private, if it's, only the owner can edit comments.
+            $content = new Content();
+            $content->setContentId($contentId);
+            $content->loadContent();
+
+            if ($content->getIsPrivate()) {
+                if ($content->getOwnerId() != $user->getUsername()) {
+                    exit("Content is private");
+                }
+            }
+
+            // Check if the user is owner of the comment.
+            $comment = new Comment();
+            $comment->setCommentId($commentId);
+            $comment->loadComment();
+
+            if ($comment->getUserId() != $user->getUsername()) {
+                exit("You can't edit this comment");
+            }
+
+            // Check content length, if more than 255 characters or if 0, exit
+            if (strlen($commentText) > 255 || strlen($commentText) == 0) {
+                exit("Comment length is invalid");
+            }
+
+            // Use Content functions to edit comment
+            if (!$content->editCommentOfContent($commentId, $commentText, $user->getUsername())) {
+                exit("Error while editing comment: " . $content->getErrorStatus());
+            }
+
+            // Return updated comment.
+            $commentsArray = getCommentsArray($content);
+            // Get the element with commentId = $commentId
+            foreach ($commentsArray as $comment) {
+                if ($comment["commentId"] == $commentId) {
+                    exit(json_encode($comment));
+                }
+            }
+
+            exit("Error while editing comment: " . $content->getErrorStatus());
+        }
+
         default:
+        {
             exit("Invalid action");
+        }
     }
 
 
