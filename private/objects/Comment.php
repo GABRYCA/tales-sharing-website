@@ -167,6 +167,16 @@ class Comment implements JsonSerializable
         return $this->commentDate;
     }
 
+    /**
+     * Get comment date without seconds and in this format: DD/MM/YYYY hh:mm.
+     * @return false|string
+     */
+    public function getCommentDateWithoutSeconds()
+    {
+        // Format the date and return it
+        return date("d/m/Y H:i", strtotime($this->commentDate));
+    }
+
     public function setCommentDate($commentDate): void
     {
         $this->commentDate = $commentDate;

@@ -459,68 +459,112 @@ $owner->loadUser();
                         <?php
                         $comments = $content->getCommentsOfContent();
                         foreach ($comments as $comment) {
-                        $commenter = new User();
-                        $commenter->setUsername($comment->getUserId());
-                        $commenter->loadUser();
-                        ?>
-                        <!-- Comment -->
-                        <div class="col-12">
-                            <div class="row">
-                                <div class="col-auto">
-                                    <div class="row justify-content-center">
-                                        <div class="col-auto">
-                                            <a href="profile.php?username=<?= $commenter->getUsername() ?>"
-                                               class="text-decoration-none">
-                                                <img src="<?= $commenter->getUrlProfilePicture() ?>"
-                                                     class="rounded-circle" style="width: 50px; height: 50px;">
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="row">
-                                                <div class="col-12">
-                                                    <h6 class="d-inline"><?= $commenter->getUsername() ?></h6>
-                                                    <p class="d-inline opacity-50"><?= $comment->getCommentDate() ?></p>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-12">
-                                                    <p><?= $comment->getCommentText() ?></p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <?php
-                                if ($comment->getUserId() == $user->getUsername()) {
-                                    ?>
-                                    <!-- Button to delete comment, it also contains the comment ID -->
+                            $commenter = new User();
+                            $commenter->setUsername($comment->getUserId());
+                            $commenter->loadUser();
+                            ?>
+                            <!-- Comment -->
+                            <div class="col-12">
+                                <div class="row">
                                     <div class="col-auto">
                                         <div class="row justify-content-center">
                                             <div class="col-auto">
-                                                <button class="btn btn-outline-danger" id="deleteCommentButton"
-                                                        data-comment-id="<?= $comment->getCommentId() ?>">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
+                                                <a href="profile.php?username=<?= $commenter->getUsername() ?>"
+                                                   class="text-decoration-none">
+                                                    <img src="<?= $commenter->getUrlProfilePicture() ?>"
+                                                         class="rounded-circle" style="width: 50px; height: 50px;">
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <h6 class="d-inline"><?= $commenter->getUsername() ?></h6>
+                                                        <p class="d-inline opacity-50"><?= $comment->getCommentDateWithoutSeconds() ?></p>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <p><?= $comment->getCommentText() ?></p>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                     <?php
-                                }
-                                ?>
+                                    if ($comment->getUserId() == $user->getUsername()) {
+                                        ?>
+                                        <!-- Button to delete/edit comment, it also contains the comment ID -->
+                                        <div class="col-auto">
+                                            <div class="dropdown">
+                                                <button class="btn btn-outline-custom dropdown-toggle" type="button"
+                                                        id="commentOptionsButton" data-bs-toggle="dropdown"
+                                                        aria-expanded="false">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </button>
+                                                <ul class="dropdown-menu" aria-labelledby="commentOptionsButton">
+                                                    <li>
+                                                        <button class="dropdown-item btn btn-outline-danger text-danger"
+                                                                id="deleteCommentButton"
+                                                                data-comment-id="<?= $comment->getCommentId() ?>"><i
+                                                                    class="fas fa-times"></i> Delete
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <button class="dropdown-item btn btn-outline-primary"
+                                                                id="editCommentButton"
+                                                                data-comment-id="<?= $comment->getCommentId() ?>"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#editCommentModal"><i
+                                                                    class="fas fa-edit"></i> Edit
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <?php
+                                    }
+                                    ?>
+                                </div>
                             </div>
-                        </div>
                             <?php
-                            }
-                            ?>
+                        }
+                        ?>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Modals section -->
+
+    <!-- Edit comment modal -->
+    <div class="modal fade" id="editCommentModal" tabindex="-1" aria-labelledby="editCommentModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCommentModalLabel">Edit comment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editCommentForm">
+                        <input type="hidden" id="editCommentId" name="commentId">
+                        <div class="mb-3">
+                            <label for="editCommentText" class="form-label">Comment</label>
+                            <textarea class="form-control" id="editCommentText" name="commentText" maxlength="255"
+                                      minlength="1" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <?php
@@ -566,7 +610,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     // Add to the comments section, with an animation effect, as innerHTML the new comment
                     // Read JSON from response
                     var comment = JSON.parse(response);
-                    // Create the comment html, with also the delete comment button.
+                    // Create the comment html, with also the delete/edit comment button.
                     var commentHtml = '<div class="col-12">' +
                         '<div class="row">' +
                         '<div class="col-auto">' +
@@ -596,12 +640,14 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                         '</div>' +
                         '</div>' +
                         '<div class="col-auto">' +
-                        '<div class="row justify-content-center">' +
-                        '<div class="col-auto">' +
-                        '<button class="btn btn-outline-danger" id="deleteCommentButton" data-comment-id="' + comment.commentId + '">' +
-                        '<i class="fas fa-times"></i>' +
+                        '<div class="dropdown">' +
+                        '<button class="btn btn-outline-custom dropdown-toggle" type="button" id="commentOptionsButton" data-bs-toggle="dropdown" aria-expanded="false">' +
+                        '<i class="fas fa-ellipsis-v me-2"></i>' +
                         '</button>' +
-                        '</div>' +
+                        '<ul class="dropdown-menu" aria-labelledby="commentOptionsButton">' +
+                        '<li><button class="dropdown-item btn btn-outline-danger text-danger" id="deleteCommentButton" data-comment-id="' + comment.commentId + '"><i class="fas fa-times"></i> Delete</button></li>' +
+                        '<li><button class="dropdown-item btn btn-outline-primary" id="editCommentButton" data-comment-id="' + comment.commentId + '"><i class="fas fa-edit"></i> Edit</button></li>' +
+                        '</ul>' +
                         '</div>' +
                         '</div>' +
                         '</div>' +
@@ -643,7 +689,148 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                 }
             });
         });
+
+        var commentId;
+
+        // Handle comment edit
+        $('#comments').on("click", "#editCommentButton", function () {
+            // Get the comment id
+            commentId = $(this).data("comment-id");
+            // Get the comment text with ajax
+            $.ajax({
+                type: "POST",
+                url: "actions/comments.php",
+                data: {
+                    contentId: <?= $content->getContentId() ?>,
+                    commentId: commentId,
+                    action: "getCommentText"
+                },
+                success: function (response) {
+                    // If the comment text was retrieved successfully
+                    console.log("Comment text retrieved successfully");
+                    // Create a modal with the comment text
+                    $('#editCommentModal').find("textarea").val(response);
+                    // Show the modal
+                    $('#editCommentModal').modal('show');
+                }
+            });
+        });
+
+        // Handle modal submit
+        $('#editCommentModal').off("submit").on("submit", "#editCommentForm", function (e) {
+            e.preventDefault();
+            // Get the comment text
+            var commentText = $('#editCommentModal').find("textarea").val();
+            // Check length, if more than 255 or minor = 0, send jquery toast and stop
+            if (commentText.length > 255 || commentText.length === 0) {
+                $.toast({
+                    heading: 'Error',
+                    text: 'Comment must be between 1 and 255 characters',
+                    showHideTransition: 'slide',
+                    icon: 'error',
+                    position: 'top-right'
+                });
+                return;
+            }
+            // Send a post request to the server to edit the comment
+            $.ajax({
+                type: "POST",
+                url: "actions/comments.php",
+                data: {
+                    contentId: <?= $content->getContentId() ?>,
+                    commentId: commentId,
+                    commentText: commentText,
+                    action: "editComment"
+                },
+                success: function (response) {
+                    // If the comment was edited successfully
+                    console.log("Comment edited successfully");
+                    // Hide the modal
+                    $('#editCommentModal').modal('hide');
+                    // Delete and rebuild the comment with animation
+                    $('#comments').find("[data-comment-id='" + commentId + "']").parent().parent().parent().parent().parent().slideUp(300, function () {
+                        $(this).remove();
+                    });
+                    // Read JSON message.
+                    var comment = JSON.parse(response);
+                    // Create the comment html, with also the delete/edit comment button.
+                    var commentHtml = '<div class="col-12">' +
+                        '<div class="row">' +
+                        '<div class="col-auto">' +
+                        '<div class="row justify-content-center">' +
+                        '<div class="col-auto">' +
+                        '<a href="profile.php?username=' + comment.commentUsername + '" class="text-decoration-none">' +
+                        '<img src="' + comment.commentUserIconUrl + '" class="rounded-circle" style="width: 50px; height: 50px;">' +
+                        '</a>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div class="col">' +
+                        '<div class="row">' +
+                        '<div class="col-12">' +
+                        '<div class="row">' +
+                        '<div class="col-12">' +
+                        '<h6 class="d-inline">' + comment.commentUsername + '</h6>' +
+                        '<p class="d-inline opacity-50"> ' + comment.commentDate + '</p>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div class="row">' +
+                        '<div class="col-12">' +
+                        '<p>' + comment.commentText + '</p>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div class="col-auto">' +
+                        '<div class="dropdown">' +
+                        '<button class="btn btn-outline-custom dropdown-toggle" type="button" id="commentOptionsButton" data-bs-toggle="dropdown" aria-expanded="false">' +
+                        '<i class="fas fa-ellipsis-v me-2"></i>' +
+                        '</button>' +
+                        '<ul class="dropdown-menu" aria-labelledby="commentOptionsButton">' +
+                        '<li><button class="dropdown-item btn btn-outline-danger text-danger" id="deleteCommentButton" data-comment-id="' + comment.commentId + '"><i class="fas fa-times"></i> Delete</button></li>' +
+                        '<li><button class="dropdown-item btn btn-outline-primary" id="editCommentButton" data-comment-id="' + comment.commentId + '"><i class="fas fa-edit"></i> Edit</button></li>' +
+                        '</ul>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>';
+
+                    // Create a new comment element and prepend it to the comments section, with also an animation (slideDown)
+                    $(commentHtml).prependTo('#comments').hide().slideDown(300);
+
+                    // Send toast
+                    $.toast({
+                        heading: 'Success',
+                        text: 'Comment edited successfully',
+                        showHideTransition: 'slide',
+                        icon: 'success',
+                        position: 'top-right'
+                    });
+                }
+            });
+        });
     });
+
+    // Return string with comment text
+    function getCommentTextAjax(commentId) {
+        // Send a post request to the server to get the comment text
+        $.ajax({
+            type: "POST",
+            url: "actions/comments.php",
+            data: {
+                contentId: <?= $content->getContentId() ?>,
+                commentId: commentId,
+                action: "getCommentText"
+            },
+            success: function (response) {
+                // If the comment text was retrieved successfully
+                console.log("Comment text retrieved successfully ");
+                // Return the comment text
+                return response;
+            }
+        });
+    }
 
     // Method to reload comments of page.
     function reloadComments() {
@@ -668,7 +855,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     // Get the comment
                     var comment = commentsArray[i];
                     // InnerHTML each comment, also check isOwner, if true, add button to delete comment.
-                    if (comment.isOwner){
+                    if (comment.isOwner) {
                         commentsDiv.append(
                             '<div class="col-12">' +
                             '<div class="row">' +

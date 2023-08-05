@@ -180,6 +180,47 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             exit("Error while editing comment: " . $content->getErrorStatus());
         }
+        case "getCommentText": {
+
+            if (empty($_POST["contentId"])) {
+                exit("ContentId is empty");
+            }
+
+            if (empty($_POST["commentId"])) {
+                exit("CommentId is empty");
+            }
+
+            $contentId = validate_input($_POST["contentId"]);
+            $commentId = validate_input($_POST["commentId"]);
+
+            // Load session user.
+            $user = new User();
+            $user->setUsername($_SESSION["username"]);
+            $user->loadUser();
+
+            // Check if content is private, if it's, only the owner can edit comments.
+            $content = new Content();
+            $content->setContentId($contentId);
+            $content->loadContent();
+
+            if ($content->getIsPrivate()) {
+                if ($content->getOwnerId() != $user->getUsername()) {
+                    exit("Content is private");
+                }
+            }
+
+            // Check if the user is owner of the comment.
+            $comment = new Comment();
+            $comment->setCommentId($commentId);
+            $comment->loadComment();
+
+            if ($comment->getUserId() != $user->getUsername()) {
+                exit("You can't edit this comment");
+            }
+
+            // Return comment text
+            exit($comment->getCommentText());
+        }
 
         default:
         {
@@ -239,7 +280,7 @@ function getCommentsArray(Content $content): array
     foreach ($comments as $comment) {
         $commentArray = array();
         $commentArray["commentText"] = $comment->getCommentText();
-        $commentArray["commentDate"] = $comment->getCommentDate();
+        $commentArray["commentDate"] = $comment->getCommentDateWithoutSeconds();
         $commentArray["commentUsername"] = $comment->getUserId();
         $commentArray["commentId"] = $comment->getCommentId();
         // If the current session user is the owner of the comment, add a flag to the array
