@@ -855,7 +855,8 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     title: 'Error',
                     icon: 'error',
                     text: 'Username must be between 3 and 18 characters',
-                    type: 'error'
+                    type: 'error',
+                    loaderBg: '#ff0f7b'
                 });
                 return;
             }
@@ -867,7 +868,8 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     icon: 'error',
                     text: 'Password must be at least 8 characters',
                     type: 'error',
-                    position: "top-center"
+                    position: "top-center",
+                    loaderBg: '#ff0f7b'
                 });
                 return;
             }
@@ -879,7 +881,8 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     icon: 'error',
                     text: 'Please provide your old password',
                     type: 'error',
-                    position: "top-center"
+                    position: "top-center",
+                    loaderBg: '#ff0f7b'
                 });
                 return;
             }
@@ -891,7 +894,8 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     icon: 'error',
                     text: 'New password and confirmation must match',
                     type: 'error',
-                    position: "top-center"
+                    position: "top-center",
+                    loaderBg: '#ff0f7b'
                 });
                 return;
             }
@@ -903,7 +907,8 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     icon: 'error',
                     text: 'New password must be different from old password',
                     type: 'error',
-                    position: "top-center"
+                    position: "top-center",
+                    loaderBg: '#ff0f7b'
                 });
                 return;
             }
@@ -937,7 +942,8 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                         $.toast({
                             text: 'Error updating password ' + data,
                             icon: 'error',
-                            position: 'top-center'
+                            position: 'top-center',
+                            loaderBg: '#ff0f7b'
                         });
                     }
                 });
@@ -975,7 +981,8 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     $.toast({
                         text: 'Error updating profile ' + data,
                         icon: 'error',
-                        position: 'top-center'
+                        position: 'top-center',
+                        loaderBg: '#ff0f7b'
                     });
                 }
             });

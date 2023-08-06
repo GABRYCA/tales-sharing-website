@@ -558,7 +558,8 @@ $owner->loadUser();
                             <textarea class="form-control" id="editCommentText" name="commentText" maxlength="255"
                                       minlength="1" rows="3" required></textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-outline-custom">Save changes</button>
                     </form>
                 </div>
             </div>
@@ -587,7 +588,8 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     text: 'Comment must be between 1 and 255 characters',
                     showHideTransition: 'slide',
                     icon: 'error',
-                    position: 'top-right'
+                    position: 'top-right',
+                    loaderBg: '#ff0f7b'
                 });
                 return;
             }
@@ -728,7 +730,8 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     text: 'Comment must be between 1 and 255 characters',
                     showHideTransition: 'slide',
                     icon: 'error',
-                    position: 'top-right'
+                    position: 'top-right',
+                    loaderBg: '#ff0f7b'
                 });
                 return;
             }
@@ -796,8 +799,8 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                         '</div>' +
                         '</div>';
 
-                    // Create a new comment element and prepend it to the comments section, with also an animation (slideDown)
-                    $(commentHtml).prependTo('#comments').hide().slideDown(300);
+                    // Add the comment in the same position where it got removed
+                    $('#comments').find("[data-comment-id='" + commentId + "']").parent().parent().parent().parent().parent().after(commentHtml);
 
                     // Send toast
                     $.toast({
@@ -805,7 +808,10 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                         text: 'Comment edited successfully',
                         showHideTransition: 'slide',
                         icon: 'success',
-                        position: 'top-right'
+                        position: 'top-right',
+                        bgColor: '#6600e1',
+                        textColor: '#fff',
+                        loaderBg: '#ff0f7b'
                     });
                 }
             });

@@ -465,7 +465,8 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
                     text: 'Please enter a name for the image.',
                     showHideTransition: 'slide',
                     icon: 'error',
-                    position: 'top-right'
+                    position: 'top-right',
+                    loaderBg: '#ff0f7b'
                 });
                 return;
             }
@@ -478,7 +479,8 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
                     text: 'Please enter a description for the image.',
                     showHideTransition: 'slide',
                     icon: 'error',
-                    position: 'top-right'
+                    position: 'top-right',
+                    loaderBg: '#ff0f7b'
                 });
                 return;
             }
@@ -526,6 +528,7 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
                         icon: 'info',
                         position: 'top-right',
                         hideAfter: 3000,
+                        loaderBg: '#ff0f7b'
                     });
 
                     // After 3 seconds, reload the page
@@ -539,7 +542,8 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
                     $.toast({
                         text: error,
                         icon: 'error',
-                        position: 'top-right'
+                        position: 'top-right',
+                        loaderBg: '#ff0f7b'
                     });
                 }
             });
@@ -555,7 +559,8 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
                     text: 'Please enter a name for the new gallery.',
                     showHideTransition: 'slide',
                     icon: 'error',
-                    position: 'top-right'
+                    position: 'top-right',
+                    loaderBg: '#ff0f7b'
                 });
             } else {
                 // If the input is not empty, create a gallery
@@ -586,6 +591,7 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
                         icon: 'info',
                         position: 'top-right',
                         hideAfter: 3000,
+                        loaderBg: '#ff0f7b'
                     });
 
                     // Close modal.
@@ -602,7 +608,8 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
                     $.toast({
                         text: error,
                         icon: 'error',
-                        position: 'top-right'
+                        position: 'top-right',
+                        loaderBg: '#ff0f7b'
                     });
                 }
             });
@@ -648,7 +655,8 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
                     positionLeft: false,
                     positionRight: true,
                     bgColor: '#6600e1',
-                    textColor: '#fff'
+                    textColor: '#fff',
+                    loaderBg: '#ff0f7b'
                 });
 
                 reloadGalleries();
@@ -670,7 +678,8 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
                     positionLeft: false,
                     positionRight: true,
                     bgColor: '#6600e1',
-                    textColor: '#fff'
+                    textColor: '#fff',
+                    loaderBg: '#ff0f7b'
                 });
             }
         });
@@ -706,6 +715,7 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
                     positionRight: true,
                     bgColor: '#6600e1',
                     textColor: '#fff',
+                    loaderBg: '#ff0f7b'
                 });
 
                 reloadGalleries();
@@ -728,6 +738,7 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
                     positionRight: true,
                     bgColor: '#6600e1',
                     textColor: '#fff',
+                    loaderBg: '#ff0f7b'
                 });
             }
         });

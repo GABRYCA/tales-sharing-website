@@ -523,7 +523,10 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                         text: 'Gallery deleted with success: ' + data,
                         icon: 'success',
                         position: 'top-right',
-                        hideAfter: 2000
+                        hideAfter: 2000,
+                        bgColor: '#6600e1',
+                        textColor: '#fff',
+                        loaderBg: '#ff0f7b'
                     });
                     // Redirect to profile page after 2 seconds.
                     setTimeout(function () {
@@ -559,7 +562,10 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                         text: 'Gallery renamed with success: ' + data,
                         icon: 'success',
                         position: 'top-right',
-                        hideAfter: 1500
+                        hideAfter: 1500,
+                        bgColor: '#6600e1',
+                        textColor: '#fff',
+                        loaderBg: '#ff0f7b'
                     });
                     // Close modal
                     $('#editGalleryModal').modal('hide');
@@ -604,7 +610,10 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     text: 'Gallery is now hidden.',
                     icon: 'success',
                     position: 'top-right',
-                    hideAfter: 2000
+                    hideAfter: 2000,
+                    bgColor: '#6600e1',
+                    textColor: '#fff',
+                    loaderBg: '#ff0f7b'
                 });
                 console.log(response);
             },
@@ -635,7 +644,10 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     text: 'Gallery is now visible to everyone.',
                     icon: 'success',
                     position: 'top-right',
-                    hideAfter: 2000
+                    hideAfter: 2000,
+                    bgColor: '#6600e1',
+                    textColor: '#fff',
+                    loaderBg: '#ff0f7b'
                 });
                 console.log(response);
             },
