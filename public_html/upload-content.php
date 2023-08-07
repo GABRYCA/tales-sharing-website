@@ -26,6 +26,7 @@ $galleries = $user->getGalleries();
     ?>
     <title>Upload Content</title>
     <style>
+
         #drop-area {}
 
         #drop-area:hover {

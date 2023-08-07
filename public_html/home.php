@@ -6,6 +6,7 @@
     ?>
     <title>Home - Tales</title>
     <style>
+
         #upload-button {
             background: rgb(0, 97, 255) !important;
             background: linear-gradient(90deg, rgba(0, 97, 255, 1) 0%, rgba(255, 15, 123, 1) 100%) !important;

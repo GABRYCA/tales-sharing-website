@@ -10,6 +10,7 @@
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <title>Share - Tales</title>
     <style>
+
         #upload-button {
             background: rgb(0, 97, 255) !important;
             background: linear-gradient(90deg, rgba(0, 97, 255, 1) 0%, rgba(255, 15, 123, 1) 100%) !important;
@@ -685,9 +686,6 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     $('#comments').find("[data-comment-id='" + commentId + "']").parent().parent().parent().parent().parent().slideUp(300, function () {
                         $(this).remove();
                     });
-
-                    // Reload comments
-                    //reloadComments();
                 }
             });
         });

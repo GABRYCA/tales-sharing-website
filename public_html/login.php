@@ -7,6 +7,28 @@
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <title>Tales - Login</title>
     <style>
+        @import url('https://fonts.cdnfonts.com/css/roboto');
+
+        h1 {
+            font-family: 'Roboto', sans-serif !important;
+        }
+
+        p {
+            font-family: 'Roboto', sans-serif !important;
+        }
+
+        label {
+            font-family: 'Roboto', sans-serif !important;
+        }
+
+        button {
+            font-family: 'Roboto', sans-serif !important;
+        }
+
+        a {
+            font-family: 'Roboto', sans-serif !important;
+        }
+
         .btn-google {
             background-color: #4285f4;
             border-color: #4285f4;
@@ -19,7 +41,6 @@
             background-color: #357ae8;
             border-color: #357ae8;
         }
-
     </style>
 </head>
 <body class="font-monospace text-light bg-dark">
@@ -267,7 +288,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="col-12 col-lg-9 col-xxl-6">
                 <div class="row mt-4 mb-4">
                     <div class="col">
-                        <h1 class="text-center">Login</h1>
+                        <h1 class="text-center">Login - Tales</h1>
                     </div>
                 </div>
                 <div class="row m-1 mb-5 p-4 border border-light rounded-5">

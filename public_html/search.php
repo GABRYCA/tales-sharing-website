@@ -6,6 +6,28 @@
     ?>
     <title>Search - Tales</title>
     <style>
+        @import url('https://fonts.cdnfonts.com/css/roboto');
+
+        h1 {
+            font-family: 'Roboto', sans-serif !important;
+        }
+
+        p {
+            font-family: 'Roboto', sans-serif !important;
+        }
+
+        label {
+            font-family: 'Roboto', sans-serif !important;
+        }
+
+        button {
+            font-family: 'Roboto', sans-serif !important;
+        }
+
+        a {
+            font-family: 'Roboto', sans-serif !important;
+        }
+
         #upload-button {
             background: rgb(0, 97, 255) !important;
             background: linear-gradient(90deg, rgba(0, 97, 255, 1) 0%, rgba(255, 15, 123, 1) 100%) !important;

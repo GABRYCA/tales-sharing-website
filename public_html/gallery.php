@@ -9,6 +9,7 @@
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <title>Gallery - Tales</title>
     <style>
+
         #upload-button {
             background: rgb(0, 97, 255) !important;
             background: linear-gradient(90deg, rgba(0, 97, 255, 1) 0%, rgba(255, 15, 123, 1) 100%) !important;
@@ -306,7 +307,7 @@ $owner->loadUser();
             ?>
         </div>
 
-        <hr class="mt-1 mb-2">
+        <hr class="mt-1 mb-2 bg-gradient-custom">
 
         <!-- If it's the owner, add buttons to edit title of the gallery and manage it -->
         <?php
@@ -324,7 +325,7 @@ $owner->loadUser();
                         <i class="fas fa-trash"></i> Delete
                     </button>
                 </div>
-                <div class="col-4">
+                <div class="col-6 col-md-4 mt-3 mt-md-0">
                     <!-- Use a dropdown button with an icon and a label -->
                     <div class="dropdown">
                         <button class="btn btn-outline-custom dropdown-toggle" type="button" id="galleryDropdown" data-bs-toggle="dropdown" aria-expanded="false">
