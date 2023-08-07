@@ -24,6 +24,7 @@ $galleries = $user->getGalleries();
     <?php
     include_once (dirname(__FILE__) . "/common/common-head.php");
     ?>
+    <link rel="canonical" href="https://tales.anonymousgca.eu/upload-content">
     <title>Upload Content</title>
     <style>
 
@@ -56,16 +57,6 @@ $galleries = $user->getGalleries();
             background: #d2186e !important;
             font-weight: bolder !important;
             color: rgb(42, 42, 42) !important;
-        }
-
-        #dropdownMenuLink {
-            background: rgb(0, 97, 255) !important;
-            background: linear-gradient(90deg, rgba(0, 97, 255, 1) 0%, rgba(255, 15, 123, 1) 100%) !important;
-            transition: 0.4s ease-out !important;
-        }
-
-        #logout-button {
-            color: #FF0F7BFF !important;
         }
 
         .tag-input {

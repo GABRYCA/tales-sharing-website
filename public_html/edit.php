@@ -61,6 +61,7 @@ foreach ($galleries as $galleryCheck) {
     <?php
     include_once (dirname(__FILE__) . "/common/common-head.php");
     ?>
+    <link rel="canonical" href="https://tales.anonymousgca.eu/edit">
     <title>Edit Content - <?= $content->getTitle() ?></title>
     <style>
         .tag-input {

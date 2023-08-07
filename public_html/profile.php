@@ -4,42 +4,9 @@
     <?php
     include_once(dirname(__FILE__) . '/common/common-head.php');
     ?>
+    <link rel="canonical" href="https://tales.anonymousgca.eu/profile">
     <title>User Profile</title>
     <style>
-
-        #upload-button {
-            background: rgb(0, 97, 255) !important;
-            background: linear-gradient(90deg, rgba(0, 97, 255, 1) 0%, rgba(255, 15, 123, 1) 100%) !important;
-            transition: 0.7s ease-out !important;
-        }
-
-        #upload-button:hover, #dropdownMenuLink:hover {
-            background: #d2186e !important;
-            font-weight: bolder !important;
-            color: rgb(42, 42, 42) !important;
-        }
-
-        #dropdownMenuLink {
-            background: rgb(0, 97, 255) !important;
-            background: linear-gradient(90deg, rgba(0, 97, 255, 1) 0%, rgba(255, 15, 123, 1) 100%) !important;
-            transition: 0.4s ease-out !important;
-        }
-
-        #logout-button {
-            color: #FF0F7BFF !important;
-        }
-
-        #bell:hover {
-            cursor: pointer;
-        }
-
-        .new-notification {
-            background-color: rgba(255, 15, 123, 0.54) !important;
-        }
-
-        #profile-stats {
-            background: linear-gradient(90deg, rgb(255, 15, 123, 0.5) 0%, rgba(0, 97, 255, 0.5) 100%) !important;
-        }
 
         .fa-user {
             transition: 0.2s ease-out !important;
@@ -65,18 +32,6 @@
             color: #FF0F7BFF !important;
         }
 
-        .img-home {
-            max-height: 80vh !important;
-            transition: 0.2s ease-out !important;
-        }
-
-        .img-home:hover {
-            background-color: rgba(255, 15, 123, 0.54) !important;
-            box-shadow: 0 0 0 0.2rem rgba(255, 15, 123, 0.25) !important;
-            filter: brightness(1.1);
-            cursor: pointer;
-        }
-
         .gallery {
             transition: 0.2s ease-out !important;
         }
@@ -92,16 +47,8 @@
             transition: 0.2s ease-out !important;
         }
 
-        #profileIcon {
-            transition: 0.2s ease-out !important;
-        }
-
         .bg-image:hover {
             filter: brightness(0.9);
-        }
-
-        #profileIcon:hover {
-            filter: brightness(1.5);
         }
     </style>
 </head>
@@ -147,7 +94,6 @@ if (!empty($_GET['username'])){
 
 <div class="container-fluid">
     <!-- Navbar -->
-    <!-- Navbar -->
     <div class="row justify-content-between border-bottom pt-2 pb-2">
         <div class="col-2">
             <!-- Logo (common/favicon.webp) -->
@@ -160,7 +106,7 @@ if (!empty($_GET['username'])){
             <form class="w-100" action="search.php" method="GET">
                 <div class="input-group">
                     <input class="form-control form-control-sm border-0 rounded-3" type="search" placeholder="Search" aria-label="Search" name="search">
-                    <button class="btn btn-sm btn-outline-light" type="submit"><i class="fas fa-search"></i></button>
+                    <button class="btn btn-sm btn-outline-custom" type="submit"><i class="fas fa-search"></i></button>
                 </div>
             </form>
         </div>

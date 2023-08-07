@@ -4,44 +4,9 @@
     <?php
     include_once (dirname(__FILE__) . '/common/common-head.php');
     ?>
+    <link rel="canonical" href="https://tales.anonymousgca.eu/login">
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <title>Tales - Login</title>
-    <style>
-        @import url('https://fonts.cdnfonts.com/css/roboto');
-
-        h1 {
-            font-family: 'Roboto', sans-serif !important;
-        }
-
-        p {
-            font-family: 'Roboto', sans-serif !important;
-        }
-
-        label {
-            font-family: 'Roboto', sans-serif !important;
-        }
-
-        button {
-            font-family: 'Roboto', sans-serif !important;
-        }
-
-        a {
-            font-family: 'Roboto', sans-serif !important;
-        }
-
-        .btn-google {
-            background-color: #4285f4;
-            border-color: #4285f4;
-            color: #fff;
-            font-weight: bold;
-            border-radius: 0.5rem;
-        }
-
-        .btn-google:hover {
-            background-color: #357ae8;
-            border-color: #357ae8;
-        }
-    </style>
 </head>
 <body class="font-monospace text-light bg-dark">
 

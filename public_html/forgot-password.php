@@ -4,7 +4,8 @@
     <?php
     include_once (dirname(__FILE__) . '/common/common-head.php');
     ?>
-    <title>Forgot Password</title>
+    <link rel="canonical" href="https://tales.anonymousgca.eu/forgot-password">
+    <title>Forgot Password - Tales</title>
 </head>
 <body class="font-monospace text-light text-center pt-5 bg-dark">
 

@@ -4,50 +4,13 @@
     <?php
     include_once(dirname(__FILE__) . '/common/common-head.php');
     ?>
+    <link rel="canonical" href="https://tales.anonymousgca.eu/share">
     <script src="data/util/tinymce/js/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.3/purify.min.js"
             integrity="sha512-TBmnYz6kBCpcGbD55K7f4LZ+ykn3owqujFnUiTSHEto6hMA7aV4W7VDPvlqDjQImvZMKxoR0dNY5inyhxfZbmA=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <title>Share - Tales</title>
     <style>
-
-        #upload-button {
-            background: rgb(0, 97, 255) !important;
-            background: linear-gradient(90deg, rgba(0, 97, 255, 1) 0%, rgba(255, 15, 123, 1) 100%) !important;
-            transition: 0.7s ease-out !important;
-        }
-
-        #upload-button:hover, #dropdownMenuLink:hover {
-            background: #d2186e !important;
-            font-weight: bolder !important;
-            color: rgb(42, 42, 42) !important;
-        }
-
-        #dropdownMenuLink {
-            background: rgb(0, 97, 255) !important;
-            background: linear-gradient(90deg, rgba(0, 97, 255, 1) 0%, rgb(255, 15, 123) 100%) !important;
-            transition: 0.4s ease-out !important;
-        }
-
-        #logout-button {
-            color: #FF0F7BFF !important;
-        }
-
-        #image {
-            max-height: 90vh !important;
-        }
-
-        #bell:hover {
-            cursor: pointer;
-        }
-
-        .new-notification {
-            background-color: rgba(255, 15, 123, 0.54) !important;
-        }
-
-        #content-stats {
-            background: linear-gradient(90deg, rgb(255, 15, 123, 0.5) 0%, rgba(0, 97, 255, 0.5) 100%) !important;
-        }
 
         .fa-heart:hover {
             cursor: pointer;
@@ -78,16 +41,6 @@
             70% {
                 transform: scale(1);
             }
-        }
-
-        .btn-outline-custom {
-            border-color: rgba(255, 15, 123, 1) !important;
-            color: rgba(255, 15, 123, 1) !important;
-        }
-
-        .btn-outline-custom:hover {
-            background-color: rgba(255, 15, 123, 0.54) !important;
-            color: white !important;
         }
     </style>
 </head>

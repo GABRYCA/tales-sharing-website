@@ -7,84 +7,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.3/purify.min.js"
             integrity="sha512-TBmnYz6kBCpcGbD55K7f4LZ+ykn3owqujFnUiTSHEto6hMA7aV4W7VDPvlqDjQImvZMKxoR0dNY5inyhxfZbmA=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="canonical" href="https://tales.anonymousgca.eu/gallery">
     <title>Gallery - Tales</title>
     <style>
-
-        #upload-button {
-            background: rgb(0, 97, 255) !important;
-            background: linear-gradient(90deg, rgba(0, 97, 255, 1) 0%, rgba(255, 15, 123, 1) 100%) !important;
-            transition: 0.7s ease-out !important;
-        }
-
-        #upload-button:hover, #dropdownMenuLink:hover {
-            background: #d2186e !important;
-            font-weight: bolder !important;
-            color: rgb(42, 42, 42) !important;
-        }
-
-        #dropdownMenuLink {
-            background: rgb(0, 97, 255) !important;
-            background: linear-gradient(90deg, rgba(0, 97, 255, 1) 0%, rgb(255, 15, 123) 100%) !important;
-            transition: 0.4s ease-out !important;
-        }
-
-        #logout-button {
-            color: #FF0F7BFF !important;
-        }
-
-        #image {
-            max-height: 90vh !important;
-        }
-
-        #bell:hover {
-            cursor: pointer;
-        }
-
-        .new-notification {
-            background-color: rgba(255, 15, 123, 0.54) !important;
-        }
-
-        .img-home {
-            max-height: 80vh !important;
-            transition: 0.2s ease-out !important;
-        }
-
-        .img-home:hover {
-            background-color: rgba(255, 15, 123, 0.54) !important;
-            box-shadow: 0 0 0 0.2rem rgba(255, 15, 123, 0.25) !important;
-            filter: brightness(1.1);
-            cursor: pointer;
-        }
-
         .fa-eye {
             color: rgb(63, 135, 255) !important;
         }
 
         .fa-eye-slash {
             color: #FF0F7BFF !important;
-        }
-
-        .custom-btn {
-            background-color: transparent !important;
-            color: #FF0F7BFF !important;
-            border-color: #FF0F7BFF !important;
-            transition: 0.2s ease-out !important;
-        }
-
-        .custom-btn:hover {
-            color: #ffffff !important;
-            border-color: #FF0F7BFF !important;
-            background-color: rgba(255, 15, 123, 0.54) !important;
-        }
-
-        .btn-outline-custom {
-            border-color: rgba(255, 15, 123, 1) !important;
-            color: rgba(255, 15, 123, 1) !important;
-        }
-
-        .btn-outline-custom:hover {
-            background-color: rgba(255, 15, 123, 0.54) !important;
-            color: white !important;
         }
     </style>
 </head>
@@ -316,7 +247,7 @@ $owner->loadUser();
             <!-- Edit title button that opens a modal on click to edit it and also a delete button that opens a modal to confirm the deletion of the gallery -->
             <div class="row bg-light bg-opacity-10 p-2 px-0 px-lg-4 mx-0 mx-lg-1 rounded-4 justify-content-center text-center align-items-center">
                 <div class="col-4">
-                    <button type="button" class="btn btn-outline-primary custom-btn" data-bs-toggle="modal" data-bs-target="#editGalleryModal">
+                    <button type="button" class="btn btn-outline-primary btn-outline-custom" data-bs-toggle="modal" data-bs-target="#editGalleryModal">
                         <i class="fas fa-edit"></i> Rename
                     </button>
                 </div>

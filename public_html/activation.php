@@ -4,30 +4,8 @@
     <?php
     include_once (dirname(__FILE__) . '/common/common-head.php');
     ?>
-    <title>Activation</title>
-    <style>
-        @import url('https://fonts.cdnfonts.com/css/roboto');
-
-        h1 {
-            font-family: 'Roboto', sans-serif !important;
-        }
-
-        p {
-            font-family: 'Roboto', sans-serif !important;
-        }
-
-        label {
-            font-family: 'Roboto', sans-serif !important;
-        }
-
-        button {
-            font-family: 'Roboto', sans-serif !important;
-        }
-
-        a {
-            font-family: 'Roboto', sans-serif !important;
-        }
-    </style>
+    <link rel="canonical" href="https://tales.anonymousgca.eu/activation">
+    <title>Activation - Tales</title>
 </head>
 <body class="font-monospace text-light text-center pt-5 bg-dark">
 <?php
