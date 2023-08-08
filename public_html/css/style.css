@@ -19,6 +19,29 @@
     border-color: #357ae8 !important;
 }
 
+.btn-custom {
+    background-color: rgba(255, 15, 123, 0.54) !important;
+    color: white !important;
+    border-radius: 0.5rem;
+    border-color: rgba(255, 15, 123, 1) !important;
+}
+
+.btn-custom:hover {
+    background-color: rgba(255, 15, 123, 1) !important;
+    color: white !important;
+    border-color: #0061FFFF !important;
+}
+
+.btn-outline-custom {
+    border-color: rgba(255, 15, 123, 1) !important;
+    color: rgba(255, 15, 123, 1) !important;
+}
+
+.btn-outline-custom:hover {
+    background-color: rgba(255, 15, 123, 0.54) !important;
+    color: white !important;
+}
+
 .new-notification {
     background-color: rgba(255, 15, 123, 0.54) !important;
 }
@@ -42,16 +65,6 @@
 .user-icon-top:hover {
     background-color: rgba(255, 15, 123, 0.54) !important;
     box-shadow: 0 0 0 0.2rem rgba(255, 15, 123, 0.25) !important;
-}
-
-.btn-outline-custom {
-    border-color: rgba(255, 15, 123, 1) !important;
-    color: rgba(255, 15, 123, 1) !important;
-}
-
-.btn-outline-custom:hover {
-    background-color: rgba(255, 15, 123, 0.54) !important;
-    color: white !important;
 }
 
 .row-horizon {

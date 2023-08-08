@@ -278,10 +278,10 @@ foreach ($galleries as $galleryCheck) {
                             <p class="fs-4 text-center">Create new gallery:</p>
                             <div class="row justify-content-center">
                                 <div class="col-9 p-0">
-                                    <input type="text" class="form-control" id="newGallery" placeholder="New Gallery" name="newGallery">
+                                    <input type="text" class="form-control rounded-end-0" id="newGallery" placeholder="New Gallery" name="newGallery">
                                 </div>
-                                <div class="col-3 px-1">
-                                    <button class="btn btn-primary w-100 border border-0" id="createGallery" title="Create new empty gallery">+</button>
+                                <div class="col-3 ms-0 ps-0">
+                                    <button class="btn btn-custom w-100 ms-0 rounded-start-0 px-1" id="createGallery" title="Create new empty gallery">+</button>
                                 </div>
                             </div>
                         </div>
@@ -301,11 +301,11 @@ foreach ($galleries as $galleryCheck) {
                 <p class="fs-4 text-center">Options:</p>
                 <!-- Checkmarks isPrivate and isAI -->
                 <div class="col-6 col-lg-3 text-center">
-                    <input class="form-check-input" type="checkbox" role="switch" id="isPrivate" name="isPrivate">
+                    <input class="form-check-input" type="checkbox" role="switch" id="isPrivate" name="isPrivate" title="Set the content as private so only you can see it">
                     <label class="form-check-label" for="isPrivate">Private</label>
                 </div>
                 <div class="col-6 col-lg-3 text-center">
-                    <input class="form-check-input" type="checkbox" role="switch" id="isAI" name="isAI">
+                    <input class="form-check-input" type="checkbox" role="switch" id="isAI" name="isAI" title="Set the content as AI generated for good measure">
                     <label class="form-check-label" for="isAI">AI - Generated</label>
                 </div>
             </div>
@@ -325,15 +325,15 @@ foreach ($galleries as $galleryCheck) {
             <div class="row mb-3 mt-5 justify-content-center">
                 <div class="col-5 col-lg-2">
                     <!-- Cancel button -->
-                    <button class="btn btn-secondary w-100 pt-2 pb-2 border border-0 fs-4" id="cancel">Cancel</button>
+                    <button class="btn btn-secondary w-100 pt-2 pb-2 border border-0 fs-4" id="cancel" title="Close the page and go back to original content share">Cancel</button>
                 </div>
                 <div class="col-5 col-lg-2 ps-0">
                     <!-- Submit button -->
-                    <button class="btn btn-success w-100 pt-2 pb-2 border border-0 fs-4" id="upload">Save</button>
+                    <button class="btn btn-success w-100 pt-2 pb-2 border border-0 fs-4" id="upload" title="Save changes">Save</button>
                 </div>
                 <div class="col-2 col-lg-2 ps-0">
                     <!-- Trash button fontawesome to delete content, on click will open modal for confirmation -->
-                    <button class="btn btn-danger w-100 pt-2 pb-2 border border-0 fs-4" id="delete" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fas fa-trash-alt"></i></button>
+                    <button class="btn btn-danger w-100 pt-2 pb-2 border border-0 fs-4" id="delete" data-bs-toggle="modal" data-bs-target="#deleteModal" title="Delete your content, CAREFUL! This's irreversible!"><i class="fas fa-trash-alt"></i></button>
                 </div>
             </div>
         </div>
@@ -529,14 +529,14 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
                         icon: 'info',
                         position: 'top-right',
                         hideAfter: 3000,
-                        loaderBg: '#ff0f7b'
+                        bgColor: '#6600e1',
+                        textColor: '#fff',
+                        loaderBg: '#ff0f7b',
+                        afterHidden: function () {
+                            // Send user to share.php?id=lastID
+                            window.location.href = "share.php?id=" + <?= $contentId ?>;
+                        }
                     });
-
-                    // After 3 seconds, reload the page
-                    setTimeout(function() {
-                        // Send user to share.php?id=lastID
-                        window.location.href = "share.php?id=" + <?= $contentId ?>;
-                    }, 3000);
                 },
                 error: function(error) {
                     // Toast with error from upload.php

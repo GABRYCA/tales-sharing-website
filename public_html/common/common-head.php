@@ -1,7 +1,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Tales is a social media platform where you can share your arts and stories with the world. Join now and discover amazing creations from other talented artists and storytellers">
+<meta name="description" content="Tales is a social media platform where you can share your arts and stories with the world. Join now and discover amazing creations from other artists and storytellers">
 <meta name="keywords" content="Tales, art, stories, social media, creative">
 <meta name="robots" content="index, follow">
 <meta name="author" content="AnonymousGCA">

@@ -276,7 +276,7 @@ $owner->loadUser();
                         $tags = $content->getTagsOfContent();
                         foreach ($tags as $tag) {
                             echo '<div class="col-auto text-center p-0">';
-                            echo '<a href="search.php?tag=' . $tag->getName() . '" class="btn btn-outline-light m-1">' . $tag->getName() . '</a>';
+                            echo '<a href="search.php?search=' . $tag->getName() . '" class="btn btn-outline-light m-1">' . $tag->getName() . '</a>';
                             echo '</div>';
                         }
                         ?>
@@ -364,7 +364,7 @@ $owner->loadUser();
                                     <i class="fas fa-comment text-light opacity-50" style="font-size: 24px;"></i>
                                 </div>
                                 <div class="col-auto">
-                                    <h6 class="d-inline"><?= $content->getNumberOfComments() ?></h6>
+                                    <h6 class="d-inline" id="commentsNumber"><?= $content->getNumberOfComments() ?></h6>
                                 </div>
                             </div>
                         </div>
@@ -372,7 +372,7 @@ $owner->loadUser();
                 </div>
             </div>
 
-            <div class="row mt-4">
+            <div class="row mt-4 mb-3">
                 <div class="col-12">
                     <p><?= html_entity_decode($content->getDescription()) ?></>
                 </div>
@@ -612,8 +612,22 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     // Create a new comment element and prepend it to the comments section, with also an animation (slideDown)
                     $(commentHtml).prependTo('#comments').hide().slideDown(300);
 
-                    // For debug only.
-                    //reloadComments();
+                    // Toast
+                    $.toast({
+                        heading: 'Success',
+                        text: 'Comment added successfully',
+                        showHideTransition: 'slide',
+                        icon: 'success',
+                        position: 'top-right',
+                        hideAfter: 1700,
+                        bgColor: '#6600e1',
+                        textColor: '#fff',
+                        loaderBg: '#ff0f7b'
+                    });
+
+                    // Update #commentsNumber
+                    var commentsNumber = parseInt($('#commentsNumber').text());
+                    $('#commentsNumber').text(commentsNumber + 1);
                 }
             });
         });
@@ -639,6 +653,23 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     $('#comments').find("[data-comment-id='" + commentId + "']").parent().parent().parent().parent().parent().slideUp(300, function () {
                         $(this).remove();
                     });
+
+                    // Toast
+                    $.toast({
+                        heading: 'Success',
+                        text: 'Comment deleted successfully',
+                        showHideTransition: 'slide',
+                        icon: 'success',
+                        position: 'top-right',
+                        hideAfter: 1700,
+                        bgColor: '#6600e1',
+                        textColor: '#fff',
+                        loaderBg: '#ff0f7b'
+                    });
+
+                    // Update #commentsNumber
+                    var commentsNumber = parseInt($('#commentsNumber').text());
+                    $('#commentsNumber').text(commentsNumber - 1);
                 }
             });
         });

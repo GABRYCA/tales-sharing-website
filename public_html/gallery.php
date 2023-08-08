@@ -330,7 +330,7 @@ $owner->loadUser();
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary custom-btn" id="renameGallery">Save changes</button>
+                            <button type="button" class="btn btn-outline-custom" id="renameGallery">Save changes</button>
                         </div>
                     </div>
                 </div>

@@ -352,10 +352,10 @@ $galleries = $user->getGalleries();
                             <p class="fs-4 text-center">Create new gallery:</p>
                             <div class="row justify-content-center">
                                 <div class="col-9 p-0">
-                                    <input type="text" class="form-control" id="newGallery" placeholder="New Gallery" name="newGallery">
+                                    <input type="text" class="form-control rounded-end-0" id="newGallery" placeholder="New Gallery" name="newGallery">
                                 </div>
-                                <div class="col-3 px-1">
-                                    <button class="btn btn-primary w-100 border border-0" id="createGallery" title="Create new empty gallery">+</button>
+                                <div class="col-3 ms-0 ps-0">
+                                    <button class="btn btn-custom w-100 ms-0 rounded-start-0 px-1" id="createGallery" title="Create new empty gallery">+</button>
                                 </div>
                             </div>
                         </div>
