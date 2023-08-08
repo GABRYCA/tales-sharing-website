@@ -518,6 +518,7 @@ if (!empty($_GET['username'])){
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-outline-custom" id="generateRandomProfileImage">Generate Random Image</button>
                         <button type="button" class="btn btn-primary" id="saveProfileImage">Save changes</button>
                     </div>
                 </div>
@@ -643,6 +644,50 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                 $('#profileImagePreview').html('<img src="' + dataURL + '" class="img-fluid">');
             };
             reader.readAsDataURL(file);
+        });
+    });
+
+    $(function() {
+        $('#generateRandomProfileImage').click(function() {
+            // Ajax to server, if success send success toast and reload page, if error send error toast.
+            $.ajax({
+                url: 'actions/updateProfile.php',
+                type: 'POST',
+                data: {
+                    action: 'randomProfileImage'
+                },
+                success: function(data) {
+                    // Close Modal.
+                    $('#profileImageModal').modal('hide');
+
+                    // Send jquery toast to user telling success and data, then when it closes reload the page.
+                    $.toast({
+                        title: 'Success',
+                        icon: 'success',
+                        text: data,
+                        type: 'success',
+                        position: "top-center",
+                        hideAfter: 3000,
+                        bgColor: '#6600e1',
+                        textColor: '#fff',
+                        loaderBg: '#ff0f7b',
+                        afterHidden: function () {
+                            location.reload();
+                        }
+                    });
+                },
+                error: function(xhr, status, error) {
+                    // Send jquery toast to user telling error and data.
+                    $.toast({
+                        title: 'Error',
+                        icon: 'error',
+                        text: xhr.responseText + ", " + error + ", " + status,
+                        type: 'error',
+                        loaderBg: '#ff0f7b',
+                        position: "top-center"
+                    });
+                }
+            });
         });
     });
 

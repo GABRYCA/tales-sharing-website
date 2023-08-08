@@ -325,7 +325,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
 
             exit("Profile cover updated successfully.");
+        }
 
+        case 'randomProfileImage':
+        {
+            if ($user->generateAndSetUniqueProfileImage()){
+                exit("Profile icon updated successfully.");
+            } else {
+                exit($user->getErrorStatus());
+            }
         }
 
         default: {

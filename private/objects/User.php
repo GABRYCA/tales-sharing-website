@@ -7,6 +7,7 @@ include_once (dirname(__FILE__) . "/../objects/Friends.php");
 include_once (dirname(__FILE__) . "/../objects/Likes.php");
 include_once (dirname(__FILE__) . "/../objects/Notification.php");
 include_once (dirname(__FILE__) . "/../objects/VariablesConfig.php");
+include_once (dirname(__FILE__) . "/../objects/UniqueImage.php");
 
 class User implements JsonSerializable
 {
@@ -213,6 +214,14 @@ class User implements JsonSerializable
                 $this->deleteUserFromDatabase();
                 return false;
             }
+
+            // TODO: TEST IF IT ACTUALLY WORKS ON USER REGISTRATION.
+            if ($this->generateAndSetUniqueProfileImage()){
+                // $this->setErrorStatus("Profile picture generated successfully!");
+            } else {
+                $this->setErrorStatus("Profile picture generation failed!");
+                return false;
+            }
         } else {
             return false;
         }
@@ -376,6 +385,25 @@ class User implements JsonSerializable
         }
         return true;
     }
+
+    /**
+     * Function to generate random unique image
+     * Please set name and load user before calling this function.
+     * @return bool
+     */
+    public function generateAndSetUniqueProfileImage() : bool
+    {
+        $uniqueImageObject = new UniqueImage($this->username);
+
+        if ($uniqueImageObject->createUniqueProfileImage()) {
+            // Reload user
+            $this->reloadData();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 
     /**
      * Function to change user password.
