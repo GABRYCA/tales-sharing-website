@@ -517,9 +517,9 @@ if (!empty($_GET['username'])){
                         <div id="profileImagePreview"></div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-outline-custom" id="generateRandomProfileImage">Generate Random Image</button>
-                        <button type="button" class="btn btn-primary" id="saveProfileImage">Save changes</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-outline-custom" id="generateRandomProfileImage" title="Careful! This will replace your current icon!">Random Image</button>
+                        <button type="button" class="btn btn-custom" id="saveProfileImage">Save changes</button>
                     </div>
                 </div>
             </div>
@@ -541,7 +541,7 @@ if (!empty($_GET['username'])){
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="saveProfileCover">Save changes</button>
+                        <button type="button" class="btn btn-outline-custom" id="saveProfileCover">Save changes</button>
                     </div>
                 </div>
             </div>

@@ -462,8 +462,10 @@ $owner->loadUser();
                                                 <ul class="dropdown-menu" aria-labelledby="commentOptionsButton">
                                                     <li>
                                                         <button class="dropdown-item btn btn-outline-danger text-danger"
-                                                                id="deleteCommentButton"
-                                                                data-comment-id="<?= $comment->getCommentId() ?>"><i
+                                                                id="deleteCommentButtonModal"
+                                                                data-comment-id="<?= $comment->getCommentId() ?>"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#deleteCommentModal"><i
                                                                     class="fas fa-times"></i> Delete
                                                         </button>
                                                     </li>
@@ -515,6 +517,26 @@ $owner->loadUser();
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-outline-custom">Save changes</button>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete comment modal -->
+    <div class="modal fade" id="deleteCommentModal" tabindex="-1" aria-labelledby="deleteCommentModalLabel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteCommentModalLabel">Delete Comment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="h6 pt-3">Are you sure you want to delete this comment?</p>
+                    <p class="fs-6 opacity-50">This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-outline-custom" id="deleteCommentButton">Delete</button>
                 </div>
             </div>
         </div>
@@ -601,7 +623,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                         '<i class="fas fa-ellipsis-v me-2"></i>' +
                         '</button>' +
                         '<ul class="dropdown-menu" aria-labelledby="commentOptionsButton">' +
-                        '<li><button class="dropdown-item btn btn-outline-danger text-danger" id="deleteCommentButton" data-comment-id="' + comment.commentId + '"><i class="fas fa-times"></i> Delete</button></li>' +
+                        '<li><button class="dropdown-item btn btn-outline-danger text-danger" id="deleteCommentButtonModal" data-comment-id="' + comment.commentId + '" data-bs-toggle="modal" data-bs-target="#deleteCommentModal"><i class="fas fa-times"></i> Delete</button></li>' +
                         '<li><button class="dropdown-item btn btn-outline-primary" id="editCommentButton" data-comment-id="' + comment.commentId + '"><i class="fas fa-edit"></i> Edit</button></li>' +
                         '</ul>' +
                         '</div>' +
@@ -632,10 +654,33 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
             });
         });
 
-        // Handle comment delete
-        $('#comments').on("click", "#deleteCommentButton", function () {
+        var commentId;
+
+        // Handle comment edit
+        $('#comments').on("click", "#deleteCommentButtonModal", function () {
             // Get the comment id
-            var commentId = $(this).data("comment-id");
+            commentId = $(this).data("comment-id");
+            console.log("Comment id: " + commentId);
+        });
+
+        // Handle comment delete
+        $('#deleteCommentModal').on("click", "#deleteCommentButton", function () {
+
+            // Check if commentId is set
+            if (commentId === undefined) {
+                console.log("Comment id not set");
+                // Error toast
+                $.toast({
+                    heading: 'Error',
+                    text: 'Comment id not set',
+                    showHideTransition: 'slide',
+                    icon: 'error',
+                    position: 'top-right',
+                    loaderBg: '#ff0f7b'
+                });
+                return;
+            }
+
             // Send a post request to the server to delete the comment
             $.ajax({
                 type: "POST",
@@ -648,6 +693,9 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                 success: function (response) {
                     // If the comment was deleted successfully
                     console.log("Comment deleted successfully");
+
+                    // Close modal
+                    $('#deleteCommentModal').modal('hide');
 
                     // If comment deleted with success, remove it from the comments section, with an animation effect (the opposite of addComment)
                     $('#comments').find("[data-comment-id='" + commentId + "']").parent().parent().parent().parent().parent().slideUp(300, function () {
@@ -673,8 +721,6 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                 }
             });
         });
-
-        var commentId;
 
         // Handle comment edit
         $('#comments').on("click", "#editCommentButton", function () {
@@ -773,7 +819,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                         '<i class="fas fa-ellipsis-v me-2"></i>' +
                         '</button>' +
                         '<ul class="dropdown-menu" aria-labelledby="commentOptionsButton">' +
-                        '<li><button class="dropdown-item btn btn-outline-danger text-danger" id="deleteCommentButton" data-comment-id="' + comment.commentId + '"><i class="fas fa-times"></i> Delete</button></li>' +
+                        '<li><button class="dropdown-item btn btn-outline-danger text-danger" id="deleteCommentButtonModal" data-comment-id="' + comment.commentId + '" data-bs-toggle="modal" data-bs-target="#deleteCommentModal"><i class="fas fa-times"></i> Delete</button></li>' +
                         '<li><button class="dropdown-item btn btn-outline-primary" id="editCommentButton" data-comment-id="' + comment.commentId + '"><i class="fas fa-edit"></i> Edit</button></li>' +
                         '</ul>' +
                         '</div>' +
@@ -874,12 +920,14 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                             '</div>' +
                             '</div>' +
                             '<div class="col-auto">' +
-                            '<div class="row justify-content-center">' +
-                            '<div class="col-auto">' +
-                            '<button class="btn btn-outline-danger" id="deleteCommentButton" data-comment-id="' + comment.commentId + '">' +
-                            '<i class="fas fa-times"></i>' +
+                            '<div class="dropdown">' +
+                            '<button class="btn btn-outline-custom dropdown-toggle" type="button" id="commentOptionsButton" data-bs-toggle="dropdown" aria-expanded="false">' +
+                            '<i class="fas fa-ellipsis-v me-2"></i>' +
                             '</button>' +
-                            '</div>' +
+                            '<ul class="dropdown-menu" aria-labelledby="commentOptionsButton">' +
+                            '<li><button class="dropdown-item btn btn-outline-danger text-danger" id="deleteCommentButtonModal" data-comment-id="' + comment.commentId + '" data-bs-toggle="modal" data-bs-target="#deleteCommentModal"><i class="fas fa-times"></i> Delete</button></li>' +
+                            '<li><button class="dropdown-item btn btn-outline-primary" id="editCommentButton" data-comment-id="' + comment.commentId + '"><i class="fas fa-edit"></i> Edit</button></li>' +
+                            '</ul>' +
                             '</div>' +
                             '</div>' +
                             '</div>' +

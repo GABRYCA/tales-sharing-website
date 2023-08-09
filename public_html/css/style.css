@@ -6,6 +6,11 @@
     background-color: rgb(14, 17, 22) !important;
 }
 
+/* Custom transparent background with bootstrap dark color and opacity */
+.bg-opacity-90 {
+    background-color: rgba(14, 17, 22, 0.9) !important;
+}
+
 .btn-google {
     background-color: #4285f4;
     border-color: #4285f4;
@@ -29,7 +34,7 @@
 .btn-custom:hover {
     background-color: rgba(255, 15, 123, 1) !important;
     color: white !important;
-    border-color: #0061FFFF !important;
+    border-color: #ffffff !important;
 }
 
 .btn-outline-custom {
