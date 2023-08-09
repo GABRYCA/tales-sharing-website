@@ -551,6 +551,115 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
 <script src="data/util/tinymce/js/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
 
+    function Comment(comment) {
+        // Assign the comment properties to the instance
+        this.commentId = comment.commentId;
+        this.commentUsername = comment.commentUsername;
+        this.commentUserIconUrl = comment.commentUserIconUrl;
+        this.commentDate = comment.commentDate;
+        this.commentText = comment.commentText;
+
+        Comment.prototype.render = function () {
+            return `
+    <div class="col-12">
+      <div class="row">
+        <div class="col-auto">
+          <div class="row justify-content-center">
+            <div class="col-auto">
+              <a href="profile.php?username=${this.commentUsername}" class="text-decoration-none">
+                <img src="${this.commentUserIconUrl}" class="rounded-circle" style="width: 50px; height: 50px;">
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="row">
+            <div class="col-12">
+              <div class="row">
+                <div class="col-12">
+                  <h6 class="d-inline">${this.commentUsername}</h6>
+                  <p class="d-inline opacity-50"> ${this.commentDate}</p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <p>${this.commentText}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-auto">
+          <div class="dropdown">
+            <button class="btn btn-outline-custom dropdown-toggle" type="button" id="commentOptionsButton" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-ellipsis-v me-2"></i>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="commentOptionsButton">
+              <li><button class="dropdown-item btn btn-outline-danger text-danger" id="deleteCommentButtonModal" data-comment-id="${this.commentId}" data-bs-toggle="modal" data-bs-target="#deleteCommentModal"><i class="fas fa-times"></i> Delete</button></li>
+              <li><button class="dropdown-item btn btn-outline-primary" id="editCommentButton" data-comment-id="${this.commentId}"><i class="fas fa-edit"></i> Edit</button></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+        };
+
+        Comment.prototype.renderAlt = function () {
+            return `
+    <div class="col-12">
+      <div class="row">
+        <div class="col-auto">
+          <div class="row justify-content-center">
+            <div class="col-auto">
+              <a href="profile.php?username=${this.commentUsername}" class="text-decoration-none">
+                <img src="${this.commentUserIconUrl}" class="rounded-circle" style="width: 50px; height: 50px;">
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="row">
+            <div class="col-12">
+              <div class="row">
+                <div class="col-12">
+                  <h6 class="d-inline">${this.commentUsername}</h6>
+                  <p class="d-inline opacity-50"> ${this.commentDate}</p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <p>${this.commentText}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+        };
+    }
+
+    // Util function to get, set, increase and decrease the comments number
+    function CommentsNumber() {
+        // Use const to declare a constant variable
+        const commentsNumberElement = $("#commentsNumber");
+
+        // Use arrow function for prototype method
+        CommentsNumber.prototype.get = () => parseInt(commentsNumberElement.text());
+
+        // Use arrow function for prototype method
+        CommentsNumber.prototype.set = (number) => commentsNumberElement.text(number);
+
+        // Use arrow function for prototype method
+        CommentsNumber.prototype.increase = () => commentsNumberElement.text(parseInt(commentsNumberElement.text()) + 1);
+
+        // Use arrow function for prototype method
+        CommentsNumber.prototype.decrease = () => commentsNumberElement.text(parseInt(commentsNumberElement.text()) - 1);
+    }
+
+
     $(function () {
         // Handle comment submit
         $('#commentForm').on("submit", function (e) {
@@ -570,7 +679,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                 return;
             }
             // Get the content id
-            var contentId = <?= $content->getContentId() ?>;
+            let contentId = <?= $content->getContentId() ?>;
             // Send a post request to the server to add the comment
             $.ajax({
                 type: "POST",
@@ -585,51 +694,10 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     console.log("Comment added successfully");
                     // Delete input text
                     $('#comment').val("");
-                    // Add to the comments section, with an animation effect, as innerHTML the new comment
-                    // Read JSON from response
-                    var comment = JSON.parse(response);
-                    // Create the comment html, with also the delete/edit comment button.
-                    var commentHtml = '<div class="col-12">' +
-                        '<div class="row">' +
-                        '<div class="col-auto">' +
-                        '<div class="row justify-content-center">' +
-                        '<div class="col-auto">' +
-                        '<a href="profile.php?username=' + comment.commentUsername + '" class="text-decoration-none">' +
-                        '<img src="' + comment.commentUserIconUrl + '" class="rounded-circle" style="width: 50px; height: 50px;">' +
-                        '</a>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>' +
-                        '<div class="col">' +
-                        '<div class="row">' +
-                        '<div class="col-12">' +
-                        '<div class="row">' +
-                        '<div class="col-12">' +
-                        '<h6 class="d-inline">' + comment.commentUsername + '</h6>' +
-                        '<p class="d-inline opacity-50"> ' + comment.commentDate + '</p>' +
-                        '</div>' +
-                        '</div>' +
-                        '<div class="row">' +
-                        '<div class="col-12">' +
-                        '<p>' + comment.commentText + '</p>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>' +
-                        '<div class="col-auto">' +
-                        '<div class="dropdown">' +
-                        '<button class="btn btn-outline-custom dropdown-toggle" type="button" id="commentOptionsButton" data-bs-toggle="dropdown" aria-expanded="false">' +
-                        '<i class="fas fa-ellipsis-v me-2"></i>' +
-                        '</button>' +
-                        '<ul class="dropdown-menu" aria-labelledby="commentOptionsButton">' +
-                        '<li><button class="dropdown-item btn btn-outline-danger text-danger" id="deleteCommentButtonModal" data-comment-id="' + comment.commentId + '" data-bs-toggle="modal" data-bs-target="#deleteCommentModal"><i class="fas fa-times"></i> Delete</button></li>' +
-                        '<li><button class="dropdown-item btn btn-outline-primary" id="editCommentButton" data-comment-id="' + comment.commentId + '"><i class="fas fa-edit"></i> Edit</button></li>' +
-                        '</ul>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>';
+
+                    // Init Comment.
+                    let commentElement = new Comment(JSON.parse(response));
+                    let commentHtml = commentElement.render();
 
                     // Create a new comment element and prepend it to the comments section, with also an animation (slideDown)
                     $(commentHtml).prependTo('#comments').hide().slideDown(300);
@@ -648,8 +716,8 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     });
 
                     // Update #commentsNumber
-                    var commentsNumber = parseInt($('#commentsNumber').text());
-                    $('#commentsNumber').text(commentsNumber + 1);
+                    let commentsNumber = new CommentsNumber();
+                    commentsNumber.increase();
                 }
             });
         });
@@ -691,8 +759,9 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     action: "deleteComment"
                 },
                 success: function (response) {
-                    // If the comment was deleted successfully
-                    console.log("Comment deleted successfully");
+
+                    // Log for debug purposes.
+                    console.log("Comment deleted successfully, status: " + response);
 
                     // Close modal
                     $('#deleteCommentModal').modal('hide');
@@ -716,8 +785,8 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     });
 
                     // Update #commentsNumber
-                    var commentsNumber = parseInt($('#commentsNumber').text());
-                    $('#commentsNumber').text(commentsNumber - 1);
+                    let commentsNumber = new CommentsNumber();
+                    commentsNumber.decrease();
                 }
             });
         });
@@ -782,50 +851,10 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     $('#comments').find("[data-comment-id='" + commentId + "']").parent().parent().parent().parent().parent().slideUp(300, function () {
                         $(this).remove();
                     });
-                    // Read JSON message.
-                    var comment = JSON.parse(response);
-                    // Create the comment html, with also the delete/edit comment button.
-                    var commentHtml = '<div class="col-12">' +
-                        '<div class="row">' +
-                        '<div class="col-auto">' +
-                        '<div class="row justify-content-center">' +
-                        '<div class="col-auto">' +
-                        '<a href="profile.php?username=' + comment.commentUsername + '" class="text-decoration-none">' +
-                        '<img src="' + comment.commentUserIconUrl + '" class="rounded-circle" style="width: 50px; height: 50px;">' +
-                        '</a>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>' +
-                        '<div class="col">' +
-                        '<div class="row">' +
-                        '<div class="col-12">' +
-                        '<div class="row">' +
-                        '<div class="col-12">' +
-                        '<h6 class="d-inline">' + comment.commentUsername + '</h6>' +
-                        '<p class="d-inline opacity-50"> ' + comment.commentDate + '</p>' +
-                        '</div>' +
-                        '</div>' +
-                        '<div class="row">' +
-                        '<div class="col-12">' +
-                        '<p>' + comment.commentText + '</p>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>' +
-                        '<div class="col-auto">' +
-                        '<div class="dropdown">' +
-                        '<button class="btn btn-outline-custom dropdown-toggle" type="button" id="commentOptionsButton" data-bs-toggle="dropdown" aria-expanded="false">' +
-                        '<i class="fas fa-ellipsis-v me-2"></i>' +
-                        '</button>' +
-                        '<ul class="dropdown-menu" aria-labelledby="commentOptionsButton">' +
-                        '<li><button class="dropdown-item btn btn-outline-danger text-danger" id="deleteCommentButtonModal" data-comment-id="' + comment.commentId + '" data-bs-toggle="modal" data-bs-target="#deleteCommentModal"><i class="fas fa-times"></i> Delete</button></li>' +
-                        '<li><button class="dropdown-item btn btn-outline-primary" id="editCommentButton" data-comment-id="' + comment.commentId + '"><i class="fas fa-edit"></i> Edit</button></li>' +
-                        '</ul>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>';
+
+                    // Init comment element
+                    let commentElement = new Comment(JSON.parse(response));
+                    var commentHtml = commentElement.render();
 
                     // Add the comment in the same position where it got removed
                     $('#comments').find("[data-comment-id='" + commentId + "']").parent().parent().parent().parent().parent().after(commentHtml);
@@ -890,82 +919,19 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                     var comment = commentsArray[i];
                     // InnerHTML each comment, also check isOwner, if true, add button to delete comment.
                     if (comment.isOwner) {
-                        commentsDiv.append(
-                            '<div class="col-12">' +
-                            '<div class="row">' +
-                            '<div class="col-auto">' +
-                            '<div class="row justify-content-center">' +
-                            '<div class="col-auto">' +
-                            '<a href="profile.php?username=' + comment.commentUsername + '" class="text-decoration-none">' +
-                            '<img src="' + comment.commentUserIconUrl + '" class="rounded-circle" style="width: 50px; height: 50px;">' +
-                            '</a>' +
-                            '</div>' +
-                            '</div>' +
-                            '</div>' +
-                            '<div class="col">' +
-                            '<div class="row">' +
-                            '<div class="col-12">' +
-                            '<div class="row">' +
-                            '<div class="col-12">' +
-                            '<h6 class="d-inline">' + comment.commentUsername + '</h6>' +
-                            '<p class="d-inline opacity-50"> ' + comment.commentDate + '</p>' +
-                            '</div>' +
-                            '</div>' +
-                            '<div class="row">' +
-                            '<div class="col-12">' +
-                            '<p>' + comment.commentText + '</p>' +
-                            '</div>' +
-                            '</div>' +
-                            '</div>' +
-                            '</div>' +
-                            '</div>' +
-                            '<div class="col-auto">' +
-                            '<div class="dropdown">' +
-                            '<button class="btn btn-outline-custom dropdown-toggle" type="button" id="commentOptionsButton" data-bs-toggle="dropdown" aria-expanded="false">' +
-                            '<i class="fas fa-ellipsis-v me-2"></i>' +
-                            '</button>' +
-                            '<ul class="dropdown-menu" aria-labelledby="commentOptionsButton">' +
-                            '<li><button class="dropdown-item btn btn-outline-danger text-danger" id="deleteCommentButtonModal" data-comment-id="' + comment.commentId + '" data-bs-toggle="modal" data-bs-target="#deleteCommentModal"><i class="fas fa-times"></i> Delete</button></li>' +
-                            '<li><button class="dropdown-item btn btn-outline-primary" id="editCommentButton" data-comment-id="' + comment.commentId + '"><i class="fas fa-edit"></i> Edit</button></li>' +
-                            '</ul>' +
-                            '</div>' +
-                            '</div>' +
-                            '</div>' +
-                            '</div>'
-                        );
+
+                        // Init comment.
+                        let commentElement = new Comment(comment);
+                        let commentHtml = commentElement.render();
+
+                        commentsDiv.append(commentHtml);
                     } else {
-                        commentsDiv.append(
-                            '<div class="col-12">' +
-                            '<div class="row">' +
-                            '<div class="col-auto">' +
-                            '<div class="row justify-content-center">' +
-                            '<div class="col-auto">' +
-                            '<a href="profile.php?username=' + comment.commentUsername + '" class="text-decoration-none">' +
-                            '<img src="' + comment.commentUserIconUrl + '" class="rounded-circle" style="width: 50px; height: 50px;">' +
-                            '</a>' +
-                            '</div>' +
-                            '</div>' +
-                            '</div>' +
-                            '<div class="col">' +
-                            '<div class="row">' +
-                            '<div class="col-12">' +
-                            '<div class="row">' +
-                            '<div class="col-12">' +
-                            '<h6 class="d-inline">' + comment.commentUsername + '</h6>' +
-                            '<p class="d-inline opacity-50"> ' + comment.commentDate + '</p>' +
-                            '</div>' +
-                            '</div>' +
-                            '<div class="row">' +
-                            '<div class="col-12">' +
-                            '<p>' + comment.commentText + '</p>' +
-                            '</div>' +
-                            '</div>' +
-                            '</div>' +
-                            '</div>' +
-                            '</div>' +
-                            '</div>' +
-                            '</div>'
-                        );
+
+                        // Init comment.
+                        let commentElement = new Comment(comment);
+                        let commentHtml = commentElement.renderAlt();
+
+                        commentsDiv.append(commentHtml);
                     }
                 }
             }
