@@ -361,7 +361,7 @@ if (!empty($_GET['username'])){
             // For each Content, print it out.
             // If there are no content, print out a message.
             if (count($contentArray) === 0) {
-                echo '<div class="col-12"><h1 class="display-6 text-center">There is no content to show!</h1></div>';
+                echo '<div class="col-12"><h1 class="display-6 text-center">There isn\'t content to show!</h1></div>';
             } else {
 
                 // For each content make an icon to visit his profile
@@ -392,7 +392,7 @@ if (!empty($_GET['username'])){
             // For each Content, print it out.
             // If there are no content, print out a message.
             if (count($galleryArray) === 0) {
-                echo '<div class="col-12"><h1 class="display-6 text-center">There are not galleries to show!</h1></div>';
+                echo '<div class="col-12"><h1 class="display-6 text-center">There aren\'t galleries to show!</h1></div>';
             } else {
                 // Show galleries and also their name.
                 foreach ($galleryArray as $gallery) {
@@ -667,7 +667,7 @@ include_once(dirname(__FILE__) . '/common/common-body.php');
                         text: data,
                         type: 'success',
                         position: "top-center",
-                        hideAfter: 3000,
+                        hideAfter: 1500,
                         bgColor: '#6600e1',
                         textColor: '#fff',
                         loaderBg: '#ff0f7b',
