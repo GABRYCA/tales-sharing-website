@@ -201,10 +201,16 @@ class User implements JsonSerializable
 
             $to = $this->getEmail();
             $subject = "Account Activation - Tales";
-            $headers = "From: " . VariablesConfig::$emailNoreply;
-            $message = "Hi " . $this->getUsername() . ",\\n";
-            $message .= "Thank you for registering! Please click on the link below to activate your account.\\n";
-            $message .= "https://tales.anonymousgca.eu/activation.php?code=" . $this->getActivationCode();
+            $headers = "From: " . VariablesConfig::$emailNoreply . "\r\n";
+            $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+            $headers .= "Reply-To: " . VariablesConfig::$emailNoreply . "\r\n";
+            $headers .= "Return-Path: " . VariablesConfig::$emailNoreply . "\r\n";
+            $headers .= "X-Mailer: PHP/" . phpversion() . "\r\n";
+            $message = "<html lang='en'><body>";
+            $message .= "<p>Hi " . $this->getUsername() . ",</p><br>";
+            $message .= "<p>Thank you for registering to " . VariablesConfig::$websiteName . "! Please click on the link below to activate your account.</p><br>";
+            $message .= "<a href='" . VariablesConfig::$domain . "activation.php?code=" . $this->getActivationCode() . "'>Activate Account</a>";
+            $message .= "</body></html>";
 
             if (@mail($to, $subject, $message, $headers)) {
                 $this->setErrorStatus("Email sent successfully!");
@@ -214,6 +220,7 @@ class User implements JsonSerializable
                 $this->deleteUserFromDatabase();
                 return false;
             }
+
 
             // TODO: TEST IF IT ACTUALLY WORKS ON USER REGISTRATION.
             if ($this->generateAndSetUniqueProfileImage()){

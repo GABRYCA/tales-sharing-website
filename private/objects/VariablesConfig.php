@@ -9,6 +9,7 @@ class VariablesConfig implements JsonSerializable
     public static $profileImage = "profile.webp";
     public static $profileCover = "cover.webp";
     public static $urlCoverGallery = "common/assets/cover.webp";
+    public static $websiteName = "TalesGCA";
 
     // Function to get the domain
     static public function getDomain(): string
@@ -38,6 +39,12 @@ class VariablesConfig implements JsonSerializable
     static public function getUrlCoverGallery(): string
     {
         return self::$urlCoverGallery;
+    }
+
+    // Function to get the website name
+    static public function getWebsiteName(): string
+    {
+        return self::$websiteName;
     }
 
     public function jsonSerialize(): mixed

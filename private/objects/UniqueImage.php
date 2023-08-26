@@ -88,7 +88,7 @@ class UniqueImage
 
 
         // Save image to the server
-        $this->setPath(save_image($image, $this->name, $this->name));
+        $this->setPath($this->save_image($image, $this->name, $this->name));
 
         // Save new URL profile picture
         if (!$user->changeProfilePicture($this->path)) {
@@ -101,8 +101,16 @@ class UniqueImage
         return true;
     }
 
-    // Function to save the image to the server and returns the path.
-    private function save_image($image, $user_id, $title)
+    /**
+     * Function to create a unique image
+     *
+     * @param string $image base64 decoded image
+     * @param string $user_id
+     * @param string $title
+     *
+     * @return string
+     */
+    private function save_image($image, $user_id, $title): string
     {
         // Make sure that title doesn't break paths.
         $title = preg_replace("/([^\w\s\d\-_~,;[\]\(\).])/", "", $title);
@@ -123,12 +131,11 @@ class UniqueImage
         $uniqueid = uniqid();
 
         // Create directories if there aren't already
-        if (!file_exists(dirname(__FILE__) . "/../data/profile/" . $user_id . "/gallery/images/")) {
-            mkdir(dirname(__FILE__) . "/../data/profile/" . $user_id . "/gallery/images/", 0777, true);
+        if (!file_exists(dirname(__FILE__) . "/../../public_html/data/profile/" . $user_id . "/gallery/images/")) {
+            mkdir(dirname(__FILE__) . "/../../public_html/data/profile/" . $user_id . "/gallery/images/", 0777, true);
         }
         // Save the image to the server as a .webp
-        imagewebp($new_image, dirname(__FILE__) . "/../data/profile/" . $user_id . "/gallery/images/" . $title . "-" . $uniqueid . ".webp", 80);
-        // Get the image path.
+        imagewebp($new_image, dirname(__FILE__) . "/../../public_html/data/profile/" . $user_id . "/gallery/images/" . $title . "-" . $uniqueid . ".webp", 80);
 
         // Return the image path
         return VariablesConfig::$domain . "data/profile/" . $user_id . "/gallery/images/" . $title . "-" . $uniqueid . ".webp";
