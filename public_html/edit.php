@@ -396,15 +396,45 @@ include_once (dirname(__FILE__) . "/common/common-body.php");
         content_css: 'dark',
         block_unsupported_drop: true,
         branding: false,
-        convert_fonts_to_spans: false,
         setup: function (editor) {
             editor.on('init', function (e) {
                 editor.setContent(content);
             });
         },
-        images_upload_handler: function () {},
-        plugins: 'link',
-        default_link_target: '_blank'
+        images_upload_handler: () => Promise.reject({
+            remove: true,
+            // Send message to the user that the image could not be uploaded
+            message: 'You can\'t upload images in the description.',
+        }),
+        plugins: 'link autolink wordcount charmap code fullscreen',
+        default_link_target: '_blank',
+        toolbar_mode: 'sliding',
+        toolbar: [
+            {
+                name: 'history',
+                items: ['undo', 'redo']
+            },
+            {
+                name: 'links',
+                items: ['link']
+            },
+            {
+                name: 'formatting',
+                items: ['bold', 'italic']
+            },
+            {
+                name: 'alignment',
+                items: ['alignleft', 'aligncenter', 'alignright', 'alignjustify']
+            },
+            {
+                name: 'indentation',
+                items: ['outdent', 'indent']
+            },
+            {
+                name: 'tools',
+                items: ['wordcount', 'charmap', 'code', 'fullscreen']
+            }
+        ]
     });
 
     $(function (){
