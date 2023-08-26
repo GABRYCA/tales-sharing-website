@@ -276,7 +276,7 @@ $owner->loadUser();
                         $tags = $content->getTagsOfContent();
                         foreach ($tags as $tag) {
                             echo '<div class="col-auto text-center p-0">';
-                            echo '<a href="search.php?search=' . $tag->getName() . '" class="btn btn-outline-light m-1">' . $tag->getName() . '</a>';
+                            echo '<a href="search.php?search=' . preg_replace('/\s+/', '_', $tag->getName()) . '" class="btn btn-outline-light m-1">' . $tag->getName() . '</a>';
                             echo '</div>';
                         }
                         ?>

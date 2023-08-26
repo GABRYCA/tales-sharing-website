@@ -46,6 +46,8 @@ if (isset($_GET["search"])) {
     $searchTags = array_filter($searchTags);
     // Remove duplicates from the array
     $searchTags = array_unique($searchTags);
+    // Replace underscores with spaces
+    $searchTags = str_replace("_", " ", $searchTags);
 }
 
 ?>
