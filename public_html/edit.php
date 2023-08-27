@@ -281,7 +281,7 @@ foreach ($galleries as $galleryCheck) {
                                     <input type="text" class="form-control rounded-end-0" id="newGallery" placeholder="New Gallery" name="newGallery">
                                 </div>
                                 <div class="col-3 ms-0 ps-0">
-                                    <button class="btn btn-custom w-100 ms-0 rounded-start-0 px-1" id="createGallery" title="Create new empty gallery">+</button>
+                                    <button class="btn btn-custom w-100 ms-0 rounded-start-0 px-1" id="createGallery" data-bs-toggle="tooltip" data-bs-placement="top" title="Create new empty gallery">+</button>
                                 </div>
                             </div>
                         </div>
@@ -301,11 +301,11 @@ foreach ($galleries as $galleryCheck) {
                 <p class="fs-4 text-center">Options:</p>
                 <!-- Checkmarks isPrivate and isAI -->
                 <div class="col-6 col-lg-3 text-center">
-                    <input class="form-check-input" type="checkbox" role="switch" id="isPrivate" name="isPrivate" title="Set the content as private so only you can see it">
+                    <input class="form-check-input" type="checkbox" role="switch" id="isPrivate" name="isPrivate" data-bs-toggle="tooltip" data-bs-placement="top" title="Set the content as private so only you can see it">
                     <label class="form-check-label" for="isPrivate">Private</label>
                 </div>
                 <div class="col-6 col-lg-3 text-center">
-                    <input class="form-check-input" type="checkbox" role="switch" id="isAI" name="isAI" title="Set the content as AI generated for good measure">
+                    <input class="form-check-input" type="checkbox" role="switch" id="isAI" name="isAI" data-bs-toggle="tooltip" data-bs-placement="top" title="Set the content as AI generated for good measure">
                     <label class="form-check-label" for="isAI">AI - Generated</label>
                 </div>
             </div>
@@ -325,11 +325,11 @@ foreach ($galleries as $galleryCheck) {
             <div class="row mb-3 mt-5 justify-content-center">
                 <div class="col-5 col-lg-2">
                     <!-- Cancel button -->
-                    <button class="btn btn-secondary w-100 pt-2 pb-2 border border-0 fs-4" id="cancel" title="Close the page and go back to original content share">Cancel</button>
+                    <button class="btn btn-secondary w-100 pt-2 pb-2 border border-0 fs-4" id="cancel" data-bs-toggle="tooltip" data-bs-placement="top" title="Close the page and go back to original content share">Cancel</button>
                 </div>
                 <div class="col-5 col-lg-2 ps-0">
                     <!-- Submit button -->
-                    <button class="btn btn-success w-100 pt-2 pb-2 border border-0 fs-4" id="upload" title="Save changes">Save</button>
+                    <button class="btn btn-success w-100 pt-2 pb-2 border border-0 fs-4" id="upload" data-bs-toggle="tooltip" data-bs-placement="top" title="Save changes">Save</button>
                 </div>
                 <div class="col-2 col-lg-2 ps-0">
                     <!-- Trash button fontawesome to delete content, on click will open modal for confirmation -->

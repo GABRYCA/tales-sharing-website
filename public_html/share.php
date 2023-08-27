@@ -109,7 +109,7 @@ $owner->loadUser();
         <div class="col-2">
             <!-- Logo (common/favicon.webp) -->
             <a href="home.php">
-                <img src="common/favicon.webp" alt="GCA's Baseline" width="40" height="40">
+                <img src="common/favicon.webp" alt="GCA's Baseline" width="40" height="40" data-bs-toggle="tooltip" data-bs-placement="right" title="Homepage">
             </a>
         </div>
         <!-- Search box here -->
@@ -145,7 +145,7 @@ $owner->loadUser();
                             echo '<p class="text-white">You have no notifications.</p>';
                         } else {
                             // Button to delete all notification that appears only on hover of the dropdown.
-                            echo '<button class="btn btn-outline-danger w-100 btn-sm" id="delete-notifications" title="Click to delete all notifications">Clear all</button>';
+                            echo '<button class="btn btn-outline-danger w-100 btn-sm" id="delete-notifications" data-bs-toggle="tooltip" data-bs-placement="left" title="Click to delete all notifications">Clear all</button>';
                             echo '<hr class="text-white notification-divider">';
                             foreach ($notifications as $notification) {
                                 $title = $notification->getTitle();
@@ -293,7 +293,7 @@ $owner->loadUser();
                     echo '<div class="col-auto">';
                     echo '<div class="row justify-content-center">';
                     echo '<div class="col-auto">';
-                    echo '<a href="edit.php?id=' . $content->getContentId() . '" class="btn btn-outline-light fs-6" id="edit-button" title="Edit"><i class="fas fa-edit"></i> Edit</a>';
+                    echo '<a href="edit.php?id=' . $content->getContentId() . '" class="btn btn-outline-light fs-6" id="edit-button" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i class="fas fa-edit"></i> Edit</a>';
                     echo '</div>';
                     echo '</div>';
                     echo '</div>';

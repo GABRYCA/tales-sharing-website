@@ -69,7 +69,7 @@ $owner->loadUser();
         <div class="col-2">
             <!-- Logo (common/favicon.webp) -->
             <a href="home.php">
-                <img src="common/favicon.webp" alt="GCA's Baseline" width="40" height="40">
+                <img src="common/favicon.webp" alt="GCA's Baseline" width="40" height="40" data-bs-toggle="tooltip" data-bs-placement="right" title="Homepage">
             </a>
         </div>
         <!-- Search box here -->

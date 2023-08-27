@@ -98,7 +98,7 @@ if (!empty($_GET['username'])){
         <div class="col-2">
             <!-- Logo (common/favicon.webp) -->
             <a href="home.php">
-                <img src="common/favicon.webp" alt="GCA's Baseline" width="40" height="40">
+                <img src="common/favicon.webp" alt="GCA's Baseline" width="40" height="40" data-bs-toggle="tooltip" data-bs-placement="right" title="Homepage">
             </a>
         </div>
         <!-- Search box here -->
@@ -133,7 +133,7 @@ if (!empty($_GET['username'])){
                             echo '<p class="text-white">You have no notifications.</p>';
                         } else {
                             // Button to delete all notification that appears only on hover of the dropdown.
-                            echo '<button class="btn btn-outline-danger w-100 btn-sm" id="delete-notifications" title="Click to delete all notifications">Clear all</button>';
+                            echo '<button class="btn btn-outline-danger w-100 btn-sm" id="delete-notifications" data-bs-toggle="tooltip" data-bs-placement="left" title="Click to delete all notifications">Clear all</button>';
                             echo '<hr class="text-white notification-divider">';
                             foreach ($notifications as $notification) {
                                 $title = $notification->getTitle();
@@ -336,8 +336,8 @@ if (!empty($_GET['username'])){
             <div class="col-auto bg-light bg-opacity-10 pt-2 pb-2 rounded-3">
                 <div class="d-flex align-items-center">
                     <span class="me-2">Show:</span>
-                    <div id="all-btn" class="btn btn-outline-light active rounded-end-0 opacity-75">All</div>
-                    <div id="gallery-btn" class="btn btn-outline-light rounded-start-0 opacity-75">Galleries</div>
+                    <div id="all-btn" class="btn btn-outline-light active rounded-end-0 opacity-75" data-bs-toggle="tooltip" data-bs-placement="top" title="Show content">All</div>
+                    <div id="gallery-btn" class="btn btn-outline-light rounded-start-0 opacity-75" data-bs-toggle="tooltip" data-bs-placement="top" title="Show galleries">Galleries</div>
                 </div>
             </div>
         </div>
@@ -366,7 +366,7 @@ if (!empty($_GET['username'])){
 
                 // For each content make an icon to visit his profile
                 foreach ($contentArray as $content) {
-                    echo '<div class="col-12 col-lg-4 col-xxl-3">';
+                    echo '<div class="col-12 col-lg-4 col-xxl-3" data-bs-toggle="tooltip" data-bs-placement="top" title="Open content">';
                     echo '<div class="img-wrapper position-relative text-center">';
                     echo '<img src="' . $content->getUrlImage() . '" alt="image" class="img-fluid rounded-4 img-thumbnail img-home" loading="lazy" onclick="window.location.href = \'/share.php?id=' . $content->getContentId() . '\'" data-aos="fade-up">';
                     echo '</div>';
@@ -396,7 +396,7 @@ if (!empty($_GET['username'])){
             } else {
                 // Show galleries and also their name.
                 foreach ($galleryArray as $gallery) {
-                    echo '<div class="col-12 col-lg-4 col-xxl-3" onclick="window.location.href = \'gallery.php?id=' . $gallery->getGalleryId() . '\'">';
+                    echo '<div class="col-12 col-lg-4 col-xxl-3" onclick="window.location.href = \'gallery.php?id=' . $gallery->getGalleryId() . '\'" data-bs-toggle="tooltip" data-bs-placement="top" title="Open gallery">';
                     echo '<div class="img-wrapper position-relative text-center gallery">';
                     echo '<img src="' . $gallery->getUrlCoverGallery() . '" alt="image-cover" class="img-fluid rounded-4 img-thumbnail img-home" loading="lazy" data-aos="fade-up">';
                     echo '<div class="img-overlay position-absolute top-0 start-0 w-100 h-100 rounded-4" style="background-color: rgba(0, 0, 0, 0.5);"></div>';

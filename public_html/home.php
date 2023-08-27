@@ -38,7 +38,7 @@ $user->loadUser();
         <div class="col-2">
             <!-- Logo (common/favicon.webp) -->
             <a href="home.php">
-                <img src="common/favicon.webp" alt="GCA's Baseline" width="40" height="40">
+                <img src="common/favicon.webp" alt="GCA's Baseline" width="40" height="40" data-bs-toggle="tooltip" data-bs-placement="right" title="Homepage">
             </a>
         </div>
         <!-- Search box here -->
@@ -73,7 +73,7 @@ $user->loadUser();
                             echo '<p class="text-white">You have no notifications.</p>';
                         } else {
                             // Button to delete all notification that appears only on hover of the dropdown.
-                            echo '<button class="btn btn-outline-danger w-100 btn-sm" id="delete-notifications" title="Click to delete all notifications">Clear all</button>';
+                            echo '<button class="btn btn-outline-danger w-100 btn-sm" id="delete-notifications" data-bs-toggle="tooltip" data-bs-placement="left" title="Click to delete all notifications">Clear all</button>';
                             echo '<hr class="text-white notification-divider">';
                             foreach ($notifications as $notification) {
                                 $title = $notification->getTitle();
@@ -197,7 +197,7 @@ $user->loadUser();
             echo '<div class="col-12"><h1 class="display-6 text-center">There is no content to show!</h1></div>';
         } else {
             foreach ($contentArray as $content) {
-                echo '<div class="col-12 col-lg-4 col-xxl-3 d-flex align-items-stretch px-0 px-lg-2">';
+                echo '<div class="col-12 col-lg-4 col-xxl-3 d-flex align-items-stretch px-0 px-lg-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Open content">';
                 echo '<div class="card border-0 bg-placeholder img-home w-100" data-aos="fade-up" onclick="window.location.href = \'/share.php?id=' . $content->getContentId() . '\'">';
                 echo '<div class="card-img-top img-wrapper position-relative text-center w-100 lazy-background" data-background="' . encode_url($content->getUrlImage()) . '" style="background-size: cover; background-position: center; height: 45vh;">';
                 echo '</div>';

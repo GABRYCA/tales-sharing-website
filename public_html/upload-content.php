@@ -170,7 +170,7 @@ $galleries = $user->getGalleries();
                             echo '<p class="text-white">You have no notifications.</p>';
                         } else {
                             // Button to delete all notification that appears only on hover of the dropdown.
-                            echo '<button class="btn btn-outline-danger w-100 btn-sm" id="delete-notifications" title="Click to delete all notifications">Clear all</button>';
+                            echo '<button class="btn btn-outline-danger w-100 btn-sm" id="delete-notifications" data-bs-toggle="tooltip" data-bs-placement="left" title="Click to delete all notifications">Clear all</button>';
                             echo '<hr class="text-white notification-divider">';
                             foreach ($notifications as $notification) {
                                 $title = $notification->getTitle();
@@ -355,7 +355,7 @@ $galleries = $user->getGalleries();
                                     <input type="text" class="form-control rounded-end-0" id="newGallery" placeholder="New Gallery" name="newGallery">
                                 </div>
                                 <div class="col-3 ms-0 ps-0">
-                                    <button class="btn btn-custom w-100 ms-0 rounded-start-0 px-1" id="createGallery" title="Create new empty gallery">+</button>
+                                    <button class="btn btn-custom w-100 ms-0 rounded-start-0 px-1" id="createGallery" data-bs-toggle="tooltip" data-bs-placement="top" title="Create new empty gallery">+</button>
                                 </div>
                             </div>
                         </div>
@@ -375,11 +375,11 @@ $galleries = $user->getGalleries();
                 <p class="fs-4 text-center">Options:</p>
                 <!-- Checkmarks isPrivate and isAI -->
                 <div class="col-6 col-lg-3 text-center">
-                    <input class="form-check-input" type="checkbox" role="switch" id="isPrivate" name="isPrivate">
+                    <input class="form-check-input" type="checkbox" role="switch" id="isPrivate" name="isPrivate" data-bs-toggle="tooltip" data-bs-placement="top" title="Set the content as private">
                     <label class="form-check-label" for="isPrivate">Private</label>
                 </div>
                 <div class="col-6 col-lg-3 text-center">
-                    <input class="form-check-input" type="checkbox" role="switch" id="isAI" name="isAI">
+                    <input class="form-check-input" type="checkbox" role="switch" id="isAI" name="isAI" data-bs-toggle="tooltip" data-bs-placement="top" title="Set the content as AI generated">
                     <label class="form-check-label" for="isAI">AI - Generated</label>
                 </div>
             </div>
@@ -399,7 +399,7 @@ $galleries = $user->getGalleries();
             <div class="row mb-3 mt-5 justify-content-center">
                 <div class="col-12 col-lg-6">
                     <!-- Submit button -->
-                    <button class="btn btn-primary w-100 pt-2 pb-2 border border-0 fs-4" id="upload" title="Submit content">Submit</button>
+                    <button class="btn btn-primary w-100 pt-2 pb-2 border border-0 fs-4" id="upload" title="Submit content" data-bs-toggle="tooltip" data-bs-placement="top">Submit</button>
                 </div>
             </div>
 
