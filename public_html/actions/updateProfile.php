@@ -261,7 +261,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
 
             // Save image (convert it also to webp)
-            $path = save_image($file, $user->getUsername(), VariablesConfig::$profileImage);
+            $path = save_image($file, $user->getUsername(), VariablesConfig::$profileImage, 150, 150);
 
             // Load image from path (an URL now and also check if it fails)
             $image = imagecreatefromstring(file_get_contents($path));
@@ -313,7 +313,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
 
             // Save image (convert it also to webp)
-            $path = save_image($file, $user->getUsername(), VariablesConfig::$profileCover);
+            $path = save_image($file, $user->getUsername(), VariablesConfig::$profileCover, 2160, 1440);
 
             // Load image from path (an URL now and also check if it fails)
             $image = imagecreatefromstring(file_get_contents($path));
@@ -349,22 +349,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 // Function to save the image to the server and returns the path.
-function save_image($image, $user_id, $title) {
+function save_image($image, $user_id, $title, $max_width = null, $max_height = null) {
     // Make sure that title doesn't break paths.
     $title = preg_replace("/([^\w\s\d\-_~,;[\]\(\).])/", "", $title);
 
     // Create a new image from the decoded image data.
     $image = imagecreatefromstring($image);
-    // Get the image width.
     $image_width = imagesx($image);
-    // Get the image height.
     $image_height = imagesy($image);
-    // Create a new image with the same width and height, keeping transparent background if there's.
-    $new_image = imagecreatetruecolor($image_width, $image_height);
+    // If max width and max height are not set, use the original image dimensions
+    if ($max_width === null) {
+        $max_width = $image_width;
+    }
+    if ($max_height === null) {
+        $max_height = $image_height;
+    }
+    // Calculate the scaling factor based on the max width and height
+    $scale = min($max_width / $image_width, $max_height / $image_height);
+    // Calculate the new width and height after scaling
+    $new_width = round($image_width * $scale);
+    $new_height = round($image_height * $scale);
+    // Create a new image with the new width and height, keeping transparent background if there's.
+    $new_image = imagecreatetruecolor($new_width, $new_height);
     // Set the flag to save full alpha channel information.
     imagesavealpha($new_image, true);
-    // Copy the image to the new image.
-    imagecopy($new_image, $image, 0, 0, 0, 0, $image_width, $image_height);
+    // Copy and resize the image to the new image.
+    imagecopyresampled($new_image, $image, 0, 0, 0, 0, $new_width, $new_height, $image_width, $image_height);
     // The uniqueid
     $uniqueid = uniqid();
 
