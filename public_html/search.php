@@ -299,7 +299,7 @@ if (isset($_GET["search"])) {
                         $content = new Content();
                         $content->setContentId($row["contentId"]);
                         $content->loadContent();
-                        echo '<div class="col-12 col-lg-4 col-xxl-3 d-flex align-items-stretch px-0 px-lg-2">';
+                        echo '<div class="col-12 col-lg-4 col-xxl-3 d-flex align-items-stretch px-0 px-lg-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Open content">';
                         echo '<div class="card border-0 bg-placeholder img-home w-100" data-aos="fade-up" onclick="window.location.href = \'/share.php?id=' . $content->getContentId() . '\'">';
                         echo '<div class="card-img-top img-wrapper position-relative text-center w-100 lazy-background" data-background="' . encode_url($content->getUrlImage()) . '" style="background-size: cover; background-position: center; height: 45vh;">';
                         echo '</div>';

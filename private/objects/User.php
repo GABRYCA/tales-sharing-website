@@ -222,9 +222,8 @@ class User implements JsonSerializable
             }
 
 
-            // TODO: TEST IF IT ACTUALLY WORKS ON USER REGISTRATION.
             if ($this->generateAndSetUniqueProfileImage()){
-                // $this->setErrorStatus("Profile picture generated successfully!");
+                $this->setErrorStatus("Profile picture generated successfully!");
             } else {
                 $this->setErrorStatus("Profile picture generation failed!");
                 return false;

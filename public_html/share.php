@@ -240,7 +240,7 @@ $owner->loadUser();
                     <div class="col-12 rounded-3 text-center px-0">
                         <a href="<?= $content->getUrlImage() ?>" target="_blank">
                             <img src="<?= $content->getUrlImage() ?>" class="img-fluid rounded-3" id="image"
-                                 alt="Image">
+                                 alt="Image" data-bs-toggle="tooltip" data-bs-placement="top" title="Fullscreen">
                         </a>
                     </div>
                 </div>
@@ -254,7 +254,7 @@ $owner->loadUser();
                         <div class="col-3 text-end">
                             <a href="profile.php?username=<?= $content->getOwnerId(); ?>" class="m-auto">
                                 <img src="<?= $owner->getUrlProfilePicture(); ?>"
-                                     class="img-fluid rounded-circle border-gradient" alt="Profile Picture" width="100">
+                                     class="img-fluid rounded-circle border-gradient" alt="Profile Picture" width="100" data-bs-toggle="tooltip" data-bs-placement="top" title="Artist's profile">
                             </a>
                         </div>
                         <!-- Title and owner name of content -->
@@ -327,9 +327,9 @@ $owner->loadUser();
                                     <?php
                                     // If has liked content, use fas fa-heart, else use far fa-heart
                                     if ($user->hasLikedContent($content->getContentId())) {
-                                        echo '<i class="fas fa-heart text-danger" style="font-size: 24px;" id="likeButton"></i>';
+                                        echo '<i class="fas fa-heart text-danger" style="font-size: 24px;" id="likeButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Unlike"></i>';
                                     } else {
-                                        echo '<i class="far fa-heart text-danger" style="font-size: 24px;" id="likeButton"></i>';
+                                        echo '<i class="far fa-heart text-danger" style="font-size: 24px;" id="likeButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Like"></i>';
                                     }
                                     ?>
                                 </div>
@@ -346,7 +346,7 @@ $owner->loadUser();
                         <div class="col-auto">
                             <div class="row justify-content-center d-flex align-items-center">
                                 <div class="col-auto pe-0 d-flex align-items-center">
-                                    <i class="fas fa-eye text-primary-emphasis opacity-75" style="font-size: 24px;"></i>
+                                    <i class="fas fa-eye text-primary-emphasis opacity-75" style="font-size: 24px;" data-bs-toggle="tooltip" data-bs-placement="top" title="Views"></i>
                                 </div>
                                 <div class="col-auto pe-0">
                                     <h6 class="d-inline"><?= $content->getNumberOfViews() ?></h6>
@@ -361,7 +361,7 @@ $owner->loadUser();
                         <div class="col-auto">
                             <div class="row justify-content-center d-flex align-items-center">
                                 <div class="col-auto pe-0 d-flex align-items-center">
-                                    <i class="fas fa-comment text-light opacity-50" style="font-size: 24px;"></i>
+                                    <i class="fas fa-comment text-light opacity-50" style="font-size: 24px;" data-bs-toggle="tooltip" data-bs-placement="top" title="Comments"></i>
                                 </div>
                                 <div class="col-auto">
                                     <h6 class="d-inline" id="commentsNumber"><?= $content->getNumberOfComments() ?></h6>
@@ -398,7 +398,7 @@ $owner->loadUser();
                                 </div>
                                 <div class="row justify-content-end mt-2">
                                     <div class="col-12">
-                                        <button type="submit" class="btn btn-outline-custom w-100">Submit comment
+                                        <button type="submit" class="btn btn-outline-custom w-100" data-bs-toggle="tooltip" data-bs-placement="top" title="Send comment">Submit comment
                                         </button>
                                     </div>
                                 </div>
@@ -424,7 +424,7 @@ $owner->loadUser();
                                         <div class="row justify-content-center">
                                             <div class="col-auto">
                                                 <a href="profile.php?username=<?= $commenter->getUsername() ?>"
-                                                   class="text-decoration-none">
+                                                   class="text-decoration-none" data-bs-toggle="tooltip" data-bs-placement="left" title="User's profile">
                                                     <img src="<?= $commenter->getUrlProfilePicture() ?>"
                                                          class="rounded-circle" style="width: 50px; height: 50px;">
                                                 </a>
