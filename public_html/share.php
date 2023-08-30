@@ -239,7 +239,7 @@ $owner->loadUser();
                     <!-- Image -->
                     <div class="col-12 rounded-3 text-center px-0">
                         <a href="<?= $content->getUrlImage() ?>" target="_blank">
-                            <img src="<?= $content->getUrlImage() ?>" class="img-fluid rounded-3" id="image"
+                            <img src="<?= $content->getUrlImage() ?>" class="img-fluid rounded-3" id="image" style="max-height: 85vh;"
                                  alt="Image" data-bs-toggle="tooltip" data-bs-placement="top" title="Fullscreen">
                         </a>
                     </div>
